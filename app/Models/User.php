@@ -39,6 +39,8 @@ class User extends Authenticatable
         ];
     }
 
+    
+
     // --- RELATIONS ---
 
     public function memberships()
@@ -57,30 +59,34 @@ class User extends Authenticatable
      * Helper untuk Cek Harga Visit.
      * Logika: Paket Aktif (0) > Member Aktif (7k) > Tamu (15k)
      */
-    public function getVisitPrice()
-    {
-        // 1. Prioritas: Cek apakah punya paket bulanan yang belum expired
-        $hasActivePackage = $this->memberships()
-            ->where('status', 'active')
-            ->where('end_date', '>=', now()->toDateString())
-            ->exists();
+  public function getVisitPrice()
+{
+    // cek paket aktif
+    $hasActivePackage = $this->memberships()
+        ->where('status', 'active')
+        ->whereDate('end_date', '>=', now())
+        ->exists();
 
-        if ($hasActivePackage) {
-            return 0;
-        }
-
-        // 2. Prioritas: Cek status aktivasi member (bayar 80k seumur hidup)
-        if ($this->is_active_member) {
-            $price = Setting::where('key', 'visit_member')->value('value');
-
-            return (int) ($price ?? 7000); // Default 7k jika setting belum diisi
-        }
-
-        // 3. Terakhir: Harga Tamu Umum
-        $price = Setting::where('key', 'visit_tamu')->value('value');
-
-        return (int) ($price ?? 15000); // Default 15k jika setting belum diisi
+    // GRATIS jika punya paket aktif
+    if ($hasActivePackage) {
+        return 0;
     }
+
+    // member aktivasi
+    if ($this->is_active_member) {
+
+        $price = Setting::where('key', 'visit_member')
+            ->value('value');
+
+        return (int) ($price ?? 7000);
+    }
+
+    // tamu umum
+    $price = Setting::where('key', 'visit_tamu')
+        ->value('value');
+
+    return (int) ($price ?? 15000);
+}
 
     public function latestMembership()
     {
@@ -96,4 +102,10 @@ class User extends Authenticatable
     {
         return $this->hasMany(Attendance::class);
     }
+    public function activeMembership()
+{
+    return $this->hasOne(Membership::class)
+        ->where('status', 'active')
+        ->latestOfMany();
+}
 }

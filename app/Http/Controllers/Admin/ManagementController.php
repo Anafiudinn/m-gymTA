@@ -16,8 +16,8 @@ class ManagementController extends Controller
 public function members(Request $request)
 {
     $query = User::with([
-        'latestMembership',
-        'ptMemberships'
+        'ptMemberships',
+        'activeMembership'
     ])->where('role', 'member');
 
     if ($request->filled('search')) {

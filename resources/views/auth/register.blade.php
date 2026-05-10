@@ -9,11 +9,12 @@
             <x-input-error :messages="$errors->get('name')" class="mt-2" />
         </div>
 
-        <!-- Email Address -->
+       {{-- wa  --}}
         <div class="mt-4">
-            <x-input-label for="email" :value="__('Email')" />
-            <x-text-input id="email" class="block mt-1 w-full" type="email" name="email" :value="old('email')" required autocomplete="username" />
-            <x-input-error :messages="$errors->get('email')" class="mt-2" />
+            <x-input-label for="whatsapp" :value="__('WhatsApp Number')" />
+            <x-text-input id="whatsapp" class="block mt-1 w-full" type="text" name="whatsapp" :value="old('whatsapp')" required autocomplete="whatsapp" />
+            <x-input-error :messages="$errors->get('whatsapp')" class="mt-2" />
+        
         </div>
 
         <!-- Password -->

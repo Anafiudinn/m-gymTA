@@ -15,136 +15,151 @@ class AttendanceController extends Controller
     public function index(Request $request)
     {
         $user = null;
-        $price = 15000;
+
+        $price = \App\Models\Setting::where('key', 'visit_tamu')
+            ->value('value') ?? 15000;
+
         $status_label = 'Tamu Umum';
 
-        // Search member
+        // =====================================================
+        // SEARCH USER
+        // =====================================================
         if ($request->filled('search')) {
 
             $user = User::where('whatsapp', $request->search)
-                        ->orWhere('member_code', $request->search)
-                        ->first();
+                ->orWhere('member_code', $request->search)
+                ->first();
 
             if ($user) {
 
-                // Guest account
+                // harga otomatis dari helper User model
+                $price = $user->getVisitPrice();
+
+                // guest
                 if ($user->role === 'guest') {
 
-                    $price = 15000;
                     $status_label = 'Tamu Umum';
-
                 }
 
-                // Active member
+                // punya paket aktif
+                elseif ($price == 0) {
+
+                    $status_label = 'Member Bulanan Aktif';
+                }
+
+                // aktivasi member
                 elseif ($user->is_active_member) {
 
-                    $hasActivePackage = $user->memberships()
-                        ->where('status', 'active')
-                        ->where('end_date', '>=', now())
-                        ->exists();
-
-                    if ($hasActivePackage) {
-
-                        $price = 0;
-                        $status_label = 'Member (Paket Aktif)';
-
-                    } else {
-
-                        $price = 7000;
-                        $status_label = 'Member (Tanpa Paket)';
-
-                    }
-
+                    $status_label = 'Member Aktivasi (Visit)';
                 }
 
-                // Not active member
+                // belum aktivasi
                 else {
 
-                    $price = 15000;
-                    $status_label = 'Member Belum Aktivasi';
-
+                    $status_label = 'Belum Aktivasi Member';
                 }
             }
         }
 
-        // History tamu harian
-        $historyTamu = Attendance::with('user')
-            ->whereDate('created_at', now())
-            ->whereNotNull('guest_name')
+        // =====================================================
+        // ATTENDANCE HISTORY
+        // =====================================================
+        $attendanceHistory = Attendance::with('user')
+            ->whereDate('created_at', today())
             ->latest()
-            ->get();
+            ->take(20)
+            ->get()
+            ->map(function ($item) {
 
-        // History member
-        $historyMember = Attendance::with('user')
-            ->whereDate('created_at', now())
-            ->whereNull('guest_name')
-            ->latest()
-            ->get();
+                $transaction = Transaction::where('user_id', $item->user_id)
+                    ->where('category', 'visit')
+                    ->whereDate('created_at', $item->created_at->format('Y-m-d'))
+                    ->latest()
+                    ->first();
+
+                $item->amount = $transaction->amount ?? 0;
+
+                $item->payment_method = $transaction->payment_method ?? 'cash';
+
+                return $item;
+            });
 
         return view('admin.attendance.index', compact(
             'user',
             'price',
             'status_label',
-            'historyTamu',
-            'historyMember'
+            'attendanceHistory'
         ));
     }
 
+    // =====================================================
+    // PROCESS CHECK-IN
+    // =====================================================
     public function process(Request $request)
     {
         $request->validate([
             'payment_method' => 'required|in:cash,transfer',
-            'amount'         => 'required|numeric',
         ]);
 
         $guestName = null;
         $guestWhatsapp = null;
 
-        // =========================
-        // MEMBER
-        // =========================
+        $finalAmount = 0;
+
+        $attendanceType = 'paid_visit';
+
+        // =====================================================
+        // MEMBER CHECK-IN
+        // =====================================================
         if ($request->filled('user_id_found')) {
 
             $user = User::findOrFail($request->user_id_found);
 
+            // otomatis dari helper model
+            $finalAmount = $user->getVisitPrice();
+
+            $attendanceType = $finalAmount == 0
+                ? 'member_package'
+                : 'paid_visit';
         }
 
-        // =========================
-        // GUEST
-        // =========================
+        // =====================================================
+        // GUEST CHECK-IN
+        // =====================================================
         else {
 
-            // Ambil akun penampung guest
             $user = User::where('role', 'guest')->first();
 
             if (!$user) {
 
                 return redirect()->back()
-                    ->with('error', 'Akun penampung Guest belum dibuat oleh Owner!');
-
+                    ->with('error', 'Akun penampung Guest belum dibuat!');
             }
 
             $guestName = $request->name ?? 'Tamu Harian';
+
             $guestWhatsapp = $request->whatsapp ?? null;
 
+            $finalAmount = \App\Models\Setting::where('key', 'visit_tamu')
+                ->value('value') ?? 15000;
+
+            $attendanceType = 'paid_visit';
         }
 
-        // =========================
+        // =====================================================
         // SIMPAN ATTENDANCE
-        // =========================
+        // =====================================================
         Attendance::create([
-            'user_id'         => $user->id,
-            'guest_name'      => $guestName,
-            'guest_whatsapp'  => $guestWhatsapp,
-            'type'            => ($request->amount == 0)
-                                    ? 'member_package'
-                                    : 'paid_visit',
+            'user_id'        => $user->id,
+            'guest_name'     => $guestName,
+            'guest_whatsapp' => $guestWhatsapp,
+            'type'           => $attendanceType,
         ]);
 
-        // =========================
+        // =====================================================
         // SIMPAN TRANSACTION
-        // =========================
-        if ($request->amount > 0) {
+        // =====================================================
+        if ($finalAmount > 0) {
 
             Transaction::create([
                 'invoice_code'   => 'VIS-' . strtoupper(Str::random(8)),
@@ -152,25 +167,20 @@ class AttendanceController extends Controller
                 'guest_name'     => $guestName,
                 'admin_id'       => Auth::id(),
                 'category'       => 'visit',
-                'amount'         => $request->amount,
+                'amount'         => $finalAmount,
                 'payment_method' => $request->payment_method,
                 'status'         => 'success',
+                'source'         => 'onsite',
             ]);
-
         }
 
-        // =========================
+        // =====================================================
         // REDIRECT
-        // =========================
+        // =====================================================
         $displayName = $guestName ?? $user->name;
 
-        $tab = $request->type === 'member'
-            ? 'member'
-            : 'guest';
-
-        return redirect()->route('admin.attendance.index', [
-                'tab' => $tab
-            ])
+        return redirect()
+            ->route('admin.attendance.index')
             ->with('success', 'Check-in ' . $displayName . ' berhasil!');
     }
 }

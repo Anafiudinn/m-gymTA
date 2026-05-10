@@ -1,20 +1,26 @@
 <?php
 
+use App\Http\Controllers\Controller;
+
 use App\Http\Controllers\Admin\AttendanceController;
 use App\Http\Controllers\Admin\DashboardController;
 use App\Http\Controllers\Admin\ManagementController;
-// Import Controller Admin
 use App\Http\Controllers\Admin\PackageController;
 use App\Http\Controllers\Admin\PersonalTrainerController;
 use App\Http\Controllers\Admin\ReportController;
 use App\Http\Controllers\Admin\RetailController;
+use App\Http\Controllers\Admin\VerificationController;
+
+use App\Http\Controllers\LandingPageController;
+use App\Http\Controllers\Member\DashboardController as MemberDashboardController;
+use App\Http\Controllers\Member\HistoryController as MemberHistoryController;
+use App\Http\Controllers\Member\PackageController as MemberPackageController;
+use App\Http\Controllers\Member\ProfileController as MemberProfileController;
 use App\Http\Controllers\Owner\OwnerController;
 use App\Http\Controllers\ProfileController;
 use Illuminate\Support\Facades\Route;
 
-Route::get('/', function () {
-    return view('welcome');
-});
+Route::get('/', [LandingPageController::class, 'index'])->name('landing');
 
 // --- AREA OWNER ---
 Route::middleware(['auth', 'role:owner'])->prefix('owner')->name('owner.')->group(function () {
@@ -59,7 +65,26 @@ Route::middleware(['auth', 'role:admin'])->prefix('admin')->name('admin.')->grou
         Route::post('/activate', [PackageController::class, 'activateMember'])->name('activate');
         Route::post('/buy', [PackageController::class, 'buyPackage'])->name('buy');
         Route::post('/buy-pt', [PackageController::class, 'buyPT'])->name('buy_pt');
+        
+        // Batalkan Transaksi
+        Route::patch('/transaction/cancel/{id}', [PackageController::class, 'cancelTransaction'])->name('transaction.cancel');
     });
+
+    // 5. VERIFIKASI PEMBAYARAN
+Route::prefix('verifications')->name('verifications.')->group(function () {
+
+    // List pembayaran pending
+    Route::get('/', [VerificationController::class, 'index'])
+        ->name('index');
+
+    // Approve pembayaran
+    Route::patch('/approve/{id}', [VerificationController::class, 'approve'])
+        ->name('approve');
+
+    // Reject pembayaran
+    Route::patch('/reject/{id}', [VerificationController::class, 'reject'])
+        ->name('reject');
+});
 
     // 5. Sesi PT
     Route::get('/pt-sessions', [PersonalTrainerController::class, 'index'])->name('pt.index');
@@ -67,18 +92,12 @@ Route::middleware(['auth', 'role:admin'])->prefix('admin')->name('admin.')->grou
 
     // 6. Manajemen Data
     Route::get('/data/members', [ManagementController::class, 'members'])->name('data.members');
-    Route::post('/data/members/update/{id}', [ManagementController::class, 'updateMember'])
-        ->name('data.members.update');
-
-    Route::patch('/data/members/toggle/{id}', [ManagementController::class, 'toggleStatus'])
-        ->name('data.members.toggle');
+    Route::post('/data/members/update/{id}', [ManagementController::class, 'updateMember'])->name('data.members.update');
+    Route::patch('/data/members/toggle/{id}', [ManagementController::class, 'toggleStatus'])->name('data.members.toggle');
 
     // Manajemen Data Produk
     Route::get('/data/products', [ManagementController::class, 'products'])->name('data.products');
-
-    // Route yang hilang tadi:
     Route::post('/data/products/store', [ManagementController::class, 'storeProduct'])->name('data.products.store');
-
     Route::put('/data/products/update/{id}', [ManagementController::class, 'updateProduct'])->name('data.products.update');
     Route::delete('/data/products/delete/{id}', [ManagementController::class, 'destroyProduct'])->name('data.products.delete');
 
@@ -86,6 +105,22 @@ Route::middleware(['auth', 'role:admin'])->prefix('admin')->name('admin.')->grou
     Route::get('/report/transactions', [ReportController::class, 'transactions'])->name('report.transactions');
     Route::get('/report/attendance', [ReportController::class, 'attendance'])->name('report.attendance');
 });
+
+// --- AREA MEMBER ---
+Route::middleware(['auth', 'role:member'])
+    ->prefix('member')
+    ->name('member.')
+    ->group(function () {
+        Route::get('/dashboard', [MemberDashboardController::class, 'index'])->name('dashboard');
+        
+        // TAMBAHKAN INI: Route untuk ambil detail transaksi via AJAX
+        Route::get('/transaction/{id}', [MemberDashboardController::class, 'getTransactionDetail']);
+        // Rute untuk proses upload ulang (PUT)
+        // Pastikan URL ini: /transaction/{id}/reupload
+        Route::put('/transaction/{id}/reupload', [MemberPackageController::class, 'reupload'])->name('package.reupload');
+
+        Route::post('/package/store', [MemberPackageController::class, 'store'])->name('package.store');
+    });
 
 // --- AREA PROFILE (Breeze) ---
 Route::middleware('auth')->group(function () {

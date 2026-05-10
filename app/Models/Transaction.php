@@ -8,7 +8,7 @@ class Transaction extends Model
 {
     protected $fillable = [
         'invoice_code', 'user_id','guest_name','guest_whatsapp', 'admin_id', 'category', 
-        'amount', 'payment_method', 'status', 'proof_attachment'
+        'amount', 'payment_method', 'status','source','sender_bank','sender_name','sender_account', 'rejection_reason', 'proof_attachment'
     ];
 
     public function user() {
@@ -22,4 +22,5 @@ class Transaction extends Model
 {
     return $this->hasMany(TransactionItem::class);
 }
+
 }

@@ -3,10 +3,10 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
-use Illuminate\Http\Request;
 use App\Models\Attendance;
-
+use App\Models\PtMembership;
 use App\Models\Transaction;
+use Illuminate\Http\Request;
 
 class ReportController extends Controller
 {
@@ -45,10 +45,17 @@ class ReportController extends Controller
             $query->where(function ($q) use ($search) {
 
                 $q->where('invoice_code', 'like', "%{$search}%")
-                  ->orWhere('guest_name', 'like', "%{$search}%");
-
+                    ->orWhere('guest_name', 'like', "%{$search}%");
             });
         }
+
+        if ($request->filled('source')) {
+            $query->where('source', $request->source);
+        }
+
+        if ($request->filled('status')) {
+    $query->where('status', $request->status);
+}
 
         $transactions = $query->paginate(10);
 
@@ -60,49 +67,181 @@ class ReportController extends Controller
 
     /*
     |--------------------------------------------------------------------------
-    | RIWAYAT KEHADIRAN
+/*
+|--------------------------------------------------------------------------
+| RIWAYAT KEHADIRAN & PT
+|--------------------------------------------------------------------------
+*/
+public function attendance(Request $request)
+{
+    /*
+    |--------------------------------------------------------------------------
+    | TAB
     |--------------------------------------------------------------------------
     */
- public function attendance(Request $request)
-{
-    $query = Attendance::with('user')->latest();
+
+    $tab = $request->get('tab', 'attendance');
+
+    /*
+    |--------------------------------------------------------------------------
+    | ATTENDANCE QUERY
+    |--------------------------------------------------------------------------
+    */
+
+    $attendanceQuery = Attendance::with('user')
+        ->latest();
 
     /*
     |--------------------------------------------------------------------------
     | FILTER TYPE
     |--------------------------------------------------------------------------
     */
-    if ($request->filled('type')) {
 
-        $query->where('type', $request->type);
+    if ($tab == 'attendance' && $request->filled('type')) {
+
+        $attendanceQuery->where(
+            'type',
+            $request->type
+        );
     }
 
     /*
     |--------------------------------------------------------------------------
-    | SEARCH
+    | SEARCH ATTENDANCE
     |--------------------------------------------------------------------------
     */
-    if ($request->filled('search')) {
+
+    if ($tab == 'attendance' && $request->filled('search')) {
 
         $search = $request->search;
 
-        $query->where(function ($q) use ($search) {
+        $attendanceQuery->where(function ($q) use ($search) {
 
             $q->where('guest_name', 'like', "%{$search}%")
-              ->orWhere('guest_whatsapp', 'like', "%{$search}%")
-              ->orWhereHas('user', function ($u) use ($search) {
+                ->orWhere('guest_whatsapp', 'like', "%{$search}%")
+                ->orWhereHas('user', function ($u) use ($search) {
 
-                    $u->where('name', 'like', "%{$search}%");
-
-              });
+                    $u->where('name', 'like', "%{$search}%")
+                        ->orWhere('member_code', 'like', "%{$search}%")
+                        ->orWhere('whatsapp', 'like', "%{$search}%");
+                });
         });
     }
 
-    $attendances = $query->paginate(12);
+    $attendances = $attendanceQuery->paginate(12);
+
+    /*
+    |--------------------------------------------------------------------------
+    | PT REPORT QUERY
+    |--------------------------------------------------------------------------
+    */
+
+    $ptQuery = PtMembership::with([
+        'user',
+        'package'
+    ])
+    ->latest('updated_at');
+
+    /*
+    |--------------------------------------------------------------------------
+    | FILTER STATUS PT
+    |--------------------------------------------------------------------------
+    */
+
+    if ($tab == 'pt' && $request->filled('status')) {
+
+        $ptQuery->where(
+            'status',
+            $request->status
+        );
+    }
+
+    /*
+    |--------------------------------------------------------------------------
+    | SEARCH PT
+    |--------------------------------------------------------------------------
+    */
+
+    if ($tab == 'pt' && $request->filled('search')) {
+
+        $search = $request->search;
+
+        $ptQuery->whereHas('user', function ($q) use ($search) {
+
+            $q->where('name', 'like', "%{$search}%")
+                ->orWhere('member_code', 'like', "%{$search}%")
+                ->orWhere('whatsapp', 'like', "%{$search}%");
+        });
+    }
+
+    $ptReports = $ptQuery->paginate(12);
+
+    /*
+    |--------------------------------------------------------------------------
+    | STATS ATTENDANCE
+    |--------------------------------------------------------------------------
+    */
+
+    $totalAttendance = Attendance::count();
+
+    $memberAttendance = Attendance::where(
+        'type',
+        'member_package'
+    )->count();
+
+    $guestAttendance = Attendance::where(
+        'type',
+        'paid_visit'
+    )->count();
+
+    $todayAttendance = Attendance::whereDate(
+        'created_at',
+        today()
+    )->count();
+
+    /*
+    |--------------------------------------------------------------------------
+    | STATS PT
+    |--------------------------------------------------------------------------
+    */
+
+    $totalPt = PtMembership::count();
+
+    $activePt = PtMembership::where(
+        'status',
+        'active'
+    )->count();
+
+    $finishedPt = PtMembership::where(
+        'status',
+        'completed'
+    )->count();
+
+    $lowSessionPt = PtMembership::where(
+        'status',
+        'active'
+    )
+    ->where('remaining_sessions', '<=', 3)
+    ->count();
 
     return view(
         'admin.report.attendance',
-        compact('attendances')
+        compact(
+            'tab',
+
+            'attendances',
+            'ptReports',
+
+            'totalAttendance',
+            'memberAttendance',
+            'guestAttendance',
+            'todayAttendance',
+
+            'totalPt',
+            'activePt',
+            'finishedPt',
+            'lowSessionPt'
+        )
     );
 }
 }

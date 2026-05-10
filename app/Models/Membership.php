@@ -6,7 +6,7 @@ use Illuminate\Database\Eloquent\Model;
 
 class Membership extends Model
 {
-    protected $fillable = ['user_id', 'start_date', 'end_date', 'status'];
+    protected $fillable = ['user_id', 'package_name', 'start_date', 'end_date', 'status'];
 
     protected $casts = [
         'start_date' => 'date',

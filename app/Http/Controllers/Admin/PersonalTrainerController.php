@@ -13,26 +13,69 @@ class PersonalTrainerController extends Controller
      */
     public function index(Request $request)
     {
-        // Query active PT memberships
-        $query = PtMembership::with(['user', 'package'])->where('status', 'active')->latest();
+        $tab = $request->get('tab', 'active');
 
-        // Search by name, member_code, or whatsapp
+        /*
+        |--------------------------------------------------------------------------
+        | ACTIVE PT MEMBERS
+        |--------------------------------------------------------------------------
+        */
+        $query = PtMembership::with(['user', 'package'])
+            ->where('status', 'active')
+            ->latest();
+
+        // Search
         if ($request->filled('search')) {
+
             $search = $request->search;
-            $query->whereHas('user', fn ($q) => $q->where('name', 'like', "%{$search}%")
-                ->orWhere('member_code', 'like', "%{$search}%")
-                ->orWhere('whatsapp', 'like', "%{$search}%"));
+
+            $query->whereHas('user', fn ($q) =>
+                $q->where('name', 'like', "%{$search}%")
+                    ->orWhere('member_code', 'like', "%{$search}%")
+                    ->orWhere('whatsapp', 'like', "%{$search}%")
+            );
         }
 
-        // Paginate results
         $ptMemberships = $query->paginate(8);
 
-        // Stats
-        $totalActive = PtMembership::where('status', 'active')->count();
-        $lowSession = PtMembership::where('status', 'active')->where('remaining_sessions', '<=', 3)->count();
-        $emptySession = PtMembership::where('status', 'active')->where('remaining_sessions', '<=', 0)->count();
+        /*
+        |--------------------------------------------------------------------------
+        | RECENT ACTIVITY
+        |--------------------------------------------------------------------------
+        */
+        $recentActivities = PtMembership::with(['user', 'package'])
 
-        return view('admin.pt.index', compact('ptMemberships', 'totalActive', 'lowSession', 'emptySession'));
+            // Sudah pernah memakai sesi
+            ->whereColumn('remaining_sessions', '<', 'total_sessions')
+
+            ->latest('updated_at')
+
+            ->take(20)
+
+            ->get();
+
+        /*
+        |--------------------------------------------------------------------------
+        | STATS
+        |--------------------------------------------------------------------------
+        */
+        $totalActive = PtMembership::where('status', 'active')->count();
+
+        $lowSession = PtMembership::where('status', 'active')
+            ->where('remaining_sessions', '<=', 3)
+            ->count();
+
+        $emptySession = PtMembership::where('remaining_sessions', '<=', 0)
+            ->count();
+
+        return view('admin.pt.index', compact(
+            'tab',
+            'ptMemberships',
+            'recentActivities',
+            'totalActive',
+            'lowSession',
+            'emptySession'
+        ));
     }
 
     /**
@@ -52,9 +95,15 @@ class PersonalTrainerController extends Controller
 
         // Auto finish if no sessions left
         if ($membership->fresh()->remaining_sessions <= 0) {
-            $membership->update(['status' => 'finished']);
+            $membership->update([
+                'status' => 'finished'
+            ]);
         }
 
-        return back()->with('success', '1 sesi PT berhasil digunakan. Sisa sesi: '.$membership->fresh()->remaining_sessions);
+        return back()->with(
+            'success',
+            '1 sesi PT berhasil digunakan. Sisa sesi: ' .
+            $membership->fresh()->remaining_sessions
+        );
     }
 }
