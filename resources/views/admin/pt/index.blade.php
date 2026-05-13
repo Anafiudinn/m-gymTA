@@ -109,7 +109,7 @@
             <thead>
                 <tr>
                     <th>Member</th>
-                    <th>WhatsApp</th>
+                    <th>Coach</th>
                     <th>Paket PT</th>
                     <th style="text-align:center;">Sisa Sesi</th>
                     <th style="text-align:center;">Status</th>
@@ -131,8 +131,14 @@
                         </div>
                     </td>
                     <td>
-                        <span style="font-size:12.5px;color:#64748b;font-family:'JetBrains Mono',monospace;">{{ $pt->user->whatsapp }}</span>
-                    </td>
+                        @if($pt->package && $pt->package->coach_name)
+                            <p style="font-size:13px;font-weight:500;color:#1c2434;margin:0;">{{ $pt->package->coach_name }}</p>
+                            <a href="https://wa.me/{{ preg_replace('/\D/', '', $pt->package->coach_whatsapp) }}" target="_blank" style="font-size:12px;color:#3b82f6;">
+                                {{ $pt->package->coach_whatsapp }}
+                            </a>
+                        @else
+                            <span style="font-size:13px;font-style:italic;color:#94a3b8;">Tidak ada coach</span>
+                        @endif
                     <td>
                         <span style="font-size:13px;font-weight:500;color:#1c2434;">{{ optional($pt->package)->nama_paket ?? '—' }}</span>
                     </td>
@@ -212,6 +218,7 @@
                     <th>Paket PT</th>
                     <th style="text-align:center;">Sisa Sesi</th>
                     <th style="text-align:center;">Digunakan</th>
+                    <th>Coach</th>
                     <th style="text-align:right;">Last Activity</th>
                 </tr>
             </thead>
@@ -237,6 +244,16 @@
                     </td>
                     <td style="text-align:center;">
                         <span class="pill pill-red">{{ $activity->total_sessions - $activity->remaining_sessions }} sesi</span>
+                    </td>
+                    <td>
+                        @if($activity->package && $activity->package->coach_name)
+                            <p style="font-size:13px;font-weight:500;color:#1c2434;margin:0;">{{ $activity->package->coach_name }}</p>
+                            <a href="https://wa.me/{{ preg_replace('/\D/', '', $activity->package->coach_whatsapp) }}" target="_blank" style="font-size:12px;color:#3b82f6;">
+                                {{ $activity->package->coach_whatsapp }}
+                            </a>
+                        @else
+                            <span style="font-size:13px;font-style:italic;color:#94a3b8;">Tidak ada coach</span>
+                        @endif
                     </td>
                     <td style="text-align:right;">
                         <span style="font-size:12px;color:#94a3b8;font-family:'JetBrains Mono',monospace;">

@@ -10,13 +10,13 @@ use Illuminate\Support\Str;
 
 class PackageController extends Controller
 {
-
     public function store(Request $request)
     {
         $request->validate([
             'type'             => 'required|in:activation,monthly,pt',
             'package_id'       => 'required_if:type,pt',
-            'amount'           => 'required|numeric',
+
+            'amount'           => 'required|numeric|min:1',
 
             'sender_bank'      => 'required|string|max:100',
             'sender_name'      => 'required|string|max:100',
@@ -24,97 +24,203 @@ class PackageController extends Controller
 
             'proof_attachment' => 'required|image|mimes:jpg,jpeg,png|max:2048',
         ]);
-        $userId = Auth::id();
 
-        // 1. Cek apakah ada transaksi kategori ini yang masih PENDING
-        // Ini mencegah user spam klik atau beli paket berkali-kali sebelum di-approve
-        $pendingTransaction = Transaction::where('user_id', $userId)
+        $user = Auth::user();
+
+        /*
+        |--------------------------------------------------------------------------
+        | CEK TRANSAKSI PENDING
+        |--------------------------------------------------------------------------
+        */
+
+        $pendingTransaction = Transaction::where('user_id', $user->id)
             ->where('category', $request->type)
+
+            // KHUSUS PT → cek per paket
+            ->when($request->type === 'pt', function ($query) use ($request) {
+                $query->where('package_id', $request->package_id);
+            })
+
             ->where('status', 'pending')
             ->first();
 
         if ($pendingTransaction) {
-            return redirect()
-                ->back()
-                ->with('error', 'Anda masih memiliki transaksi ' . strtoupper($request->type) . ' yang sedang menunggu verifikasi admin.');
+
+            if ($request->type === 'pt') {
+                return back()->with(
+                    'error',
+                    'Paket PT ini masih dalam proses verifikasi admin.'
+                );
+            }
+
+            return back()->with(
+                'error',
+                'Anda masih memiliki transaksi '
+                . strtoupper($request->type)
+                . ' yang sedang diproses admin.'
+            );
         }
 
-        // 2. Tambahan: Jika tipe adalah 'activation', cek apakah user sudah aktif
-        if ($request->type === 'activation' && Auth::user()->is_active_member) {
-            return redirect()
-                ->back()
-                ->with('error', 'Akun Anda sudah aktif sebagai member.');
+        /*
+        |--------------------------------------------------------------------------
+        | CEK AKTIVASI MEMBER
+        |--------------------------------------------------------------------------
+        */
+
+        if (
+            $request->type === 'activation'
+            && $user->is_active_member
+        ) {
+            return back()->with(
+                'error',
+                'Akun Anda sudah aktif sebagai member.'
+            );
         }
 
-        // Upload bukti pembayaran
+        /*
+        |--------------------------------------------------------------------------
+        | UPLOAD BUKTI
+        |--------------------------------------------------------------------------
+        */
+
         $proofPath = $request->file('proof_attachment')
             ->store('proofs', 'public');
 
-        // Simpan transaksi pending
+        /*
+        |--------------------------------------------------------------------------
+        | SIMPAN TRANSAKSI
+        |--------------------------------------------------------------------------
+        */
+
         Transaction::create([
-            'invoice_code'     => 'TRX-' . strtoupper(Str::random(8)),
-            'user_id'          => $userId,
-            'admin_id'         => null,
 
-            'category'         => $request->type,
+            'invoice_code' => 'TRX-' . strtoupper(Str::random(8)),
 
-            'package_id'       => $request->type === 'pt'
+            'user_id'      => $user->id,
+
+            // null = belum diverifikasi admin
+            'admin_id'     => null,
+
+            'category'     => $request->type,
+
+            // khusus PT
+            'package_id'   => $request->type === 'pt'
                 ? $request->package_id
                 : null,
 
-            'amount'           => $request->amount,
+            'amount'       => $request->amount,
 
-            'payment_method'   => 'transfer',
+            'payment_method' => 'transfer',
 
-            'source'           => 'online',
+            // online / onsite
+            'source'       => 'online',
 
-            'sender_bank'      => $request->sender_bank,
-            'sender_name'      => $request->sender_name,
-            'sender_account'   => $request->sender_account,
+            /*
+            |--------------------------------------------------------------------------
+            | DATA PENGIRIM
+            |--------------------------------------------------------------------------
+            */
 
-            'status'           => 'pending',
+            'sender_bank'    => $request->sender_bank,
+            'sender_name'    => $request->sender_name,
+            'sender_account' => $request->sender_account,
+
+            /*
+            |--------------------------------------------------------------------------
+            | STATUS
+            |--------------------------------------------------------------------------
+            */
+
+            'status' => 'pending',
+
+            /*
+            |--------------------------------------------------------------------------
+            | BUKTI
+            |--------------------------------------------------------------------------
+            */
 
             'proof_attachment' => $proofPath,
         ]);
 
         return redirect()
             ->route('member.dashboard', ['tab' => 'history'])
-            ->with('success', 'Pembayaran berhasil dikirim dan sedang menunggu verifikasi admin.');
+            ->with(
+                'success',
+                'Pembayaran berhasil dikirim dan sedang menunggu verifikasi admin.'
+            );
     }
-public function reupload(Request $request, $id)
-{
-    $request->validate([
-        'sender_bank'      => 'required|string|max:100',
-        'sender_name'      => 'required|string|max:100',
-        'sender_account'    => 'required|string|max:100',
-        'proof_attachment' => 'required|image|mimes:jpg,jpeg,png|max:2048',
-    ]);
 
-    $transaction = Transaction::where('user_id', Auth::id())
-        ->where('id', $id)
-        ->firstOrFail();
+    public function reupload(Request $request, $id)
+    {
+        $request->validate([
+            'sender_bank'      => 'required|string|max:100',
+            'sender_name'      => 'required|string|max:100',
+            'sender_account'   => 'required|string|max:50',
 
-    // Upload bukti baru
-    $proofPath = $request->file('proof_attachment')
-        ->store('proofs', 'public');
+            'proof_attachment' => 'required|image|mimes:jpg,jpeg,png|max:2048',
+        ]);
 
-    // Update transaksi
-    $transaction->update([
-        'sender_bank'      => $request->sender_bank,
-        'sender_name'      => $request->sender_name,
-        'sender_account'   => $request->sender_account,
+        /*
+        |--------------------------------------------------------------------------
+        | AMBIL TRANSAKSI USER
+        |--------------------------------------------------------------------------
+        */
 
-        'proof_attachment' => $proofPath,
+        $transaction = Transaction::where('user_id', Auth::id())
+            ->where('id', $id)
+            ->firstOrFail();
 
-        // balik lagi ke pending
-        'status'            => 'pending',
+        /*
+        |--------------------------------------------------------------------------
+        | HANYA BOLEH REUPLOAD JIKA REJECTED
+        |--------------------------------------------------------------------------
+        */
 
-        // hapus alasan reject lama
-        'rejection_reason'  => null,
-    ]);
+        if ($transaction->status !== 'rejected') {
+            return back()->with(
+                'error',
+                'Transaksi ini tidak dapat diupload ulang.'
+            );
+        }
 
-    return redirect()
-        ->route('member.dashboard', ['tab' => 'history'])
-        ->with('success', 'Bukti pembayaran berhasil dikirim ulang.');
-}
+        /*
+        |--------------------------------------------------------------------------
+        | UPLOAD BUKTI BARU
+        |--------------------------------------------------------------------------
+        */
+
+        $proofPath = $request->file('proof_attachment')
+            ->store('proofs', 'public');
+
+        /*
+        |--------------------------------------------------------------------------
+        | UPDATE TRANSAKSI
+        |--------------------------------------------------------------------------
+        */
+
+        $transaction->update([
+
+            'sender_bank'    => $request->sender_bank,
+            'sender_name'    => $request->sender_name,
+            'sender_account' => $request->sender_account,
+
+            'proof_attachment' => $proofPath,
+
+            // kembali diproses
+            'status' => 'pending',
+
+            // reset alasan reject
+            'rejection_reason' => null,
+
+            // reset admin verifier
+            'admin_id' => null,
+        ]);
+
+        return redirect()
+            ->route('member.dashboard', ['tab' => 'history'])
+            ->with(
+                'success',
+                'Bukti pembayaran berhasil dikirim ulang.'
+            );
+    }
 }

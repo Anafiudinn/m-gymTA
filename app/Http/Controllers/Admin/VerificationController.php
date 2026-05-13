@@ -14,7 +14,10 @@ class VerificationController extends Controller
 {
     public function index()
     {
-        $transactions = Transaction::with('user')
+        $transactions = Transaction::with([
+            'user',
+            'ptPackage'
+        ])
 
             // hanya transaksi online
             ->where('source', 'online')
@@ -34,13 +37,14 @@ class VerificationController extends Controller
             ->latest()
             ->get();
 
-        return view('admin.verifications.index', compact('transactions'));
+        return view(
+            'admin.verifications.index',
+            compact('transactions')
+        );
     }
-
     public function approve($id)
     {
-        $transaction = Transaction::with('user')
-            ->findOrFail($id);
+        $transaction = Transaction::with(['user', 'ptPackage'])->findOrFail($id);
 
         if ($transaction->status !== 'pending') {
             return back()->with('error', 'Transaksi sudah diproses.');
@@ -48,46 +52,38 @@ class VerificationController extends Controller
 
         $user = $transaction->user;
 
-        /*
-        |--------------------------------------------------------------------------
-        | AKTIVASI MEMBER
-        |--------------------------------------------------------------------------
-        */
-        if ($transaction->category === 'activation') {
+        // 1. GENERATE MEMBER CODE (Jika belum punya)
+        // Apapun kategorinya, karena dia sudah bayar, kita kasih identitas resmi.
+        if (!$user->member_code) {
+            do {
+                $memberCode = 'GYM-' . strtoupper(\Illuminate\Support\Str::random(5));
+            } while (\App\Models\User::where('member_code', $memberCode)->exists());
 
-            $user->update([
-                'is_active_member' => true
-            ]);
+            $user->update(['member_code' => $memberCode]);
         }
 
         /*
-        |--------------------------------------------------------------------------
-        | PAKET BULANAN
-        |--------------------------------------------------------------------------
-        */
-        elseif ($transaction->category === 'monthly') {
-
-            // expire paket lama
+    |--------------------------------------------------------------------------
+    | LOGIKA PER KATEGORI
+    |--------------------------------------------------------------------------
+    */
+        if ($transaction->category === 'activation') {
+            $user->update(['is_active_member' => true]);
+        } elseif ($transaction->category === 'monthly') {
+            // Logika Paket Bulanan (sama seperti sebelumnya)
             Membership::where('user_id', $user->id)
                 ->where('status', 'active')
                 ->whereDate('end_date', '<', now())
-                ->update([
-                    'status' => 'expired'
-                ]);
+                ->update(['status' => 'expired']);
 
-            // cek paket aktif terakhir
             $lastMembership = Membership::where('user_id', $user->id)
                 ->where('status', 'active')
                 ->whereDate('end_date', '>=', now())
                 ->latest('end_date')
                 ->first();
 
-            $startDate = $lastMembership
-                ? Carbon::parse($lastMembership->end_date)->addDay()
-                : now();
-
-            $endDate = Carbon::parse($startDate)
-                ->addDays(30);
+            $startDate = $lastMembership ? \Carbon\Carbon::parse($lastMembership->end_date)->addDay() : now();
+            $endDate = \Carbon\Carbon::parse($startDate)->addDays(30);
 
             Membership::create([
                 'user_id' => $user->id,
@@ -96,49 +92,36 @@ class VerificationController extends Controller
                 'end_date' => $endDate,
                 'status' => 'active',
             ]);
-        }
+        } elseif ($transaction->category === 'pt') {
+            // CEK VALIDASI PT (Wajib Member Aktif ATAU punya Paket Bulanan Aktif)
+            $hasMonthly = Membership::where('user_id', $user->id)
+                ->where('status', 'active')
+                ->whereDate('end_date', '>=', now())
+                ->exists();
 
-        /*
-        |--------------------------------------------------------------------------
-        | PT PACKAGE
-        |--------------------------------------------------------------------------
-        */
-        elseif ($transaction->category === 'pt') {
-
-            $ptPackage = PtPackage::find($transaction->package_id);
-
-            if ($ptPackage) {
-
-                PtMembership::create([
-                    'user_id' => $user->id,
-                    'pt_package_id' => $ptPackage->id,
-
-                    'total_sessions' => $ptPackage->jumlah_sesi,
-
-                    'remaining_sessions' => $ptPackage->jumlah_sesi,
-
-                    'status' => 'active',
-                ]);
+            if (!$user->is_active_member && !$hasMonthly) {
+                return back()->with('error', 'User belum menjadi member aktif atau tidak memiliki paket bulanan yang aktif. Gagal approve PT.');
             }
+
+            $ptPackage = $transaction->ptPackage;
+            if (!$ptPackage) return back()->with('error', 'Paket PT tidak ditemukan.');
+
+            PtMembership::create([
+                'user_id' => $user->id,
+                'pt_package_id' => $ptPackage->id,
+                'total_sessions' => $ptPackage->jumlah_sesi,
+                'remaining_sessions' => $ptPackage->jumlah_sesi,
+                'status' => 'active',
+            ]);
         }
 
-        /*
-        |--------------------------------------------------------------------------
-        | UPDATE TRANSACTION
-        |--------------------------------------------------------------------------
-        */
+        // UPDATE STATUS TRANSAKSI
         $transaction->update([
-
             'status' => 'success',
-
-            // ADMIN YANG MEMVERIFIKASI
             'admin_id' => auth()->id(),
         ]);
 
-        return back()->with(
-            'success',
-            'Pembayaran berhasil diverifikasi.'
-        );
+        return back()->with('success', 'Verifikasi berhasil. Member: ' . $user->member_code);
     }
 
     public function reject(Request $request, $id)

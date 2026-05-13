@@ -6,12 +6,17 @@
 function openCheckoutModal(name, price, type, packageId = null)
 {
     document.getElementById('checkoutModal').style.display = 'flex';
+
     document.getElementById('checkoutPackageName').innerText = name;
+
     document.getElementById('checkoutPrice').innerText =
-        'RP ' + Number(price).toLocaleString('id-ID');
+        'Rp ' + Number(price).toLocaleString('id-ID');
+
     document.getElementById('checkoutType').value = type;
-    document.getElementById('checkoutPackageId').value = packageId ?? '';
-    document.getElementById('checkoutPackageNameInput').value = name;
+
+    document.getElementById('checkoutPackageId').value =
+        packageId ?? '';
+
     document.getElementById('checkoutAmount').value = price;
 }
 

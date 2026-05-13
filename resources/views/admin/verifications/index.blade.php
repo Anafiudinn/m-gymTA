@@ -47,7 +47,7 @@
             <table style="width:100%; border-collapse:collapse;">
                 <thead style="background:#f9fafb;">
                     <tr>
-                        <th style="padding:16px; text-align:left; font-size:12px; color:#6b7280; text-transform:uppercase;">Member</th>
+                        <th style="padding:16px; text-align:left; font-size:12px; color:#6b7280; text-transform:uppercase;">Nama</th>
                         <th style="padding:16px; text-align:left; font-size:12px; color:#6b7280; text-transform:uppercase;">Kategori</th>
                         <th style="padding:16px; text-align:left; font-size:12px; color:#6b7280; text-transform:uppercase;">Nama Pengirim</th>
                         <th style="padding:16px; text-align:left; font-size:12px; color:#6b7280; text-transform:uppercase;">No. Rekening</th>
@@ -75,7 +75,9 @@
                         </td>
 
                         {{-- CATEGORY --}}
+                        {{-- CATEGORY --}}
                         <td style="padding:18px 16px;">
+
                             @php
                             $badgeColor = match($trx->category) {
                             'activation' => '#2563eb',
@@ -83,10 +85,45 @@
                             'pt' => '#ea580c',
                             default => '#6b7280'
                             };
+
+                            $categoryName = match($trx->category) {
+
+                            'activation' => 'Aktivasi Member',
+
+                            'monthly' => 'Paket Bulanan',
+
+                            'pt' => optional(
+                            \App\Models\PtPackage::find($trx->package_id)
+                            )->nama_paket ?? 'Personal Trainer',
+
+                            default => strtoupper($trx->category),
+                            };
                             @endphp
-                            <span style="padding:6px 12px; border-radius:999px; font-size:12px; font-weight:700; background:{{ $badgeColor }}15; color:{{ $badgeColor }};">
-                                {{ strtoupper($trx->category) }}
-                            </span>
+
+                            <div style="display:flex; flex-direction:column; gap:6px;">
+
+                                <span style="
+            width:max-content;
+            padding:6px 12px;
+            border-radius:999px;
+            font-size:12px;
+            font-weight:700;
+            background:{{ $badgeColor }}15;
+            color:{{ $badgeColor }};
+        ">
+                                    {{ strtoupper($trx->category) }}
+                                </span>
+
+                                <div style="
+            font-size:13px;
+            font-weight:600;
+            color:#111827;
+        ">
+                                    {{ $categoryName }}
+                                </div>
+
+                            </div>
+
                         </td>
                         {{-- SENDER NAME --}}
                         <td style="padding:18px 16px; font-weight:500; color:#111827;">
@@ -94,11 +131,11 @@
                         </td>
                         {{-- ACCOUNT NUMBER --}}
                         <td style="padding:18px 16px; font-weight:500; color:#111827;">
-                            {{ $trx->account_number ?? '-' }}
+                            {{ $trx->sender_account ?? '-' }}
                         </td>
                         {{-- BANK NAME --}}
                         <td style="padding:18px 16px; font-weight:500; color:#111827;">
-                            {{ $trx->bank_name ?? '-' }}
+                            {{ $trx->sender_bank ?? '-' }}
                         </td>
 
                         {{-- NOMINAL --}}

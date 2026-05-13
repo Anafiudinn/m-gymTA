@@ -13,6 +13,14 @@ return new class extends Migration
     {
         Schema::table('pt_packages', function (Blueprint $table) {
             //
+
+                $table->string('coach_name')
+                ->nullable()
+                ->after('nama_paket');
+
+            $table->string('coach_whatsapp')
+                ->nullable()
+                ->after('coach_name');
         });
     }
 
@@ -23,6 +31,10 @@ return new class extends Migration
     {
         Schema::table('pt_packages', function (Blueprint $table) {
             //
+                $table->dropColumn([
+                    'coach_name',
+                    'coach_whatsapp'
+                ]);
         });
     }
 };

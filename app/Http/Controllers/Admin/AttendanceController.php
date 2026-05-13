@@ -154,6 +154,7 @@ class AttendanceController extends Controller
             'guest_name'     => $guestName,
             'guest_whatsapp' => $guestWhatsapp,
             'type'           => $attendanceType,
+            'admin_id'       => Auth::id(),
         ]);
 
         // =====================================================

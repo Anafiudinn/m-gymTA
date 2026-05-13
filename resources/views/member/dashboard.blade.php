@@ -22,6 +22,12 @@
        class="member-tab {{ $activeTab == 'overview' ? 'active' : '' }}">
         OVERVIEW
     </a>
+
+    <a href="{{ route('member.dashboard', ['tab' => 'my-package']) }}"
+   class="member-tab {{ $activeTab == 'my-package' ? 'active' : '' }}">
+    PAKET SAYA
+</a>
+
     <a href="{{ route('member.dashboard', ['tab' => 'package']) }}"
        class="member-tab {{ $activeTab == 'package' ? 'active' : '' }}">
         BELI PAKET & AKTIVASI
@@ -94,6 +100,8 @@
 <div class="tab-content">
     @if($activeTab == 'overview')
         @include('member.tabs.overview')
+        @elseif($activeTab == 'my-package')
+    @include('member.tabs.paket-saya')
     @elseif($activeTab == 'package')
         @include('member.tabs.package')
     @elseif($activeTab == 'history')
@@ -140,4 +148,5 @@
         });
     </script>
 @endif
+
 @endsection

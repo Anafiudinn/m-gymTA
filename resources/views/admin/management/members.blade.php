@@ -352,9 +352,9 @@
                     {{-- Status AKTIVASI --}}
                     <td>
                         @if($m->is_active_member)
-                        <span class="badge badge-green"><span class="badge-dot"></span>Aktif</span>
+                        <span class="badge badge-green"><span class="badge-dot"></span>Aktivasi</span>
                         @else
-                        <span class="badge badge-red"><span class="badge-dot"></span>Non-Aktif</span>
+                        <span class="badge badge-red"><span class="badge-dot"></span>Non-Aktivasi</span>
                         @endif
                     </td>
 
@@ -476,7 +476,6 @@
             <div class="digi-card-brand">
                 <div class="digi-card-brand-icon"><i class="fa fa-dumbbell"></i></div>
                 <span class="digi-card-brand-name">UB GYM</span>
-                <span class="digi-card-status" id="dc_status_badge">MEMBER AKTIF</span>
             </div>
             <div class="digi-card-member-row">
                 <div class="digi-card-avatar" id="dc_avatar">A</div>
@@ -586,14 +585,6 @@ function openDetail(m) {
     document.getElementById('dc_code').textContent    = m.member_code || 'NON MEMBER';
     document.getElementById('dc_expired').textContent = m.expired || '—';
 
-    const badge = document.getElementById('dc_status_badge');
-    if (m.is_member) {
-        badge.textContent = 'MEMBER AKTIF';
-        badge.style.cssText = 'background:#16a34a;color:#fff;padding:3px 9px;border-radius:20px;font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;';
-    } else {
-        badge.textContent = 'NON AKTIVASI';
-        badge.style.cssText = 'background:#ef4444;color:#fff;padding:3px 9px;border-radius:20px;font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;';
-    }
 
     // extended details
     document.getElementById('ed_name').textContent       = m.name;

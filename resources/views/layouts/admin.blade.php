@@ -61,6 +61,7 @@
             z-index: 40;
             overflow: hidden;
         }
+        
 
         /* Brand */
         .sb-brand {
@@ -463,7 +464,7 @@
         .m-ok:active { transform: scale(.97); }
 
         /* ──── MOBILE ──── */
-        @media (max-width: 767px) {
+        @media (max-width: 768px) {
             #sidebar {
                 position: fixed; top: 0; left: 0; bottom: 0;
                 transform: translateX(-100%);
@@ -478,6 +479,11 @@
             .user-chip { padding: 4px; }
             .hdr-divider { display: none; }
         }
+        @media (max-width: 768px) {
+    .attendance-grid {
+        grid-template-columns: 1fr !important;
+    }
+}
     </style>
 </head>
 <body>

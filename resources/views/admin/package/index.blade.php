@@ -81,7 +81,7 @@
             <p style="font-size:13.5px;font-weight:700;color:#1c2434;margin:0 0 1px;">{{ $user->name }}</p>
             <p style="font-size:11px;color:#94a3b8;margin:0 0 6px;font-family:'JetBrains Mono',monospace;">{{ $user->whatsapp }}</p>
             <span class="pill {{ $user->is_active_member ? 'pill-green' : 'pill-red' }}">
-                {{ $user->is_active_member ? 'Member Aktif' : 'Belum Aktif' }}
+                {{ $user->is_active_member ? 'Membership Aktif' : 'Belum Aktif' }}
             </span>
         </div>
         @endif
@@ -117,7 +117,7 @@
 
             @elseif($user && !$user->is_active_member)
             <div style="background:#fff7ed;border:1px solid #fed7aa;border-radius:8px;padding:10px 12px;margin-bottom:12px;">
-                <p style="font-size:12px;font-weight:700;color:#9a3412;margin:0 0 2px;"><i class="fa fa-exclamation-triangle" style="margin-right:4px;"></i>Upgrade ke Member</p>
+                <p style="font-size:12px;font-weight:700;color:#9a3412;margin:0 0 2px;"><i class="fa fa-exclamation-triangle" style="margin-right:4px;"></i>Upgrade Menjadi Member</p>
                 <p style="font-size:11px;color:#c2410c;margin:0;">User pernah membeli paket non member.</p>
             </div>
             <form action="{{ route('admin.package.activate') }}" method="POST" style="display:flex;flex-direction:column;gap:10px;">
@@ -178,7 +178,7 @@
                     </div>
                 </div>
                 <button type="submit" class="btn btn-primary" style="justify-content:center;background:#f97316;font-size:12.5px;padding:9px;">
-                    <i class="fa fa-user-plus"></i> DAFTAR & AKTIFKAN
+                    <i class="fa fa-user-plus"></i> Daftar & Aktivasi Member
                 </button>
             </form>
             @endif
@@ -200,7 +200,7 @@
                 <i class="fa fa-dumbbell" style="font-size:11px;color:#3b82f6;"></i>
             </div>
             <div>
-                <p style="font-size:12.5px;font-weight:700;color:#1c2434;margin:0;">Paket Bulanan Gym</p>
+                <p style="font-size:12.5px;font-weight:700;color:#1c2434;margin:0;">Paket Membership Bulanan Gym</p>
                 <p style="font-size:10.5px;color:#94a3b8;margin:0;">Member & non member</p>
             </div>
         </div>
@@ -209,7 +209,7 @@
             @if($user)
                 @if($isMember)
                 <div style="background:#f0fdf4;border:1px solid #bbf7d0;border-radius:8px;padding:9px 12px;margin-bottom:12px;">
-                    <p style="font-size:12px;font-weight:700;color:#15803d;margin:0;"><i class="fa fa-check-circle" style="margin-right:4px;"></i>Member Aktif — harga khusus</p>
+                    <p style="font-size:12px;font-weight:700;color:#15803d;margin:0;"><i class="fa fa-check-circle" style="margin-right:4px;"></i>Membership Aktif — harga khusus</p>
                 </div>
                 @else
                 <div style="background:#fff7ed;border:1px solid #fed7aa;border-radius:8px;padding:9px 12px;margin-bottom:12px;">
@@ -226,7 +226,7 @@
             <div style="text-align:center;padding:12px;border-radius:8px;border:1px solid {{ $isMember ? '#bfdbfe' : '#fed7aa' }};background:{{ $isMember ? '#eff6ff' : '#fff7ed' }};margin-bottom:12px;">
                 <p style="font-size:10px;color:#94a3b8;margin:0 0 3px;">Harga Paket</p>
                 <p style="font-size:22px;font-weight:800;margin:0;color:{{ $isMember ? '#2563eb' : '#ea580c' }};">Rp {{ number_format($monthlyPrice, 0, ',', '.') }}</p>
-                <p style="font-size:10px;color:#94a3b8;margin:4px 0 0;">{{ $isMember ? 'harga member' : 'harga non member' }}</p>
+                <p style="font-size:10px;color:#94a3b8;margin:4px 0 0;">{{ $isMember ? 'harga sudah aktivasi member' : 'harga non aktivasi member' }}</p>
             </div>
 
             <form action="{{ route('admin.package.buy') }}" method="POST" style="display:flex;flex-direction:column;gap:10px;">
@@ -300,7 +300,7 @@
                         <option value="transfer">Transfer</option>
                     </select>
                 </div>
-                <button type="submit" class="btn btn-dark" style="justify-content:center;font-size:12.5px;padding:9px;">
+                <button type="submit" class="btn-primary" style="justify-content:center;font-size:12.5px;padding:9px;">
                     <i class="fa fa-dumbbell"></i> BELI PAKET PT
                 </button>
             </form>
@@ -385,11 +385,11 @@
                     {{-- Category + invoice --}}
                     <div style="display:flex;align-items:center;gap:6px;margin-bottom:5px;flex-wrap:wrap;">
                         @if($trx->category == 'activation')
-                            <span class="pill pill-amber">Aktivasi</span>
+                        <span class="pill pill-amber">Aktivasi Member</span>
                         @elseif($trx->category == 'monthly')
-                            <span class="pill pill-blue">Bulanan</span>
+                          <span class="pill pill-blue">Membership Bulanan</span>
                         @elseif($trx->category == 'pt')
-                            <span class="pill pill-gray">PT</span>
+                           <span class="pill pill-gray">Paket PT</span>
                         @endif
                         <span style="font-size:10.5px;color:#94a3b8;font-family:'JetBrains Mono',monospace;">{{ $trx->invoice_code }}</span>
                     </div>

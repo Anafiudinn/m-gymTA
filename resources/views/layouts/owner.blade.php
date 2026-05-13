@@ -337,79 +337,186 @@
             </div>
         </div>
 
-        <!-- Nav -->
-        <nav id="sb-nav">
+      <!-- Nav -->
+<nav id="sb-nav">
 
-            <a href="{{ route('owner.dashboard') }}"
-               class="nav-item {{ request()->routeIs('owner.dashboard') ? 'active' : '' }}">
-                <span class="ni">
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round">
-                        <rect x="3" y="3" width="7" height="8" rx="2"/>
-                        <rect x="14" y="3" width="7" height="4" rx="2"/>
-                        <rect x="14" y="11" width="7" height="10" rx="2"/>
-                        <rect x="3" y="15" width="7" height="6" rx="2"/>
-                    </svg>
-                </span>
-                Dashboard
-            </a>
+    {{-- DASHBOARD --}}
+    <a href="{{ route('owner.dashboard') }}"
+       class="nav-item {{ request()->routeIs('owner.dashboard') ? 'active' : '' }}">
 
-            <div class="sb-section">Manajemen</div>
+        <span class="ni">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                 stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round">
+                <rect x="3" y="3" width="7" height="8" rx="2"/>
+                <rect x="14" y="3" width="7" height="4" rx="2"/>
+                <rect x="14" y="11" width="7" height="10" rx="2"/>
+                <rect x="3" y="15" width="7" height="6" rx="2"/>
+            </svg>
+        </span>
 
-            <a href="{{ route('owner.admins') }}"
-               class="nav-item {{ request()->routeIs('owner.admins') ? 'active' : '' }}">
-                <span class="ni">
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round">
-                        <rect x="2" y="5" width="20" height="14" rx="2"/>
-                        <circle cx="8" cy="12" r="2.5"/>
-                        <path d="M13 10h5M13 14h3"/>
-                    </svg>
-                </span>
-                Kelola Admin
-            </a>
+        Dashboard
+    </a>
 
-            <a href="{{ route('owner.pt-packages') }}"
-               class="nav-item {{ request()->routeIs('owner.pt-packages') ? 'active' : '' }}">
-                <span class="ni">
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round">
-                        <rect x="1.5" y="9.5" width="3" height="5" rx="1.5"/>
-                        <rect x="19.5" y="9.5" width="3" height="5" rx="1.5"/>
-                        <rect x="4.5" y="7.5" width="3" height="9" rx="1.5"/>
-                        <rect x="16.5" y="7.5" width="3" height="9" rx="1.5"/>
-                        <line x1="7.5" y1="12" x2="16.5" y2="12"/>
-                    </svg>
-                </span>
-                Paket PT
-            </a>
+    {{-- ===================================================== --}}
+    {{-- MANAJEMEN --}}
+    {{-- ===================================================== --}}
+    <div class="sb-section">Manajemen</div>
 
-            <div class="sb-section">Pengaturan</div>
+    {{-- ADMIN --}}
+    <a href="{{ route('owner.admins.index') }}"
+       class="nav-item {{ request()->routeIs('owner.admins.*') ? 'active' : '' }}">
 
-            <a href="{{ route('owner.settings') }}"
-               class="nav-item {{ request()->routeIs('owner.settings') ? 'active' : '' }}">
-                <span class="ni">
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round">
-                        <path d="M20.59 13.41l-7.17 7.17a2 2 0 01-2.83 0L2 12V2h10l8.59 8.59a2 2 0 010 2.82z"/>
-                        <circle cx="7" cy="7" r="1.5" fill="currentColor" stroke="none"/>
-                    </svg>
-                </span>
-                Pengaturan Harga
-            </a>
+        <span class="ni">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                 stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round">
+                <rect x="2" y="5" width="20" height="14" rx="2"/>
+                <circle cx="8" cy="12" r="2.5"/>
+                <path d="M13 10h5M13 14h3"/>
+            </svg>
+        </span>
 
-            <div class="sb-section">Laporan</div>
+        Kelola Admin
+    </a>
 
-            <a href="{{ route('owner.reports') }}"
-               class="nav-item {{ request()->routeIs('owner.reports') ? 'active' : '' }}">
-                <span class="ni">
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round">
-                        <line x1="18" y1="20" x2="18" y2="10"/>
-                        <line x1="12" y1="20" x2="12" y2="4"/>
-                        <line x1="6"  y1="20" x2="6"  y2="14"/>
-                        <line x1="2"  y1="20" x2="22" y2="20"/>
-                    </svg>
-                </span>
-                Laporan
-            </a>
+    {{-- MEMBER --}}
+    <a href="{{ route('owner.members.index') }}"
+       class="nav-item {{ request()->routeIs('owner.members.*') ? 'active' : '' }}">
 
-        </nav>
+        <span class="ni">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                 stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/>
+                <circle cx="9" cy="7" r="4"/>
+                <path d="M23 21v-2a4 4 0 0 0-3-3.87"/>
+                <path d="M16 3.13a4 4 0 0 1 0 7.75"/>
+            </svg>
+        </span>
+
+        Monitoring Member
+    </a>
+
+    {{-- PRODUK --}}
+    <a href="{{ route('owner.products.index') }}"
+       class="nav-item {{ request()->routeIs('owner.products.*') ? 'active' : '' }}">
+
+        <span class="ni">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                 stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/>
+                <polyline points="7.5 4.21 12 6.81 16.5 4.21"/>
+                <polyline points="7.5 19.79 7.5 14.6 3 12"/>
+                <polyline points="21 12 16.5 14.6 16.5 19.79"/>
+                <polyline points="12 22.08 12 17"/>
+            </svg>
+        </span>
+
+        Monitoring Produk
+    </a>
+
+    {{-- PT PACKAGE --}}
+    <a href="{{ route('owner.pt-packages.index') }}"
+       class="nav-item {{ request()->routeIs('owner.pt-packages.*') ? 'active' : '' }}">
+
+        <span class="ni">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                 stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round">
+                <rect x="1.5" y="9.5" width="3" height="5" rx="1.5"/>
+                <rect x="19.5" y="9.5" width="3" height="5" rx="1.5"/>
+                <rect x="4.5" y="7.5" width="3" height="9" rx="1.5"/>
+                <rect x="16.5" y="7.5" width="3" height="9" rx="1.5"/>
+                <line x1="7.5" y1="12" x2="16.5" y2="12"/>
+            </svg>
+        </span>
+
+        Paket PT
+    </a>
+
+    {{-- ===================================================== --}}
+    {{-- LAPORAN --}}
+    {{-- ===================================================== --}}
+    <div class="sb-section">Laporan</div>
+
+    {{-- TRANSAKSI --}}
+    <a href="{{ route('owner.reports.transactions') }}"
+       class="nav-item {{ request()->routeIs('owner.reports.transactions') ? 'active' : '' }}">
+
+        <span class="ni">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                 stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M3 3v18h18"/>
+                <path d="M7 14l4-4 3 3 5-6"/>
+            </svg>
+        </span>
+
+        Laporan Transaksi
+    </a>
+
+    {{-- ATTENDANCE --}}
+    <a href="{{ route('owner.reports.attendance') }}"
+       class="nav-item {{ request()->routeIs('owner.reports.attendance') ? 'active' : '' }}">
+
+        <span class="ni">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                 stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M9 11l3 3L22 4"/>
+                <path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/>
+            </svg>
+        </span>
+
+        Laporan Kehadiran
+    </a>
+
+    {{-- ===================================================== --}}
+    {{-- PENGATURAN --}}
+    {{-- ===================================================== --}}
+    <div class="sb-section">Pengaturan</div>
+
+    <a href="{{ route('owner.settings.index') }}"
+       class="nav-item {{ request()->routeIs('owner.settings.*') ? 'active' : '' }}">
+
+        <span class="ni">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                 stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round">
+                <circle cx="12" cy="12" r="3"/>
+                <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06
+                         a2 2 0 0 1 0 2.83
+                         2 2 0 0 1-2.83 0l-.06-.06
+                         a1.65 1.65 0 0 0-1.82-.33
+                         1.65 1.65 0 0 0-1 1.51V21
+                         a2 2 0 0 1-2 2
+                         2 2 0 0 1-2-2v-.09
+                         a1.65 1.65 0 0 0-1-1.51
+                         1.65 1.65 0 0 0-1.82.33l-.06.06
+                         a2 2 0 0 1-2.83 0
+                         2 2 0 0 1 0-2.83l.06-.06
+                         a1.65 1.65 0 0 0 .33-1.82
+                         1.65 1.65 0 0 0-1.51-1H3
+                         a2 2 0 0 1-2-2
+                         2 2 0 0 1 2-2h.09
+                         a1.65 1.65 0 0 0 1.51-1
+                         1.65 1.65 0 0 0-.33-1.82l-.06-.06
+                         a2 2 0 0 1 0-2.83
+                         2 2 0 0 1 2.83 0l.06.06
+                         a1.65 1.65 0 0 0 1.82.33H9
+                         a1.65 1.65 0 0 0 1-1.51V3
+                         a2 2 0 0 1 2-2
+                         2 2 0 0 1 2 2v.09
+                         a1.65 1.65 0 0 0 1 1.51
+                         1.65 1.65 0 0 0 1.82-.33l.06-.06
+                         a2 2 0 0 1 2.83 0
+                         2 2 0 0 1 0 2.83l-.06.06
+                         a1.65 1.65 0 0 0-.33 1.82V9
+                         a1.65 1.65 0 0 0 1.51 1H21
+                         a2 2 0 0 1 2 2
+                         2 2 0 0 1-2 2h-.09
+                         a1.65 1.65 0 0 0-1.51 1z"/>
+            </svg>
+        </span>
+
+        Pengaturan Harga
+    </a>
+
+</nav>
 
         <!-- Footer -->
         <div class="sb-footer">

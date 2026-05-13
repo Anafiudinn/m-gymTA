@@ -130,118 +130,126 @@ public function attendance(Request $request)
 
     $attendances = $attendanceQuery->paginate(12);
 
-    /*
-    |--------------------------------------------------------------------------
-    | PT REPORT QUERY
-    |--------------------------------------------------------------------------
-    */
+  /*
+|--------------------------------------------------------------------------
+| PT REPORT QUERY
+|--------------------------------------------------------------------------
+*/
 
-    $ptQuery = PtMembership::with([
-        'user',
-        'package'
-    ])
-    ->latest('updated_at');
+$ptQuery = PtMembership::with([
+    'user',
+    'package'
+])->latest('updated_at');
 
-    /*
-    |--------------------------------------------------------------------------
-    | FILTER STATUS PT
-    |--------------------------------------------------------------------------
-    */
+/*
+|--------------------------------------------------------------------------
+| FILTER STATUS PT
+|--------------------------------------------------------------------------
+*/
 
-    if ($tab == 'pt' && $request->filled('status')) {
+if ($tab == 'pt' && $request->filled('status')) {
 
-        $ptQuery->where(
-            'status',
-            $request->status
-        );
-    }
+    $ptQuery->where(
+        'status',
+        $request->status
+    );
+}
 
-    /*
-    |--------------------------------------------------------------------------
-    | SEARCH PT
-    |--------------------------------------------------------------------------
-    */
+/*
+|--------------------------------------------------------------------------
+| SEARCH PT
+|--------------------------------------------------------------------------
+*/
 
-    if ($tab == 'pt' && $request->filled('search')) {
+if ($tab == 'pt' && $request->filled('search')) {
 
-        $search = $request->search;
+    $search = $request->search;
 
-        $ptQuery->whereHas('user', function ($q) use ($search) {
+    $ptQuery->where(function ($q) use ($search) {
 
-            $q->where('name', 'like', "%{$search}%")
+        $q->whereHas('user', function ($u) use ($search) {
+
+            $u->where('name', 'like', "%{$search}%")
                 ->orWhere('member_code', 'like', "%{$search}%")
                 ->orWhere('whatsapp', 'like', "%{$search}%");
+        })
+
+        ->orWhereHas('package', function ($p) use ($search) {
+
+            $p->where('coach_name', 'like', "%{$search}%")
+                ->orWhere('nama_paket', 'like', "%{$search}%");
         });
-    }
+    });
+}
 
-    $ptReports = $ptQuery->paginate(12);
+$ptReports = $ptQuery->paginate(12);
 
-    /*
-    |--------------------------------------------------------------------------
-    | STATS ATTENDANCE
-    |--------------------------------------------------------------------------
-    */
+/*
+|--------------------------------------------------------------------------
+| STATS ATTENDANCE
+|--------------------------------------------------------------------------
+*/
 
-    $totalAttendance = Attendance::count();
+$totalAttendance = Attendance::count();
 
-    $memberAttendance = Attendance::where(
-        'type',
-        'member_package'
-    )->count();
+$memberAttendance = Attendance::where(
+    'type',
+    'member_package'
+)->count();
 
-    $guestAttendance = Attendance::where(
-        'type',
-        'paid_visit'
-    )->count();
+$guestAttendance = Attendance::where(
+    'type',
+    'paid_visit'
+)->count();
 
-    $todayAttendance = Attendance::whereDate(
-        'created_at',
-        today()
-    )->count();
+$todayAttendance = Attendance::whereDate(
+    'created_at',
+    today()
+)->count();
 
-    /*
-    |--------------------------------------------------------------------------
-    | STATS PT
-    |--------------------------------------------------------------------------
-    */
+/*
+|--------------------------------------------------------------------------
+| STATS PT
+|--------------------------------------------------------------------------
+*/
 
-    $totalPt = PtMembership::count();
+$totalPt = PtMembership::count();
 
-    $activePt = PtMembership::where(
-        'status',
-        'active'
-    )->count();
+$activePt = PtMembership::where(
+    'status',
+    'active'
+)->count();
 
-    $finishedPt = PtMembership::where(
-        'status',
-        'completed'
-    )->count();
+$finishedPt = PtMembership::where(
+    'status',
+    'completed'
+)->count();
 
-    $lowSessionPt = PtMembership::where(
-        'status',
-        'active'
+$lowSessionPt = PtMembership::where(
+    'status',
+    'active'
+)
+->where('remaining_sessions', '<=', 3)
+->count();
+
+return view(
+    'admin.report.attendance',
+    compact(
+        'tab',
+
+        'attendances',
+        'ptReports',
+
+        'totalAttendance',
+        'memberAttendance',
+        'guestAttendance',
+        'todayAttendance',
+
+        'totalPt',
+        'activePt',
+        'finishedPt',
+        'lowSessionPt'
     )
-    ->where('remaining_sessions', '<=', 3)
-    ->count();
-
-    return view(
-        'admin.report.attendance',
-        compact(
-            'tab',
-
-            'attendances',
-            'ptReports',
-
-            'totalAttendance',
-            'memberAttendance',
-            'guestAttendance',
-            'todayAttendance',
-
-            'totalPt',
-            'activePt',
-            'finishedPt',
-            'lowSessionPt'
-        )
-    );
+);
 }
 }
