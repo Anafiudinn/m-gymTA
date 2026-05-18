@@ -1,410 +1,437 @@
 @extends('layouts.admin')
 
+@section('title', 'Laporan Transaksi')
+@section('header-title', 'Laporan Transaksi')
+
 @section('content')
-<div class="space-y-6">
-    {{-- Header --}}
-    <div class="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
-        <div>
-            <h1 class="text-2xl md:text-3xl font-extrabold text-slate-800 tracking-tight">
-                Riwayat Transaksi
-            </h1>
-            <p class="text-sm text-slate-500 mt-1">
-                Semua histori transaksi gym dan retail.
-            </p>
-        </div>
 
-        {{-- FILTER --}}
-        <form method="GET" class="flex flex-col sm:flex-row flex-wrap gap-3 w-full lg:w-auto">
-            {{-- Search --}}
-            <div class="relative">
-                <i class="fas fa-search absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 text-xs"></i>
-                <input
-                    type="text"
-                    name="search"
-                    value="{{ request('search') }}"
-                    placeholder="Cari invoice / nama..."
-                    class="w-full sm:w-[240px] bg-white border border-slate-200 rounded-2xl pl-10 pr-4 py-3 text-sm font-medium focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none shadow-sm">
-            </div>
-
-            {{-- Category --}}
-            <select name="category" class="bg-white border border-slate-200 rounded-2xl px-4 py-3 text-sm font-semibold text-slate-700 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none shadow-sm">
-                <option value="">Semua Kategori</option>
-                <option value="retail" {{ request('category') == 'retail' ? 'selected' : '' }}>Retail</option>
-                <option value="activation" {{ request('category') == 'activation' ? 'selected' : '' }}>Aktivasi</option>
-                <option value="monthly" {{ request('category') == 'monthly' ? 'selected' : '' }}>Membership</option>
-                <option value="pt" {{ request('category') == 'pt' ? 'selected' : '' }}>Personal Trainer</option>
-                <option value="visit" {{ request('category') == 'visit' ? 'selected' : '' }}>Visit Harian</option>
-            </select>
-
-            {{-- Source --}}
-            <select name="source" class="bg-white border border-slate-200 rounded-2xl px-4 py-3 text-sm font-semibold text-slate-700 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none shadow-sm">
-                <option value="">Semua Source</option>
-                <option value="onsite" {{ request('source') == 'onsite' ? 'selected' : '' }}>Onsite</option>
-                <option value="online" {{ request('source') == 'online' ? 'selected' : '' }}>Online</option>
-            </select>
-
-            {{-- Status --}}
-            <select name="status" class="bg-white border border-slate-200 rounded-2xl px-4 py-3 text-sm font-semibold text-slate-700 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none shadow-sm">
-                <option value="">Semua Status</option>
-                <option value="success" {{ request('status') == 'success' ? 'selected' : '' }}>Success</option>
-                <option value="pending" {{ request('status') == 'pending' ? 'selected' : '' }}>Pending</option>
-                <option value="rejected" {{ request('status') == 'rejected' ? 'selected' : '' }}>Rejected</option>
-                <option value="cancelled" {{ request('status') == 'cancelled' ? 'selected' : '' }}>Cancelled</option>
-            </select>
-
-            {{-- Submit --}}
-            <button type="submit" class="bg-slate-900 hover:bg-blue-600 text-white px-5 py-3 rounded-2xl text-xs font-bold uppercase tracking-widest transition-all shadow-sm">
-                Filter
-            </button>
-        </form>
+{{-- ═══ PAGE HEADER ═══ --}}
+<div style="margin-bottom:20px;">
+    <div style="display:flex;align-items:center;gap:6px;font-size:11px;color:var(--muted);margin-bottom:6px;">
+        <i class="fa-solid fa-house" style="font-size:10px;"></i>
+        <span>Dashboard</span>
+        <i class="fa-solid fa-chevron-right" style="font-size:9px;"></i>
+        <span>Laporan</span>
+        <i class="fa-solid fa-chevron-right" style="font-size:9px;"></i>
+        <span style="color:var(--text);font-weight:600;">Transaksi</span>
     </div>
-
-    {{-- STATS --}}
-    <div class="grid grid-cols-2 lg:grid-cols-4 gap-4">
-        <div class="bg-white border border-slate-100 rounded-2xl p-5 shadow-sm">
-            <p class="text-[11px] uppercase tracking-widest font-bold text-slate-400">Total Transaksi</p>
-            <h3 class="text-2xl font-extrabold text-slate-800 mt-2">{{ $transactions->total() }}</h3>
-        </div>
-
-        <div class="bg-white border border-slate-100 rounded-2xl p-5 shadow-sm">
-            <p class="text-[11px] uppercase tracking-widest font-bold text-slate-400">Retail</p>
-            <h3 class="text-2xl font-extrabold text-blue-600 mt-2">{{ $transactions->where('category', 'retail')->count() }}</h3>
-        </div>
-
-        <div class="bg-white border border-slate-100 rounded-2xl p-5 shadow-sm">
-            <p class="text-[11px] uppercase tracking-widest font-bold text-slate-400">Membership</p>
-            <h3 class="text-2xl font-extrabold text-emerald-600 mt-2">{{ $transactions->where('category', 'monthly')->count() }}</h3>
-        </div>
-
-        <div class="bg-white border border-slate-100 rounded-2xl p-5 shadow-sm">
-            <p class="text-[11px] uppercase tracking-widest font-bold text-slate-400">Pending</p>
-            <h3 class="text-2xl font-extrabold text-amber-500 mt-2">{{ $transactions->where('status', 'pending')->count() }}</h3>
-        </div>
-    </div>
-
-    {{-- TABLE --}}
-    <div class="bg-white border border-slate-100 rounded-3xl shadow-sm overflow-hidden">
-        {{-- HEADER --}}
-        <div class="px-6 py-5 border-b border-slate-100 flex items-center justify-between">
-            <div>
-                <h3 class="font-bold text-slate-800">List Transaksi</h3>
-                <p class="text-xs text-slate-400 mt-1">Histori pembayaran gym dan retail.</p>
-            </div>
-        </div>
-
-        {{-- TABLE --}}
-        <div class="overflow-x-auto">
-            <table class="w-full min-w-[1200px]">
-                <thead class="bg-slate-50">
-                    <tr>
-                        <th class="px-6 py-4 text-left text-[11px] uppercase tracking-widest font-bold text-slate-500">Invoice</th>
-                        <th class="px-6 py-4 text-left text-[11px] uppercase tracking-widest font-bold text-slate-500">Pelanggan</th>
-                        <th class="px-6 py-4 text-left text-[11px] uppercase tracking-widest font-bold text-slate-500">Kategori</th>
-                        <th class="px-6 py-4 text-left text-[11px] uppercase tracking-widest font-bold text-slate-500">Source</th>
-                        <th class="px-6 py-4 text-left text-[11px] uppercase tracking-widest font-bold text-slate-500">Pembayaran</th>
-                        <th class="px-6 py-4 text-left text-[11px] uppercase tracking-widest font-bold text-slate-500">Total</th>
-                        <th class="px-6 py-4 text-center text-[11px] uppercase tracking-widest font-bold text-slate-500">Status</th>
-                        <th class="px-6 py-4 text-right text-[11px] uppercase tracking-widest font-bold text-slate-500">Aksi</th>
-                    </tr>
-                </thead>
-
-                <tbody class="divide-y divide-slate-100">
-                    @forelse($transactions as $trx)
-                    <tr class="hover:bg-slate-50/70 transition-all">
-                        {{-- Invoice --}}
-                        <td class="px-6 py-5">
-                            <div>
-                                <h4 class="font-bold text-slate-800">{{ $trx->invoice_code }}</h4>
-                                <p class="text-xs text-slate-400 mt-1">{{ $trx->created_at->format('d M Y - H:i') }}</p>
-                            </div>
-                        </td>
-
-                        {{-- Customer --}}
-                        <td class="px-6 py-5">
-                            <div>
-                                <h4 class="font-semibold text-slate-700">{{ $trx->guest_name ?? $trx->user->name ?? '-' }}</h4>
-                                <p class="text-xs text-slate-400 mt-1">Admin : {{ $trx->admin->name ?? '-' }}</p>
-                            </div>
-                        </td>
-
-                        {{-- Category --}}
-                        <td class="px-6 py-5">
-                            @php
-                            $categoryColors = [
-                            'retail' => 'bg-blue-100 text-blue-600',
-                            'monthly' => 'bg-emerald-100 text-emerald-600',
-                            'activation' => 'bg-purple-100 text-purple-600',
-                            'visit' => 'bg-amber-100 text-amber-600',
-                            'pt' => 'bg-pink-100 text-pink-600',
-                            ];
-                            @endphp
-
-                            @php
-                            $categoryLabels = [
-                            'retail' => 'Retail',
-                            'monthly' => 'Paket Bulanan',
-                            'activation' => 'Aktivasi Member',
-                            'visit' => 'Visit Harian',
-                            'pt' => 'Paket PT',
-                            ];
-                            @endphp
-
-                            <span class="px-3 py-1.5 rounded-full text-[10px] font-bold uppercase tracking-wider {{ $categoryColors[$trx->category] ?? 'bg-slate-100 text-slate-600' }}">
-                                {{ $categoryLabels[$trx->category] ?? $trx->category }}
-                            </span>
-                        </td>
-
-                        {{-- SOURCE --}}
-                        <td class="px-6 py-5">
-                            @if($trx->source == 'online')
-                            <span class="px-3 py-1.5 rounded-full bg-blue-100 text-blue-600 text-[10px] font-bold uppercase tracking-wider">
-                                Online
-                            </span>
-                            @else
-                            <span class="px-3 py-1.5 rounded-full bg-slate-100 text-slate-600 text-[10px] font-bold uppercase tracking-wider">
-                                Onsite
-                            </span>
-                            @endif
-                        </td>
-
-                        {{-- Payment --}}
-                        <td class="px-6 py-5">
-                            <div>
-                                <h4 class="font-semibold text-slate-700 uppercase">{{ $trx->payment_method }}</h4>
-                            </div>
-                        </td>
-
-                        {{-- Amount --}}
-                        <td class="px-6 py-5">
-                            <h4 class="font-extrabold text-slate-800">Rp {{ number_format($trx->amount, 0, ',', '.') }}</h4>
-                        </td>
-
-                        {{-- STATUS --}}
-                        <td class="px-6 py-5 text-center">
-                            @if($trx->status == 'success')
-                            <span class="px-3 py-1.5 rounded-full bg-emerald-100 text-emerald-600 text-[10px] font-bold uppercase tracking-wider">
-                                Success
-                            </span>
-                            @elseif($trx->status == 'pending')
-                            <span class="px-3 py-1.5 rounded-full bg-amber-100 text-amber-600 text-[10px] font-bold uppercase tracking-wider">
-                                Pending
-                            </span>
-                            @elseif($trx->status == 'rejected')
-                            <span class="px-3 py-1.5 rounded-full bg-red-100 text-red-600 text-[10px] font-bold uppercase tracking-wider">
-                                Rejected
-                            </span>
-                            @else
-                            <span class="px-3 py-1.5 rounded-full bg-slate-200 text-slate-700 text-[10px] font-bold uppercase tracking-wider">
-                                Cancelled
-                            </span>
-                            @endif
-                        </td>
-
-                        {{-- ACTION --}}
-                        <td class="px-6 py-5">
-                            <div class="flex justify-end">
-                                @if($trx->category == 'retail' || $trx->source == 'online')
-                                <button onclick="openDetailModal({{ $trx->id }})"
-                                    class="w-10 h-10 rounded-xl bg-slate-100 hover:bg-blue-600 hover:text-white text-slate-600 transition-all flex items-center justify-center">
-                                    <i class="fas fa-eye text-[12px]"></i>
-                                </button>
-                                @endif
-                            </div>
-                        </td>
-                    </tr>
-
-                    {{-- DATA --}}
-                    <script>
-                        window['trx_{{ $trx->id }}'] = {
-                            invoice: "{{ $trx->invoice_code }}",
-                            customer: "{{ $trx->guest_name ?? $trx->user->name ?? '-' }}",
-                            category: "{{ $trx->category }}",
-                            source: "{{ $trx->source }}",
-                            payment: "{{ $trx->payment_method }}",
-                            status: "{{ $trx->status }}",
-                            total: "{{ number_format($trx->amount, 0, ',', '.') }}",
-                            sender_bank: "{{ $trx->sender_bank ?? '-' }}",
-                            sender_account: "{{ $trx->sender_account ?? '-' }}",
-                            rejection_reason: "{{ $trx->rejection_reason ?? '-' }}",
-                            proof: "{{ $trx->proof_attachment ? asset('storage/'.$trx->proof_attachment) : '' }}",
-                           items: [
-    @foreach($trx->items as $item)
-    {
-        product: "{{ $item->product->nama_produk ?? '-' }}",
-        qty: "{{ $item->qty }}",
-        subtotal: "{{ number_format($item->subtotal, 0, ',', '.') }}"
-    }{{ !$loop->last ? ',' : '' }}
-    @endforeach
-]
-                        };
-                    </script>
-                    @empty
-                    <tr>
-                        <td colspan="8" class="py-24 text-center">
-                            <div class="flex flex-col items-center">
-                                <div class="w-20 h-20 rounded-full bg-slate-100 flex items-center justify-center mb-5">
-                                    <i class="fas fa-receipt text-3xl text-slate-300"></i>
-                                </div>
-                                <h3 class="font-bold text-slate-700">Belum Ada Transaksi</h3>
-                                <p class="text-sm text-slate-400 mt-1">Histori transaksi akan muncul di sini.</p>
-                            </div>
-                        </td>
-                    </tr>
-                    @endforelse
-                </tbody>
-            </table>
-        </div>
-
-        {{-- PAGINATION --}}
-        <div class="px-6 py-5 border-t border-slate-100">
-            {{ $transactions->withQueryString()->links() }}
-        </div>
-    </div>
+    <h1 style="font-size:20px;font-weight:800;color:var(--text);margin:0 0 2px;">Laporan Transaksi</h1>
+    <p style="font-size:12px;color:var(--muted);margin:0;">Semua histori transaksi gym dan retail</p>
 </div>
 
-{{-- MODAL --}}
-<div id="detailModal" class="hidden fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-[70] flex items-center justify-center p-4">
-    <div class="bg-white w-full max-w-2xl rounded-3xl shadow-2xl overflow-hidden">
-        {{-- HEADER --}}
-        <div class="px-8 py-6 border-b border-slate-100 flex items-center justify-between">
+{{-- ═══ FILTER BAR ═══ --}}
+<form method="GET" style="background:#fff;border:1px solid var(--border);border-radius:var(--radius);padding:14px 16px;margin-bottom:16px;display:flex;flex-wrap:wrap;gap:8px;align-items:center;">
+
+    {{-- Search --}}
+    <div style="position:relative;flex:1;min-width:180px;max-width:240px;">
+        <i class="fa-solid fa-magnifying-glass" style="position:absolute;left:10px;top:50%;transform:translateY(-50%);font-size:10px;color:var(--muted);pointer-events:none;"></i>
+        <input type="text" name="search" value="{{ request('search') }}" placeholder="Invoice / nama..."
+               style="width:100%;border:1px solid var(--border);border-radius:var(--radius);padding:8px 12px 8px 30px;font-size:12.5px;color:var(--text);outline:none;font-family:'Outfit',sans-serif;box-sizing:border-box;background:#fff;transition:border-color .15s,box-shadow .15s;"
+               onfocus="this.style.borderColor='var(--red)';this.style.boxShadow='0 0 0 3px rgba(239,68,68,.08)';"
+               onblur="this.style.borderColor='var(--border)';this.style.boxShadow='none';">
+    </div>
+
+    {{-- Kategori --}}
+    <select name="category"
+            style="border:1px solid var(--border);border-radius:var(--radius);padding:8px 12px;font-size:12.5px;color:var(--text);outline:none;font-family:'Outfit',sans-serif;background:#fff;cursor:pointer;transition:border-color .15s,box-shadow .15s;"
+            onfocus="this.style.borderColor='var(--red)';this.style.boxShadow='0 0 0 3px rgba(239,68,68,.08)';"
+            onblur="this.style.borderColor='var(--border)';this.style.boxShadow='none';">
+        <option value="">Semua Kategori</option>
+        <option value="retail"     {{ request('category')=='retail'     ? 'selected':'' }}>Retail</option>
+        <option value="activation" {{ request('category')=='activation' ? 'selected':'' }}>Aktivasi</option>
+        <option value="monthly"    {{ request('category')=='monthly'    ? 'selected':'' }}>Membership</option>
+        <option value="pt"         {{ request('category')=='pt'         ? 'selected':'' }}>Personal Trainer</option>
+        <option value="visit"      {{ request('category')=='visit'      ? 'selected':'' }}>Visit Harian</option>
+    </select>
+
+    {{-- Source --}}
+    <select name="source"
+            style="border:1px solid var(--border);border-radius:var(--radius);padding:8px 12px;font-size:12.5px;color:var(--text);outline:none;font-family:'Outfit',sans-serif;background:#fff;cursor:pointer;transition:border-color .15s,box-shadow .15s;"
+            onfocus="this.style.borderColor='var(--red)';this.style.boxShadow='0 0 0 3px rgba(239,68,68,.08)';"
+            onblur="this.style.borderColor='var(--border)';this.style.boxShadow='none';">
+        <option value="">Semua Source</option>
+        <option value="onsite" {{ request('source')=='onsite' ? 'selected':'' }}>Onsite</option>
+        <option value="online" {{ request('source')=='online' ? 'selected':'' }}>Online</option>
+    </select>
+
+    {{-- Status --}}
+    <select name="status"
+            style="border:1px solid var(--border);border-radius:var(--radius);padding:8px 12px;font-size:12.5px;color:var(--text);outline:none;font-family:'Outfit',sans-serif;background:#fff;cursor:pointer;transition:border-color .15s,box-shadow .15s;"
+            onfocus="this.style.borderColor='var(--red)';this.style.boxShadow='0 0 0 3px rgba(239,68,68,.08)';"
+            onblur="this.style.borderColor='var(--border)';this.style.boxShadow='none';">
+        <option value="">Semua Status</option>
+        <option value="success"   {{ request('status')=='success'   ? 'selected':'' }}>Success</option>
+        <option value="pending"   {{ request('status')=='pending'   ? 'selected':'' }}>Pending</option>
+        <option value="rejected"  {{ request('status')=='rejected'  ? 'selected':'' }}>Rejected</option>
+        <option value="cancelled" {{ request('status')=='cancelled' ? 'selected':'' }}>Cancelled</option>
+    </select>
+
+    {{-- Filter btn --}}
+    <button type="submit"
+        style="background:var(--text);color:#fff;font-weight:700;font-size:12px;padding:8px 16px;border-radius:var(--radius);border:none;cursor:pointer;font-family:'Outfit',sans-serif;transition:background .15s;white-space:nowrap;"
+        onmouseover="this.style.background='#333'" onmouseout="this.style.background='var(--text)'">
+        <i class="fa-solid fa-filter" style="font-size:10px;margin-right:5px;"></i> Filter
+    </button>
+
+    {{-- Spacer --}}
+    <div style="flex:1;"></div>
+
+    {{-- Export btns --}}
+    <a href="{{ route('admin.report.transactions.excel', request()->query()) }}"
+       style="display:inline-flex;align-items:center;gap:6px;background:rgba(34,197,94,.1);color:#15803d;border:1px solid rgba(34,197,94,.2);font-size:12px;font-weight:700;padding:8px 14px;border-radius:var(--radius);text-decoration:none;transition:background .15s;white-space:nowrap;"
+       onmouseover="this.style.background='rgba(34,197,94,.18)'" onmouseout="this.style.background='rgba(34,197,94,.1)'">
+        <i class="fa-solid fa-file-excel" style="font-size:11px;"></i> Excel
+    </a>
+    <a href="{{ route('admin.report.transactions.pdf', request()->query()) }}"
+       style="display:inline-flex;align-items:center;gap:6px;background:rgba(239,68,68,.08);color:var(--red);border:1px solid rgba(239,68,68,.15);font-size:12px;font-weight:700;padding:8px 14px;border-radius:var(--radius);text-decoration:none;transition:background .15s;white-space:nowrap;"
+       onmouseover="this.style.background='rgba(239,68,68,.14)'" onmouseout="this.style.background='rgba(239,68,68,.08)'">
+        <i class="fa-solid fa-file-pdf" style="font-size:11px;"></i> PDF
+    </a>
+</form>
+
+{{-- ═══ STAT CARDS ═══ --}}
+<div style="display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:16px;">
+    @php
+        $statCards = [
+            ['label'=>'Total Transaksi', 'val'=>$transactions->total(),                              'color'=>'var(--text)'],
+            ['label'=>'Retail',          'val'=>$transactions->where('category','retail')->count(),   'color'=>'var(--text)'],
+            ['label'=>'Membership',      'val'=>$transactions->where('category','monthly')->count(),  'color'=>'var(--text)'],
+            ['label'=>'Pending',         'val'=>$transactions->where('status','pending')->count(),    'color'=>'var(--red)'],
+        ];
+    @endphp
+    @foreach($statCards as $s)
+    <div class="card" style="padding:16px;">
+        <p style="font-size:10px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.08em;margin:0 0 8px;">{{ $s['label'] }}</p>
+        <p style="font-size:24px;font-weight:800;color:{{ $s['color'] }};margin:0;">{{ $s['val'] }}</p>
+    </div>
+    @endforeach
+</div>
+
+{{-- ═══ TABLE CARD ═══ --}}
+<div class="card" style="padding:0;overflow:hidden;">
+
+    {{-- Card Header --}}
+    <div style="padding:14px 18px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;">
+        <div>
+            <p style="font-size:13px;font-weight:700;color:var(--text);margin:0;">List Transaksi</p>
+            <p style="font-size:11px;color:var(--muted);margin:2px 0 0;">Histori pembayaran gym dan retail</p>
+        </div>
+        <span style="font-size:11px;font-weight:700;color:var(--muted);background:#fafafa;border:1px solid var(--border);padding:3px 10px;border-radius:999px;">
+            {{ $transactions->total() }} total
+        </span>
+    </div>
+
+    {{-- Table --}}
+    <div style="overflow-x:auto;">
+        <table style="width:100%;min-width:960px;border-collapse:collapse;">
+            <thead>
+                <tr style="background:#fafafa;border-bottom:1px solid var(--border);">
+                    @foreach(['Invoice','Pelanggan','Kategori','Source','Pembayaran','Total','Status','Aksi'] as $th)
+                    <th style="padding:11px 16px;text-align:{{ $th=='Aksi'?'center':'left' }};font-size:10px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.08em;white-space:nowrap;">{{ $th }}</th>
+                    @endforeach
+                </tr>
+            </thead>
+            <tbody>
+                @forelse($transactions as $trx)
+
+                {{-- Simpan data ke JS --}}
+                <script>
+                window['trx_{{ $trx->id }}'] = {
+                    invoice: "{{ $trx->invoice_code }}",
+                    customer: "{{ addslashes($trx->guest_name ?? optional($trx->user)->name ?? '-') }}",
+                    category: "{{ $trx->category }}",
+                    detail: "{{ addslashes($trx->detail_label ?? '-') }}",
+                    source: "{{ $trx->source }}",
+                    payment: "{{ $trx->payment_method }}",
+                    status: "{{ $trx->status }}",
+                    total: "{{ number_format($trx->amount,0,',','.') }}",
+                    sender_bank: "{{ addslashes($trx->sender_bank ?? '-') }}",
+                    sender_account: "{{ addslashes($trx->sender_account ?? '-') }}",
+                    rejection_reason: "{{ addslashes($trx->rejection_reason ?? '-') }}",
+                    proof: "{{ $trx->proof_attachment ? asset('storage/'.$trx->proof_attachment) : '' }}",
+                    items: [
+                        @foreach($trx->items as $item)
+                        {
+                            product: "{{ addslashes($item->product->nama_produk ?? '-') }}",
+                            qty: "{{ $item->qty }}",
+                            subtotal: "{{ number_format($item->subtotal,0,',','.') }}"
+                        }{{ !$loop->last ? ',' : '' }}
+                        @endforeach
+                    ]
+                };
+                </script>
+
+                <tr style="border-bottom:1px solid var(--border);transition:background .12s;"
+                    onmouseover="this.style.background='#fafafa'" onmouseout="this.style.background='transparent'">
+
+                    {{-- Invoice --}}
+                    <td style="padding:13px 16px;">
+                        <p style="font-size:12.5px;font-weight:700;color:var(--text);margin:0;font-variant-numeric:tabular-nums;">{{ $trx->invoice_code }}</p>
+                        <p style="font-size:10.5px;color:var(--muted);margin:2px 0 0;">{{ $trx->created_at->format('d M Y · H:i') }}</p>
+                    </td>
+
+                    {{-- Pelanggan --}}
+                    <td style="padding:13px 16px;">
+                        <p style="font-size:13px;font-weight:700;color:var(--text);margin:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:140px;">
+                            {{ $trx->guest_name ?? optional($trx->user)->name ?? '-' }}
+                        </p>
+                        <p style="font-size:10.5px;color:var(--muted);margin:2px 0 0;">{{ optional($trx->admin)->name ?? 'Admin' }}</p>
+                    </td>
+
+                    {{-- Kategori --}}
+                    <td style="padding:13px 16px;">
+                        @php
+                            $catMap = [
+                                'retail'     => 'Retail',
+                                'monthly'    => 'Membership',
+                                'activation' => 'Aktivasi',
+                                'visit'      => 'Visit Harian',
+                                'pt'         => 'Personal Trainer',
+                            ];
+                        @endphp
+                        <span style="font-size:10px;font-weight:700;padding:3px 9px;border-radius:999px;white-space:nowrap;background:rgba(239,68,68,.08);color:var(--red);">
+                            {{ $catMap[$trx->category] ?? $trx->category }}
+                        </span>
+                    </td>
+
+                    {{-- Source --}}
+                    <td style="padding:13px 16px;">
+                        @if($trx->source == 'online')
+                        <span style="font-size:10px;font-weight:700;padding:3px 9px;border-radius:999px;background:rgba(34,197,94,.1);color:#15803d;">Online</span>
+                        @else
+                        <span style="font-size:10px;font-weight:700;padding:3px 9px;border-radius:999px;background:#fafafa;border:1px solid var(--border);color:var(--muted);">Onsite</span>
+                        @endif
+                    </td>
+
+                    {{-- Pembayaran --}}
+                    <td style="padding:13px 16px;">
+                        <p style="font-size:12.5px;font-weight:700;color:var(--text);margin:0;text-transform:uppercase;">{{ $trx->payment_method }}</p>
+                    </td>
+
+                    {{-- Total --}}
+                    <td style="padding:13px 16px;">
+                        <p style="font-size:13px;font-weight:800;color:var(--text);margin:0;white-space:nowrap;">Rp {{ number_format($trx->amount,0,',','.') }}</p>
+                    </td>
+
+                    {{-- Status --}}
+                    <td style="padding:13px 16px;">
+                        @if($trx->status == 'success')
+                        <span style="font-size:10px;font-weight:700;padding:3px 9px;border-radius:999px;background:rgba(34,197,94,.1);color:#15803d;">Success</span>
+                        @elseif($trx->status == 'pending')
+                        <span style="font-size:10px;font-weight:700;padding:3px 9px;border-radius:999px;background:rgba(245,158,11,.1);color:#b45309;">Pending</span>
+                        @elseif($trx->status == 'rejected')
+                        <span style="font-size:10px;font-weight:700;padding:3px 9px;border-radius:999px;background:rgba(239,68,68,.08);color:var(--red);">Rejected</span>
+                        @else
+                        <span style="font-size:10px;font-weight:700;padding:3px 9px;border-radius:999px;background:#fafafa;border:1px solid var(--border);color:var(--muted);">Cancelled</span>
+                        @endif
+                    </td>
+
+                    {{-- Aksi --}}
+                    <td style="padding:13px 16px;text-align:center;">
+                        <button onclick="openDetailModal({{ $trx->id }})"
+                            style="width:32px;height:32px;border-radius:var(--radius);background:#fafafa;border:1px solid var(--border);color:var(--muted);cursor:pointer;display:inline-flex;align-items:center;justify-content:center;transition:all .15s;font-size:11px;"
+                            onmouseover="this.style.background='var(--red)';this.style.color='#fff';this.style.borderColor='var(--red)';"
+                            onmouseout="this.style.background='#fafafa';this.style.color='var(--muted)';this.style.borderColor='var(--border)';">
+                            <i class="fa-solid fa-eye"></i>
+                        </button>
+                    </td>
+
+                </tr>
+                @empty
+                <tr>
+                    <td colspan="8" style="padding:72px 24px;text-align:center;">
+                        <div style="display:flex;flex-direction:column;align-items:center;gap:10px;">
+                            <div style="width:44px;height:44px;border-radius:var(--radius);background:#fafafa;border:1px solid var(--border);display:flex;align-items:center;justify-content:center;">
+                                <i class="fa-solid fa-receipt" style="font-size:18px;color:#ddd;"></i>
+                            </div>
+                            <p style="font-size:13px;font-weight:700;color:var(--text);margin:0;">Belum Ada Transaksi</p>
+                            <p style="font-size:12px;color:var(--muted);margin:0;">Histori transaksi akan muncul di sini.</p>
+                        </div>
+                    </td>
+                </tr>
+                @endforelse
+            </tbody>
+        </table>
+    </div>
+
+    {{-- Pagination --}}
+    <div style="padding:14px 18px;border-top:1px solid var(--border);">
+        {{ $transactions->withQueryString()->links() }}
+    </div>
+
+</div>
+
+{{-- ═══════════════════════════════════════════
+     DETAIL MODAL
+═══════════════════════════════════════════ --}}
+<div id="detailModal"
+     style="display:none;position:fixed;inset:0;z-index:9000;background:rgba(0,0,0,.35);backdrop-filter:blur(4px);align-items:center;justify-content:center;padding:16px;">
+    <div style="background:#fff;width:100%;max-width:580px;border-radius:var(--radius);border:1px solid var(--border);box-shadow:0 16px 48px rgba(0,0,0,.14);overflow:hidden;animation:alertIn .2s ease;">
+
+        {{-- Modal Header --}}
+        <div style="padding:16px 20px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;">
             <div>
-                <h3 class="text-xl font-extrabold text-slate-800">Detail Transaksi</h3>
-                <p class="text-sm text-slate-400 mt-1" id="modal_invoice">-</p>
+                <p style="font-size:14px;font-weight:800;color:var(--text);margin:0;">Detail Transaksi</p>
+                <p id="modal_invoice" style="font-size:11.5px;color:var(--muted);margin:2px 0 0;font-variant-numeric:tabular-nums;">-</p>
             </div>
-            <button onclick="closeDetailModal()" class="w-10 h-10 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-500 transition-all">
-                <i class="fas fa-times"></i>
+            <button onclick="closeDetailModal()"
+                style="width:30px;height:30px;border-radius:var(--radius);background:#fafafa;border:1px solid var(--border);color:var(--muted);cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:11px;transition:all .15s;"
+                onmouseover="this.style.background='var(--red)';this.style.color='#fff';this.style.borderColor='var(--red)';"
+                onmouseout="this.style.background='#fafafa';this.style.color='var(--muted)';this.style.borderColor='var(--border)';">
+                <i class="fa-solid fa-xmark"></i>
             </button>
         </div>
 
-        {{-- BODY --}}
-        <div class="p-8 space-y-6">
-            {{-- INFO --}}
-            <div class="grid md:grid-cols-2 gap-4">
-                <div class="bg-slate-50 rounded-2xl p-4">
-                    <p class="text-xs text-slate-400 mb-1">Pelanggan</p>
-                    <h4 id="modal_customer" class="font-bold text-slate-800">-</h4>
+        {{-- Modal Body --}}
+        <div style="padding:18px 20px;display:flex;flex-direction:column;gap:14px;max-height:72vh;overflow-y:auto;">
+
+            {{-- Info grid --}}
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;">
+                @foreach([
+                    ['id'=>'modal_customer', 'label'=>'Pelanggan'],
+                    ['id'=>'modal_category', 'label'=>'Kategori'],
+                    ['id'=>'modal_detail',   'label'=>'Detail Paket'],
+                    ['id'=>'modal_source',   'label'=>'Source'],
+                    ['id'=>'modal_payment',  'label'=>'Pembayaran'],
+                ] as $f)
+                <div style="background:#fafafa;border:1px solid var(--border);border-radius:var(--radius);padding:11px 13px;">
+                    <p style="font-size:10px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.07em;margin:0 0 3px;">{{ $f['label'] }}</p>
+                    <p id="{{ $f['id'] }}" style="font-size:13px;font-weight:700;color:var(--text);margin:0;text-transform:uppercase;">-</p>
                 </div>
-                <div class="bg-slate-50 rounded-2xl p-4">
-                    <p class="text-xs text-slate-400 mb-1">Kategori</p>
-                    <h4 id="modal_category" class="font-bold text-slate-800 uppercase">-</h4>
-                </div>
-                <div class="bg-slate-50 rounded-2xl p-4">
-                    <p class="text-xs text-slate-400 mb-1">Source</p>
-                    <h4 id="modal_source" class="font-bold text-slate-800 uppercase">-</h4>
-                </div>
-                <div class="bg-slate-50 rounded-2xl p-4">
-                    <p class="text-xs text-slate-400 mb-1">Payment</p>
-                    <h4 id="modal_payment" class="font-bold text-slate-800 uppercase">-</h4>
-                </div>
+                @endforeach
             </div>
 
-            {{-- RETAIL ITEMS --}}
+            {{-- Retail items --}}
             <div id="modal_items_wrapper">
-                <div class="mb-3">
-                    <h4 class="font-bold text-slate-700">Detail Item</h4>
-                </div>
-                <div class="space-y-3" id="modal_items"></div>
+                <p style="font-size:10.5px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.07em;margin:0 0 8px;">Detail Item</p>
+                <div id="modal_items" style="display:flex;flex-direction:column;gap:6px;"></div>
             </div>
 
-            {{-- ONLINE INFO --}}
-            <div id="modal_online" class="hidden">
-                <div class="grid md:grid-cols-2 gap-4">
-                    <div class="bg-slate-50 rounded-2xl p-4">
-                        <p class="text-xs text-slate-400 mb-1">Bank Pengirim</p>
-                        <h4 id="modal_bank" class="font-bold text-slate-800">-</h4>
+            {{-- Online info --}}
+            <div id="modal_online" style="display:none;">
+                <p style="font-size:10.5px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.07em;margin:0 0 8px;">Info Transfer</p>
+                <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;">
+                    <div style="background:#fafafa;border:1px solid var(--border);border-radius:var(--radius);padding:11px 13px;">
+                        <p style="font-size:10px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.07em;margin:0 0 3px;">Bank Pengirim</p>
+                        <p id="modal_bank" style="font-size:13px;font-weight:700;color:var(--text);margin:0;">-</p>
                     </div>
-                    <div class="bg-slate-50 rounded-2xl p-4">
-                        <p class="text-xs text-slate-400 mb-1">Nama Pengirim</p>
-                        <h4 id="modal_sender" class="font-bold text-slate-800">-</h4>
+                    <div style="background:#fafafa;border:1px solid var(--border);border-radius:var(--radius);padding:11px 13px;">
+                        <p style="font-size:10px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.07em;margin:0 0 3px;">Nama Pengirim</p>
+                        <p id="modal_sender" style="font-size:13px;font-weight:700;color:var(--text);margin:0;">-</p>
                     </div>
                 </div>
-                {{-- Bukti --}}
-                <div class="mt-5" id="proof_wrapper">
-                    <p class="text-xs text-slate-400 mb-2">Bukti Transfer</p>
-                    <img id="modal_proof" src="" class="w-full rounded-2xl border border-slate-200 object-cover">
+                <div id="proof_wrapper" style="margin-top:10px;">
+                    <p style="font-size:10px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.07em;margin:0 0 6px;">Bukti Transfer</p>
+                    <img id="modal_proof" src="" style="width:100%;border-radius:var(--radius);border:1px solid var(--border);object-fit:cover;">
                 </div>
             </div>
 
-            {{-- REJECT --}}
-            <div id="modal_reject" class="hidden bg-red-50 border border-red-100 rounded-2xl p-4">
-                <p class="text-xs text-red-400 uppercase tracking-widest font-bold mb-2">Alasan Rejected</p>
-                <p id="modal_reject_reason" class="text-sm text-red-600 font-medium">-</p>
+            {{-- Reject reason --}}
+            <div id="modal_reject" style="display:none;background:#fafafa;border:1px solid var(--border);border-left:3px solid var(--red);border-radius:var(--radius);padding:12px 14px;">
+                <p style="font-size:10px;font-weight:700;color:var(--red);text-transform:uppercase;letter-spacing:.07em;margin:0 0 5px;">Alasan Rejected</p>
+                <p id="modal_reject_reason" style="font-size:12.5px;color:var(--text);margin:0;line-height:1.6;">-</p>
             </div>
 
-            {{-- TOTAL --}}
-            <div class="bg-slate-900 rounded-3xl p-5 flex items-center justify-between">
+            {{-- Total bar --}}
+            <div style="background:var(--text);border-radius:var(--radius);padding:14px 18px;display:flex;align-items:center;justify-content:space-between;">
                 <div>
-                    <p class="text-[10px] uppercase tracking-widest text-slate-500 font-bold">Total Pembayaran</p>
-                    <h3 class="text-2xl font-extrabold text-white mt-1">Rp <span id="modal_total">0</span></h3>
+                    <p style="font-size:10px;font-weight:700;color:#888;text-transform:uppercase;letter-spacing:.08em;margin:0 0 4px;">Total Pembayaran</p>
+                    <p style="font-size:22px;font-weight:800;color:#fff;margin:0;">Rp <span id="modal_total">0</span></p>
                 </div>
-                <div class="w-14 h-14 rounded-2xl bg-red-500/15 flex items-center justify-center">
-                    <i class="fas fa-wallet text-red-400"></i>
+                <div style="width:42px;height:42px;border-radius:var(--radius);background:rgba(239,68,68,.15);display:flex;align-items:center;justify-content:center;">
+                    <i class="fa-solid fa-wallet" style="color:var(--red);font-size:16px;"></i>
                 </div>
             </div>
+
         </div>
     </div>
 </div>
 
 <script>
-    function openDetailModal(id) {
-        const trx = window['trx_' + id];
-        document.getElementById('detailModal').classList.remove('hidden');
+const _catLabels = {
+    retail:     'Retail',
+    monthly:    'Membership',
+    activation: 'Aktivasi Member',
+    visit:      'Visit Harian',
+    pt:         'Personal Trainer'
+};
 
-        document.getElementById('modal_invoice').innerText = trx.invoice;
-        document.getElementById('modal_customer').innerText = trx.customer;
-        document.getElementById('modal_category').innerText = trx.category;
-        document.getElementById('modal_source').innerText = trx.source;
-        document.getElementById('modal_payment').innerText = trx.payment;
-        document.getElementById('modal_total').innerText = trx.total;
+function openDetailModal(id) {
+    const trx = window['trx_' + id];
+    if (!trx) return;
 
-        // RETAIL ITEMS
+    const modal = document.getElementById('detailModal');
+    modal.style.display = 'flex';
+
+    document.getElementById('modal_invoice').innerText  = trx.invoice;
+    document.getElementById('modal_customer').innerText = trx.customer;
+    document.getElementById('modal_category').innerText = _catLabels[trx.category] || trx.category;
+    document.getElementById('modal_detail').innerText   = trx.detail;
+    document.getElementById('modal_source').innerText   = trx.source;
+    document.getElementById('modal_payment').innerText  = trx.payment;
+    document.getElementById('modal_total').innerText    = trx.total;
+
+    // Retail items
+    const itemsWrap = document.getElementById('modal_items_wrapper');
+    const itemsBox  = document.getElementById('modal_items');
+    if (trx.category === 'retail' && trx.items && trx.items.length) {
         let html = '';
         trx.items.forEach(item => {
             html += `
-            <div class="bg-slate-50 rounded-2xl p-4 flex items-center justify-between">
+            <div style="background:#fafafa;border:1px solid var(--border);border-radius:var(--radius);padding:11px 13px;display:flex;align-items:center;justify-content:space-between;gap:12px;">
                 <div>
-                    <h4 class="font-bold text-slate-800">${item.product}</h4>
-                    <p class="text-xs text-slate-400 mt-1">Qty : ${item.qty}</p>
+                    <p style="font-size:13px;font-weight:700;color:var(--text);margin:0;">${item.product}</p>
+                    <p style="font-size:11px;color:var(--muted);margin:2px 0 0;">Qty: ${item.qty}</p>
                 </div>
-                <h5 class="font-extrabold text-blue-600">Rp ${item.subtotal}</h5>
-            </div>
-        `;
+                <p style="font-size:13px;font-weight:800;color:var(--text);margin:0;white-space:nowrap;">Rp ${item.subtotal}</p>
+            </div>`;
         });
-        document.getElementById('modal_items').innerHTML = html;
-
-        if (trx.category === 'retail') {
-            document.getElementById('modal_items_wrapper').classList.remove('hidden');
-        } else {
-            document.getElementById('modal_items_wrapper').classList.add('hidden');
-        }
-
-        // ONLINE
-        if (trx.source === 'online') {
-            document.getElementById('modal_online').classList.remove('hidden');
-            document.getElementById('modal_bank').innerText = trx.sender_bank;
-            document.getElementById('modal_sender').innerText = trx.sender_account;
-
-            if (trx.proof !== '') {
-                document.getElementById('proof_wrapper').classList.remove('hidden');
-                document.getElementById('modal_proof').src = trx.proof;
-            } else {
-                document.getElementById('proof_wrapper').classList.add('hidden');
-            }
-        } else {
-            document.getElementById('modal_online').classList.add('hidden');
-        }
-
-        // REJECT
-        if (trx.status === 'rejected') {
-            document.getElementById('modal_reject').classList.remove('hidden');
-            document.getElementById('modal_reject_reason').innerText = trx.rejection_reason;
-        } else {
-            document.getElementById('modal_reject').classList.add('hidden');
-        }
+        itemsBox.innerHTML = html;
+        itemsWrap.style.display = 'block';
+    } else {
+        itemsWrap.style.display = 'none';
     }
 
-    function closeDetailModal() {
-        document.getElementById('detailModal').classList.add('hidden');
+    // Online info
+    const onlineDiv = document.getElementById('modal_online');
+    if (trx.source === 'online') {
+        onlineDiv.style.display = 'block';
+        document.getElementById('modal_bank').innerText   = trx.sender_bank;
+        document.getElementById('modal_sender').innerText = trx.sender_account;
+        const proofWrap = document.getElementById('proof_wrapper');
+        if (trx.proof) {
+            document.getElementById('modal_proof').src = trx.proof;
+            proofWrap.style.display = 'block';
+        } else {
+            proofWrap.style.display = 'none';
+        }
+    } else {
+        onlineDiv.style.display = 'none';
     }
+
+    // Reject reason
+    const rejectDiv = document.getElementById('modal_reject');
+    if (trx.status === 'rejected') {
+        rejectDiv.style.display = 'block';
+        document.getElementById('modal_reject_reason').innerText = trx.rejection_reason;
+    } else {
+        rejectDiv.style.display = 'none';
+    }
+}
+
+function closeDetailModal() {
+    document.getElementById('detailModal').style.display = 'none';
+}
+
+// Close on backdrop click
+document.getElementById('detailModal').addEventListener('click', function(e) {
+    if (e.target === this) closeDetailModal();
+});
+
+// Close on ESC (layout.blade.js handles it too, but keep as backup)
+document.addEventListener('keydown', function(e) {
+    if (e.key === 'Escape') closeDetailModal();
+});
 </script>
+
 @endsection

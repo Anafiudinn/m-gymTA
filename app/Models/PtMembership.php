@@ -19,6 +19,10 @@ class PtMembership extends Model
         return $this->belongsTo(PtPackage::class, 'pt_package_id');
     }
 
+    public function ptPackage() {
+    return $this->belongsTo(PtPackage::class, 'pt_package_id');
+}
+
     // Logic Potong Sesi
   public function subtractSession()
 {

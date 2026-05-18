@@ -1,426 +1,649 @@
 @push('styles')
 <style>
-
-    /* Contoh tambahan biar tombol info kelihatan interaktif */
-button[onclick="showPTRequirements()"]:hover {
-    background-color: #f9fafb !important;
-    border-color: #6b7280 !important;
-    color: #374151 !important;
-}
     /* ============================================================
-   PACKAGE SECTION
-============================================================ */
+       PACKAGE SECTION
+    ============================================================ */
+    .package-section {
+        display: flex;
+        flex-direction: column;
+        gap: 22px;
+    }
+
+    .package-header {
+        margin-bottom: 6px;
+    }
+
     .package-section-title {
         font-family: 'Bebas Neue', sans-serif;
-        font-size: 36px;
-        letter-spacing: .06em;
-        margin-bottom: 28px;
-        text-transform: uppercase;
+        font-size: 34px;
+        letter-spacing: .08em;
+        line-height: 1;
+        margin-bottom: 8px;
     }
 
-    .package-grid {
-        display: grid;
-        grid-template-columns: repeat(3, 1fr);
-        gap: 20px;
+    .package-section-sub {
+        color: var(--muted);
+        font-size: 14px;
+        line-height: 1.6;
+        max-width: 720px;
     }
 
     /* ============================================================
-   PACKAGE CARD
-============================================================ */
+       GRID
+    ============================================================ */
+    .package-grid {
+        display: grid;
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+        gap: 20px;
+        align-items: stretch;
+    }
+
+    /* ============================================================
+       CARD
+    ============================================================ */
     .package-card {
+        position: relative;
+        overflow: hidden;
+
         background: var(--bg2);
         border: 1px solid var(--border);
         border-radius: 14px;
-        padding: 28px;
+
+        padding: 24px;
         display: flex;
         flex-direction: column;
-        position: relative;
-        overflow: hidden;
-        transition: transform .25s ease, border-color .25s ease, box-shadow .25s ease;
+
+        min-height: 100%;
+        transition:
+            transform .22s ease,
+            border-color .22s ease,
+            box-shadow .22s ease;
     }
 
     .package-card:hover {
-        transform: translateY(-6px);
-        border-color: rgba(255, 45, 45, .4);
-        box-shadow: 0 20px 50px rgba(0, 0, 0, .4), 0 0 0 1px rgba(255, 45, 45, .1);
+        transform: translateY(-4px);
+        border-color: rgba(255, 45, 45, .25);
+        box-shadow: 0 16px 40px rgba(0,0,0,.35);
     }
 
-    /* Corner decoration */
-    .package-card::after {
+    .package-card::before {
         content: '';
         position: absolute;
-        top: 0;
-        right: 0;
-        width: 60px;
-        height: 60px;
-        background: linear-gradient(225deg, rgba(255, 45, 45, .1) 0%, transparent 70%);
-        border-bottom-left-radius: 50%;
+        inset: 0;
+        background:
+            linear-gradient(
+                135deg,
+                rgba(255,45,45,.04) 0%,
+                transparent 55%
+            );
         pointer-events: none;
     }
 
-    /* Badge */
+    .package-card::after {
+        content: '';
+        position: absolute;
+        top: -40px;
+        right: -40px;
+        width: 120px;
+        height: 120px;
+        border-radius: 50%;
+        background: radial-gradient(circle, rgba(255,45,45,.08) 0%, transparent 70%);
+        pointer-events: none;
+    }
+
+    /* ============================================================
+       BADGE
+    ============================================================ */
     .pkg-badge {
         position: absolute;
         top: 16px;
         right: 16px;
-        background: rgba(255, 255, 255, .06);
-        padding: 3px 8px;
-        font-size: 10px;
-        font-weight: 700;
+
+        background: rgba(255,255,255,.06);
+        border: 1px solid rgba(255,255,255,.08);
+
         color: var(--muted);
-        border-radius: 4px;
-        letter-spacing: .05em;
+        font-size: 10px;
+        font-weight: 800;
+        letter-spacing: .08em;
+
+        padding: 5px 8px;
+        border-radius: 999px;
+
+        z-index: 2;
     }
 
-    /* Category */
+    /* ============================================================
+       TOP
+    ============================================================ */
     .pkg-category {
         font-size: 11px;
-        color: var(--muted);
+        font-weight: 800;
+        letter-spacing: .16em;
         text-transform: uppercase;
-        letter-spacing: .12em;
-        margin-bottom: 10px;
-        font-weight: 700;
+        color: var(--muted);
+
+        margin-bottom: 14px;
+        font-family: 'Barlow Condensed', sans-serif;
     }
 
-    /* Icon */
     .pkg-icon {
-        width: 42px;
-        height: 42px;
+        width: 46px;
+        height: 46px;
+
+        border-radius: 12px;
         background: var(--red-dim);
-        border-radius: 10px;
+        border: 1px solid rgba(255,45,45,.2);
+
         display: flex;
         align-items: center;
         justify-content: center;
+
         color: var(--red);
         font-size: 18px;
-        margin-bottom: 16px;
+
+        margin-bottom: 18px;
     }
 
-    /* Name */
     .pkg-name {
-        font-family: 'Barlow Condensed', sans-serif;
-        font-size: 22px;
-        font-weight: 900;
-        text-transform: uppercase;
-        letter-spacing: .04em;
+        font-family: 'Bebas Neue', sans-serif;
+        font-size: 28px;
+        line-height: 1.05;
+        letter-spacing: .05em;
+
         margin-bottom: 12px;
-        line-height: 1.1;
     }
 
-    /* Price */
     .pkg-price {
         font-family: 'Bebas Neue', sans-serif;
-        font-size: 36px;
-        color: var(--red);
-        margin-bottom: 14px;
-        letter-spacing: .03em;
+        font-size: 38px;
         line-height: 1;
+        letter-spacing: .03em;
+
+        color: var(--red);
+
+        margin-bottom: 14px;
     }
 
     .pkg-price-strike {
-        font-size: 14px;
+        display: block;
+
+        margin-top: 6px;
+
+        font-size: 12px;
+        font-family: 'Barlow', sans-serif;
+        font-weight: 500;
+
         color: var(--muted);
         text-decoration: line-through;
-        display: block;
-        margin-top: 2px;
-        font-family: 'Barlow', sans-serif;
-        font-weight: 400;
     }
 
-    /* Description */
     .pkg-desc {
         font-size: 13px;
+        line-height: 1.7;
         color: var(--muted);
-        line-height: 1.65;
-        margin-bottom: 20px;
+
+        margin-bottom: 22px;
         flex-grow: 1;
     }
 
-
-    /* Promo text */
-    .promo-text {
-        color: var(--red);
-        font-size: 12px;
-        font-weight: 700;
-        margin-bottom: 14px;
-        display: block;
-        padding: 6px 10px;
-        background: var(--red-dim);
-        border-radius: 4px;
+    .pkg-desc strong {
+        color: var(--text);
     }
 
-    /* Divider */
+    /* ============================================================
+       DIVIDER
+    ============================================================ */
     .pkg-divider {
+        width: 100%;
         height: 1px;
         background: var(--border);
         margin-bottom: 18px;
     }
 
-    /* Buy button */
+    /* ============================================================
+       BUTTON
+    ============================================================ */
     .btn-buy {
         width: 100%;
-        padding: 13px;
+        height: 48px;
+
+        border-radius: 10px;
+        border: 1px solid rgba(255,255,255,.12);
+
         background: transparent;
-        border: 1px solid rgba(255, 255, 255, .12);
         color: var(--text);
-        font-weight: 800;
-        font-size: 13px;
-        text-transform: uppercase;
-        cursor: pointer;
-        transition: all .2s ease;
-        text-align: center;
+
         font-family: 'Barlow', sans-serif;
-        letter-spacing: .08em;
-        border-radius: 8px;
-        display: block;
+        font-size: 12px;
+        font-weight: 800;
+        letter-spacing: .12em;
+        text-transform: uppercase;
+
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: 8px;
+
+        cursor: pointer;
+
+        transition:
+            background .2s ease,
+            border-color .2s ease,
+            color .2s ease,
+            transform .15s ease;
     }
 
     .btn-buy:hover {
         background: var(--red);
         border-color: var(--red);
         color: #fff;
-        box-shadow: 0 4px 20px rgba(255, 45, 45, .35);
+
+        transform: translateY(-1px);
+        box-shadow: 0 8px 24px rgba(255,45,45,.28);
     }
 
-    .btn-buy:disabled,
-    .btn-buy.btn-done {
-        opacity: .5;
+    .btn-buy:disabled {
         cursor: not-allowed;
+        opacity: .75;
+    }
+
+    .btn-buy.done {
         background: var(--green-dim);
-        border-color: rgba(16, 185, 129, .3);
+        border-color: rgba(16,185,129,.25);
         color: var(--green);
     }
 
+    .btn-buy.pending {
+        border-color: rgba(234,179,8,.35);
+        color: #eab308;
+    }
+
+    .btn-buy.rejected {
+        border-color: rgba(239,68,68,.35);
+        color: #ef4444;
+    }
+
+    .btn-buy.locked {
+        background: rgba(255,255,255,.03);
+        border: 1px dashed rgba(255,255,255,.18);
+        color: #9ca3af;
+    }
+
+    .btn-buy.locked:hover {
+        background: rgba(255,255,255,.05);
+        border-color: rgba(255,255,255,.25);
+        color: #d1d5db;
+        box-shadow: none;
+    }
+
     /* ============================================================
-   RESPONSIVE
-============================================================ */
-    @media (max-width: 900px) {
+       RESPONSIVE
+    ============================================================ */
+    @media (max-width: 1100px) {
         .package-grid {
-            grid-template-columns: repeat(2, 1fr);
+            grid-template-columns: repeat(2, minmax(0, 1fr));
         }
     }
 
-    @media (max-width: 600px) {
+    @media (max-width: 680px) {
         .package-grid {
             grid-template-columns: 1fr;
         }
 
-        .pkg-price {
+        .package-card {
+            padding: 22px 20px;
+        }
+
+        .package-section-title {
             font-size: 30px;
         }
-    }
 
-    
+        .pkg-price {
+            font-size: 34px;
+        }
+    }
 </style>
 @endpush
 
-<h2 class="package-section-title">PILIH PAKET</h2>
+<div class="package-section">
 
-<div class="package-grid">
-
-    {{-- 1. AKTIVASI MEMBER --}}
-    @php
-    $pendingActivation = $pendingOrRejectedTransactions->where('category', 'activation')->where('status', 'pending')->first();
-    $rejectedActivation = $pendingOrRejectedTransactions->where('category', 'activation')->where('status', 'rejected')->first();
-    @endphp
-
-    <div class="package-card">
-        <div class="pkg-category">SEKALI BAYAR</div>
-        <div class="pkg-icon"><i class="fa-solid fa-id-card-clip"></i></div>
-        <div class="pkg-name">Aktivasi Member</div>
-        <div class="pkg-price">Rp {{ number_format($settings['biaya_aktivasi'] ?? 80000, 0, ',', '.') }}</div>
-        <div class="pkg-desc">
-            Aktivasi akun sekali seumur hidup untuk mendapatkan harga member yang jauh lebih murah.
+    {{-- ============================================================
+         HEADER
+    ============================================================ --}}
+    <div class="package-header">
+        <div class="package-section-title">
+            PILIH PAKET
         </div>
 
-        @if($isActivated)
-        <button class="btn-buy" style="background:var(--green-dim); color:var(--green); border-color:transparent;" disabled>
-            <i class="fa-solid fa-check"></i> SUDAH AKTIF
-        </button>
-        @elseif($pendingActivation)
-        <button type="button" class="btn-buy" style="color:#eab308; border-color:#eab308;"
-            onclick="openTrackingModal('{{ $pendingActivation->id }}')">
-            <i class="fa-solid fa-spinner fa-spin"></i> SEDANG DIPROSES
-        </button>
-        @elseif($rejectedActivation)
-        <button type="button" class="btn-buy" style="color:#ef4444; border-color:#ef4444;"
-            onclick="openTrackingModal('{{ $rejectedActivation->id }}')">
-            <i class="fa-solid fa-circle-exclamation"></i> PERBAIKI BUKTI
-        </button>
-        @else
-        <button type="button" class="btn-buy"
-            onclick="openCheckoutModal('Aktivasi Member', '{{ $settings['biaya_aktivasi'] ?? 80000 }}', 'activation')">
-            AKTIVASI SEKARANG
-        </button>
-        @endif
-    </div>
-
-    {{-- 2. PAKET BULANAN --}}
-    @php
-    $pendingMonthly = $pendingOrRejectedTransactions->where('category', 'monthly')->where('status', 'pending')->first();
-    $rejectedMonthly = $pendingOrRejectedTransactions->where('category', 'monthly')->where('status', 'rejected')->first();
-    @endphp
-
-    <div class="package-card">
-        @if(!$isActivated)<div class="pkg-badge">NON-AKTIVASI</div>@endif
-        <div class="pkg-category">BULANAN</div>
-        <div class="pkg-icon"><i class="fa-solid fa-calendar-days"></i></div>
-        <div class="pkg-name">Paket Bulanan</div>
-        <div class="pkg-price">
-            Rp {{ number_format($isActivated ? ($settings['bulanan_member'] ?? 110000) : ($settings['bulanan_tamu'] ?? 200000), 0, ',', '.') }}
-            @if(!$isActivated)<span class="pkg-price-strike">Harga Tamu</span>@endif
+        <div class="package-section-sub">
+            Aktivasi akun, beli paket gym bulanan, atau ambil sesi Personal Trainer sesuai kebutuhan latihan kamu.
         </div>
-        <div class="pkg-desc">Bebas latihan selama 30 hari penuh.</div>
-
-        @if($pendingMonthly)
-        {{-- Ubah onclick dari showPendingAlert ke openTrackingModal --}}
-        <button type="button" class="btn-buy" style="color:#eab308; border-color:#eab308;"
-            onclick="openTrackingModal('{{ $pendingMonthly->id }}')">
-            <i class="fa-solid fa-spinner fa-spin"></i> SEDANG DIPROSES
-        </button>
-        @elseif($rejectedMonthly)
-        {{-- Ubah onclick dari showRejectedAlert ke openTrackingModal --}}
-        <button type="button" class="btn-buy" style="color:#ef4444; border-color:#ef4444;"
-            onclick="openTrackingModal('{{ $rejectedMonthly->id }}')">
-            <i class="fa-solid fa-circle-exclamation"></i> PERBAIKI BUKTI
-        </button>
-        @else
-        <button type="button" class="btn-buy" onclick="openCheckoutModal('Paket Bulanan', '{{ $isActivated ? ($settings['bulanan_member'] ?? 110000) : ($settings['bulanan_tamu'] ?? 200000) }}', 'monthly')">
-            PILIH PAKET
-        </button>
-        @endif
     </div>
 
+    {{-- ============================================================
+         GRID
+    ============================================================ --}}
+    <div class="package-grid">
 
+        {{-- ============================================================
+             1. AKTIVASI MEMBER
+        ============================================================ --}}
+        @php
+            $pendingActivation = $pendingOrRejectedTransactions
+                ->where('category', 'activation')
+                ->where('status', 'pending')
+                ->first();
 
-    @foreach($ptPackages as $pt)
-    @php
-    $pendingPT = $pendingOrRejectedTransactions
-    ->where('category', 'pt')
-    ->where('package_id', $pt->id)
-    ->where('status', 'pending')
-    ->first();
+            $rejectedActivation = $pendingOrRejectedTransactions
+                ->where('category', 'activation')
+                ->where('status', 'rejected')
+                ->first();
+        @endphp
 
-    $rejectedPT = $pendingOrRejectedTransactions
-    ->where('category', 'pt')
-    ->where('package_id', $pt->id)
-    ->where('status', 'rejected')
-    ->first();
+        <div class="package-card">
 
-    // LOGIC BARU: Cek apakah boleh beli PT (Harus Aktivasi ATAU punya Paket Bulanan Aktif)
-    $isEligibleForPT = $isActivated || $activePackage;
-    @endphp
+            <div class="pkg-category">SEKALI BAYAR</div>
 
-    <div class="package-card">
-        <div class="pkg-category">PERSONAL TRAINER</div>
-        <div class="pkg-icon"><i class="fa-solid fa-person-running"></i></div>
-        <div class="pkg-name">{{ $pt->nama_paket }}</div>
-        <div class="pkg-price">Rp {{ number_format($pt->harga, 0, ',', '.') }}</div>
-        <div class="pkg-desc">Private training sebanyak <strong>{{ $pt->jumlah_sesi }} sesi</strong> dengan coach profesional {{ $pt->coach_name ?? 'tanpa coach' }}.</div>
-
-        @if($pendingPT)
-        <button type="button" class="btn-buy" style="color:#eab308; border-color:#eab308;" onclick="openTrackingModal('{{ $pendingPT->id }}')">
-            <i class="fa-solid fa-spinner fa-spin"></i> SEDANG DIPROSES
-        </button>
-        @elseif($rejectedPT)
-        <button type="button" class="btn-buy" style="color:#ef4444; border-color:#ef4444;" onclick="openTrackingModal('{{ $rejectedPT->id }}')">
-            <i class="fa-solid fa-circle-exclamation"></i> PERBAIKI BUKTI
-        </button>
-        @else
-        {{-- CEK APAKAH ELIGIBLE --}}
-        @if($isEligibleForPT)
-        <button type="button" class="btn-buy" onclick="openCheckoutModal('{{ $pt->nama_paket }}', '{{ $pt->harga }}', 'pt', '{{ $pt->id }}')">
-            PILIH PAKET
-        </button>
-        @else
-        {{-- Tombol tidak di-disable, tapi diarahkan ke fungsi penjelasan --}}
-        <button type="button" class="btn-buy"
-            style="background: #f3f4f6; color: #6b7280; border: 1px dashed #9ca3af;"
-            onclick="showPTRequirements()">
-            <i class="fa-solid fa-circle-info"></i> CEK SYARAT PT
-        </button>
-        @endif
-        @endif
-    </div>
-    @endforeach
-
-    <script>
-        function showLockedPTAlert() {
-            Swal.fire({
-                title: 'Akses Dibatasi',
-                text: 'Maaf, paket Personal Trainer hanya tersedia bagi Member Aktif atau yang memiliki Paket Bulanan aktif.',
-                icon: 'warning',
-                showCancelButton: true,
-                confirmButtonText: 'Aktivasi / Beli Paket',
-                cancelButtonText: 'Tutup',
-                confirmButtonColor: 'var(--red)',
-            }).then((result) => {
-                if (result.isConfirmed) {
-                    // Scroll ke section Pilih Paket (bagian atas)
-                    window.scrollTo({
-                        top: 100,
-                        behavior: 'smooth'
-                    });
-                }
-            });
-        }
-
-        function showPTRequirements() {
-            Swal.fire({
-                title: 'Mau Ambil Personal Trainer?',
-                html: `
-            <div style="text-align: left; font-size: 0.95rem;">
-                <p>Untuk menjaga kualitas latihan, program PT kami hanya tersedia bagi:</p>
-                <ul style="margin-top: 10px;">
-                    <li style="margin-bottom: 5px;">✅ <b>Member Resmi</b> (Sudah bayar Aktivasi)</li>
-                    <li style="margin-bottom: 5px;">✅ <b>Pemegang Paket Bulanan</b> yang masih aktif</li>
-                </ul>
-                <p style="margin-top: 15px; color: #666; font-style: italic;">
-                    Silakan lakukan <b>Aktivasi Member</b> atau beli <b>Paket Bulanan</b> terlebih dahulu di menu atas.
-                </p>
+            <div class="pkg-icon">
+                <i class="fa-solid fa-id-card-clip"></i>
             </div>
-        `,
-                icon: 'info',
-                showCancelButton: true,
-                confirmButtonText: 'Lihat Paket Lain',
-                cancelButtonText: 'Tutup',
-                confirmButtonColor: 'var(--red)',
-            }).then((result) => {
-                if (result.isConfirmed) {
-                    // Scroll otomatis ke bagian paling atas (Aktivasi/Bulanan)
-                    document.querySelector('.package-section-title').scrollIntoView({
-                        behavior: 'smooth'
-                    });
-                }
-            });
-        }
 
-        function showPendingAlert(name) {
-            Swal.fire({
-                title: 'Pesanan Diproses',
-                text: `Pesanan ${name} kamu sedang dicek admin. Cek status berkala di menu Riwayat.`,
-                icon: 'info',
-                confirmButtonText: 'Ke Riwayat',
-                confirmButtonColor: 'var(--red)'
-            }).then((res) => {
-                if (res.isConfirmed) switchTab('history');
-            });
-        }
+            <div class="pkg-name">
+                Aktivasi Member
+            </div>
 
-        function showRejectedAlert(name) {
-            Swal.fire({
-                title: 'Pembayaran Ditolak',
-                text: `Bukti transfer ${name} ditolak. Silakan upload ulang di menu Riwayat.`,
-                icon: 'warning',
-                confirmButtonText: 'Perbaiki Sekarang',
-                confirmButtonColor: 'var(--red)'
-            }).then((res) => {
-                if (res.isConfirmed) switchTab('history');
-            });
-        }
-    </script>
+            <div class="pkg-price">
+                Rp {{ number_format($settings['biaya_aktivasi'] ?? 80000, 0, ',', '.') }}
+            </div>
 
-    @include('member.partials.checkout-modal')
-    @include('member.partials.tracking-modal')
-    @include('member.partials.reupload-modal')
-    @include('member.partials.payment-script')
+            <div class="pkg-desc">
+                Aktivasi akun sekali bayar seumur hidup untuk mendapatkan harga khusus member.
+            </div>
+
+            <div class="pkg-divider"></div>
+
+            @if($isActivated)
+
+                <button class="btn-buy done" disabled>
+                    <i class="fa-solid fa-circle-check"></i>
+                    SUDAH AKTIF
+                </button>
+
+            @elseif($pendingActivation)
+
+                <button type="button"
+                        class="btn-buy pending"
+                        onclick="openTrackingModal('{{ $pendingActivation->id }}')">
+
+                    <i class="fa-solid fa-spinner fa-spin"></i>
+                    SEDANG DIPROSES
+                </button>
+
+            @elseif($rejectedActivation)
+
+                <button type="button"
+                        class="btn-buy rejected"
+                        onclick="openTrackingModal('{{ $rejectedActivation->id }}')">
+
+                    <i class="fa-solid fa-circle-exclamation"></i>
+                    PERBAIKI BUKTI
+                </button>
+
+            @else
+
+                <button type="button"
+                        class="btn-buy"
+                        onclick="openCheckoutModal(
+                            'Aktivasi Member',
+                            '{{ $settings['biaya_aktivasi'] ?? 80000 }}',
+                            'activation'
+                        )">
+
+                    AKTIVASI SEKARANG
+                </button>
+
+            @endif
+
+        </div>
+
+        {{-- ============================================================
+             2. PAKET BULANAN
+        ============================================================ --}}
+        @php
+            $pendingMonthly = $pendingOrRejectedTransactions
+                ->where('category', 'monthly')
+                ->where('status', 'pending')
+                ->first();
+
+            $rejectedMonthly = $pendingOrRejectedTransactions
+                ->where('category', 'monthly')
+                ->where('status', 'rejected')
+                ->first();
+        @endphp
+
+        <div class="package-card">
+
+            @if(!$isActivated)
+                <div class="pkg-badge">
+                    NON MEMBER
+                </div>
+            @endif
+
+            <div class="pkg-category">BULANAN</div>
+
+            <div class="pkg-icon">
+                <i class="fa-solid fa-calendar-days"></i>
+            </div>
+
+            <div class="pkg-name">
+                Paket Bulanan
+            </div>
+
+            <div class="pkg-price">
+                Rp {{ number_format(
+                    $isActivated
+                        ? ($settings['bulanan_member'] ?? 110000)
+                        : ($settings['bulanan_tamu'] ?? 200000),
+                    0,
+                    ',',
+                    '.'
+                ) }}
+
+                @if(!$isActivated)
+                    <span class="pkg-price-strike">
+                        Harga member lebih murah setelah aktivasi
+                    </span>
+                @endif
+            </div>
+
+            <div class="pkg-desc">
+                Akses gym unlimited selama 30 hari penuh tanpa batas kunjungan.
+            </div>
+
+            <div class="pkg-divider"></div>
+
+            @if($pendingMonthly)
+
+                <button type="button"
+                        class="btn-buy pending"
+                        onclick="openTrackingModal('{{ $pendingMonthly->id }}')">
+
+                    <i class="fa-solid fa-spinner fa-spin"></i>
+                    SEDANG DIPROSES
+                </button>
+
+            @elseif($rejectedMonthly)
+
+                <button type="button"
+                        class="btn-buy rejected"
+                        onclick="openTrackingModal('{{ $rejectedMonthly->id }}')">
+
+                    <i class="fa-solid fa-circle-exclamation"></i>
+                    PERBAIKI BUKTI
+                </button>
+
+            @else
+
+                <button type="button"
+                        class="btn-buy"
+                        onclick="openCheckoutModal(
+                            'Paket Bulanan',
+                            '{{ $isActivated ? ($settings['bulanan_member'] ?? 110000) : ($settings['bulanan_tamu'] ?? 200000) }}',
+                            'monthly'
+                        )">
+
+                    PILIH PAKET
+                </button>
+
+            @endif
+
+        </div>
+
+        {{-- ============================================================
+             3. PT PACKAGES
+        ============================================================ --}}
+        @foreach($ptPackages as $pt)
+
+            @php
+                $pendingPT = $pendingOrRejectedTransactions
+                    ->where('category', 'pt')
+                    ->where('package_id', $pt->id)
+                    ->where('status', 'pending')
+                    ->first();
+
+                $rejectedPT = $pendingOrRejectedTransactions
+                    ->where('category', 'pt')
+                    ->where('package_id', $pt->id)
+                    ->where('status', 'rejected')
+                    ->first();
+
+                $isEligibleForPT = $isActivated || $activePackage;
+            @endphp
+
+            <div class="package-card">
+
+                <div class="pkg-category">
+                    PERSONAL TRAINER
+                </div>
+
+                <div class="pkg-icon">
+                    <i class="fa-solid fa-person-running"></i>
+                </div>
+
+                <div class="pkg-name">
+                    {{ strtoupper($pt->nama_paket) }}
+                </div>
+
+                <div class="pkg-price">
+                    Rp {{ number_format($pt->harga, 0, ',', '.') }}
+                </div>
+
+                <div class="pkg-desc">
+                    Program private training
+                    <strong>{{ $pt->jumlah_sesi }} sesi</strong>
+
+                    @if($pt->coach_name)
+                        bersama coach
+                        <strong>{{ $pt->coach_name }}</strong>.
+                    @endif
+                </div>
+
+                <div class="pkg-divider"></div>
+
+                @if($pendingPT)
+
+                    <button type="button"
+                            class="btn-buy pending"
+                            onclick="openTrackingModal('{{ $pendingPT->id }}')">
+
+                        <i class="fa-solid fa-spinner fa-spin"></i>
+                        SEDANG DIPROSES
+                    </button>
+
+                @elseif($rejectedPT)
+
+                    <button type="button"
+                            class="btn-buy rejected"
+                            onclick="openTrackingModal('{{ $rejectedPT->id }}')">
+
+                        <i class="fa-solid fa-circle-exclamation"></i>
+                        PERBAIKI BUKTI
+                    </button>
+
+                @else
+
+                    @if($isEligibleForPT)
+
+                        <button type="button"
+                                class="btn-buy"
+                                onclick="openCheckoutModal(
+                                    '{{ $pt->nama_paket }}',
+                                    '{{ $pt->harga }}',
+                                    'pt',
+                                    '{{ $pt->id }}'
+                                )">
+
+                            PILIH PAKET
+                        </button>
+
+                    @else
+
+                        <button type="button"
+                                class="btn-buy locked"
+                                onclick="showPTRequirements()">
+
+                            <i class="fa-solid fa-circle-info"></i>
+                            CEK SYARAT PT
+                        </button>
+
+                    @endif
+
+                @endif
+
+            </div>
+
+        @endforeach
+
+    </div>
+
+</div>
+
+<script>
+    function showPTRequirements() {
+        Swal.fire({
+            title: 'Syarat Paket PT',
+            html: `
+                <div style="text-align:left;font-size:14px;line-height:1.7;">
+                    <p style="margin-bottom:12px;">
+                        Paket Personal Trainer hanya tersedia untuk:
+                    </p>
+
+                    <ul style="padding-left:18px;margin:0;">
+                        <li style="margin-bottom:8px;">
+                            Member yang sudah aktivasi
+                        </li>
+
+                        <li>
+                            Member dengan paket bulanan aktif
+                        </li>
+                    </ul>
+
+                    <p style="margin-top:16px;color:#9ca3af;">
+                        Silakan aktivasi akun atau beli paket bulanan terlebih dahulu.
+                    </p>
+                </div>
+            `,
+            icon: 'info',
+            confirmButtonText: 'Mengerti',
+            confirmButtonColor: '#ef4444',
+            background: '#111827',
+            color: '#fff'
+        });
+    }
+</script>
+
+@include('member.partials.checkout-modal')
+@include('member.partials.tracking-modal')
+@include('member.partials.reupload-modal')
+@include('member.partials.payment-script')

@@ -4,7 +4,9 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Models\PtMembership;
+use App\Models\PtSessionLog;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 
 class PersonalTrainerController extends Controller
 {
@@ -20,16 +22,25 @@ class PersonalTrainerController extends Controller
         | ACTIVE PT MEMBERS
         |--------------------------------------------------------------------------
         */
-        $query = PtMembership::with(['user', 'package'])
+        $query = PtMembership::with([
+            'user',
+            'package'
+        ])
             ->where('status', 'active')
             ->latest();
 
-        // Search
+        /*
+        |--------------------------------------------------------------------------
+        | SEARCH
+        |--------------------------------------------------------------------------
+        */
         if ($request->filled('search')) {
 
             $search = $request->search;
 
-            $query->whereHas('user', fn ($q) =>
+            $query->whereHas(
+                'user',
+                fn($q) =>
                 $q->where('name', 'like', "%{$search}%")
                     ->orWhere('member_code', 'like', "%{$search}%")
                     ->orWhere('whatsapp', 'like', "%{$search}%")
@@ -42,16 +53,17 @@ class PersonalTrainerController extends Controller
         |--------------------------------------------------------------------------
         | RECENT ACTIVITY
         |--------------------------------------------------------------------------
+        | Sidebar hanya tampilkan aktivitas hari ini
+        | Full histori ada di menu laporan PT
+        |--------------------------------------------------------------------------
         */
-        $recentActivities = PtMembership::with(['user', 'package'])
-
-            // Sudah pernah memakai sesi
-            ->whereColumn('remaining_sessions', '<', 'total_sessions')
-
-            ->latest('updated_at')
-
-            ->take(20)
-
+        $recentActivities = PtSessionLog::with([
+            'user',
+            'admin'
+        ])
+            ->whereDate('created_at', today())
+            ->latest()
+            ->take(10)
             ->get();
 
         /*
@@ -59,23 +71,41 @@ class PersonalTrainerController extends Controller
         | STATS
         |--------------------------------------------------------------------------
         */
-        $totalActive = PtMembership::where('status', 'active')->count();
 
-        $lowSession = PtMembership::where('status', 'active')
+        // Total member PT aktif
+        $totalActive = PtMembership::where(
+            'status',
+            'active'
+        )->count();
+
+        // Sesi hampir habis (<= 3)
+        $lowSession = PtMembership::where(
+            'status',
+            'active'
+        )
             ->where('remaining_sessions', '<=', 3)
+            ->where('remaining_sessions', '>', 0)
             ->count();
 
-        $emptySession = PtMembership::where('remaining_sessions', '<=', 0)
-            ->count();
+        // Aktivitas penggunaan sesi hari ini
+        $todayActivity = PtSessionLog::whereDate(
+            'created_at',
+            today()
+        )->count();
 
-        return view('admin.pt.index', compact(
-            'tab',
-            'ptMemberships',
-            'recentActivities',
-            'totalActive',
-            'lowSession',
-            'emptySession'
-        ));
+        return view(
+            'admin.pt.index',
+            compact(
+                'tab',
+                'ptMemberships',
+                'recentActivities',
+
+                // stats
+                'totalActive',
+                'lowSession',
+                'todayActivity'
+            )
+        );
     }
 
     /**
@@ -83,27 +113,33 @@ class PersonalTrainerController extends Controller
      */
     public function cutSession($id)
     {
-        $membership = PtMembership::findOrFail($id);
+        return DB::transaction(function () use ($id) {
+            $membership = PtMembership::with(['user', 'package'])->findOrFail($id);
 
-        // Check if sessions depleted
-        if ($membership->remaining_sessions <= 0) {
-            return back()->with('error', 'Sesi PT member sudah habis!');
-        }
+            if ($membership->remaining_sessions <= 0) {
+                return back()->with('error', 'Sesi PT member sudah habis!');
+            }
 
-        // Subtract session
-        $membership->subtractSession();
+            // Simpan data lama untuk log
+            $before = $membership->remaining_sessions;
 
-        // Auto finish if no sessions left
-        if ($membership->fresh()->remaining_sessions <= 0) {
-            $membership->update([
-                'status' => 'finished'
+            // Eksekusi potong sesi
+            $membership->subtractSession();
+
+            $after = $membership->remaining_sessions;
+
+            // CATAT KE LOG PT SESSION
+            \App\Models\PtSessionLog::create([
+                'user_id'          => $membership->user_id,
+                'admin_id'         => auth()->id(),
+                'pt_membership_id' => $membership->id,
+                'member_name'      => $membership->user->name,
+                'coach_name'       => $membership->package->coach_name ?? 'Personal Trainer',
+                'previous_session' => $before,
+                'current_session'  => $after,
             ]);
-        }
 
-        return back()->with(
-            'success',
-            '1 sesi PT berhasil digunakan. Sisa sesi: ' .
-            $membership->fresh()->remaining_sessions
-        );
+            return back()->with('success', "1 sesi digunakan. Sisa: $after");
+        });
     }
 }

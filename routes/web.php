@@ -87,19 +87,26 @@ Route::middleware(['auth', 'role:owner'])
     |--------------------------------------------------------------------------
     */
 
-        Route::prefix('admins')->name('admins.')->group(function () {
+      Route::prefix('admins')->name('admins.')->group(function () {
 
-            Route::get('/', [OwnerAdminController::class, 'index'])
-                ->name('index');
+    Route::get('/', [OwnerAdminController::class, 'index'])
+        ->name('index');
 
-            Route::post('/store', [OwnerAdminController::class, 'store'])
-                ->name('store');
+    Route::post('/store', [OwnerAdminController::class, 'store'])
+        ->name('store');
 
-            Route::put('/update/{id}', [OwnerAdminController::class, 'update'])
-                ->name('update');
-            Route::delete('/destroy/{id}', [OwnerAdminController::class, 'destroy'])
-                ->name('destroy');
-        });
+    // UPDATE DATA ADMIN
+    Route::put('/update/{id}', [OwnerAdminController::class, 'update'])
+        ->name('update');
+
+    // UPDATE PASSWORD
+    Route::put('/password/{id}', [OwnerAdminController::class, 'updatePassword'])
+        ->name('password');
+
+    // TOGGLE AKTIF / NONAKTIF
+    Route::delete('/destroy/{id}', [OwnerAdminController::class, 'destroy'])
+        ->name('destroy');
+});
 
         /*
     |--------------------------------------------------------------------------
@@ -149,6 +156,11 @@ Route::middleware(['auth', 'role:owner'])
                 ->name('show');
         });
 
+      /*
+        |--------------------------------------------------------------------------
+        | PRODUCTS (OWNER AREA)
+        |--------------------------------------------------------------------------
+        */
         Route::prefix('products')->name('products.')->group(function () {
 
             Route::get('/', [OwnerProductController::class, 'index'])
@@ -156,8 +168,11 @@ Route::middleware(['auth', 'role:owner'])
 
             Route::get('/{id}', [OwnerProductController::class, 'show'])
                 ->name('show');
+                
+            // 🌟 TAMBAHKAN ROUTE BARU INI UNTUK TOGGLE STATUS DI SISI OWNER
+            Route::patch('/toggle/{id}', [OwnerProductController::class, 'toggleProductStatus'])
+                ->name('toggle');
         });
-
         /*
     |--------------------------------------------------------------------------
     | REPORTS
@@ -295,6 +310,11 @@ Route::middleware(['auth', 'role:admin'])
         Route::patch('/data/members/toggle/{id}', [ManagementController::class, 'toggleStatus'])
             ->name('data.members.toggle');
 
+        Route::get(
+            '/admin/data/members/export',
+            [ManagementController::class, 'exportMembers']
+        )->name('data.members.export');
+
         /*
     |--------------------------------------------------------------------------
     | PRODUCT MANAGEMENT
@@ -313,6 +333,9 @@ Route::middleware(['auth', 'role:admin'])
         Route::delete('/data/products/delete/{id}', [ManagementController::class, 'destroyProduct'])
             ->name('data.products.delete');
 
+            Route::patch('/data/products/toggle/{id}', [ManagementController::class, 'toggleProductStatus'])
+            ->name('data.products.toggle');
+
         /*
     |--------------------------------------------------------------------------
     | REPORTS
@@ -322,8 +345,20 @@ Route::middleware(['auth', 'role:admin'])
         Route::get('/report/transactions', [AdminReportController::class, 'transactions'])
             ->name('report.transactions');
 
+        Route::get('/report/transactions/export-excel', [AdminReportController::class, 'exportExcel'])
+            ->name('report.transactions.excel');
+
+        Route::get('/report/transactions/export-pdf', [AdminReportController::class, 'exportPdf'])
+            ->name('report.transactions.pdf');
+
         Route::get('/report/attendance', [AdminReportController::class, 'attendance'])
             ->name('report.attendance');
+
+        Route::get('/report/attendance/export', [AdminReportController::class, 'exportAttendanceExcel'])
+            ->name('report.attendance.export');
+
+        Route::get('/report/pt-activity/export', [AdminReportController::class, 'exportPtActivityExcel'])
+            ->name('report.pt_activity.export');
     });
 
 /*
@@ -339,6 +374,12 @@ Route::middleware(['auth', 'role:member'])
 
         Route::get('/dashboard', [MemberDashboardController::class, 'index'])
             ->name('dashboard');
+
+        Route::get('/activities', [MemberDashboardController::class, 'activities'])
+            ->name('activities');
+
+        Route::get('/transactions', [MemberDashboardController::class, 'transactions'])
+            ->name('transactions');
 
         Route::get('/transaction/{id}', [MemberDashboardController::class, 'getTransactionDetail']);
 

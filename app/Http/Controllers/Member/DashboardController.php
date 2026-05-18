@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Member;
 
 use App\Http\Controllers\Controller;
 use App\Models\PtPackage;
+use App\Models\PtSessionLog;
 use App\Models\Transaction;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -16,38 +17,140 @@ class DashboardController extends Controller
 
         $user = auth()->user();
 
-        // Settings
+        /*
+        |--------------------------------------------------------------------------
+        | SETTINGS
+        |--------------------------------------------------------------------------
+        */
         $settings = \App\Models\Setting::pluck('value', 'key');
 
-        // Status aktivasi
+        /*
+        |--------------------------------------------------------------------------
+        | STATUS MEMBER
+        |--------------------------------------------------------------------------
+        */
         $isActivated = $user->is_active_member;
 
-        // Paket bulanan aktif
+        /*
+        |--------------------------------------------------------------------------
+        | MEMBERSHIP AKTIF
+        |--------------------------------------------------------------------------
+        */
         $activePackage = $user->memberships()
             ->where('status', 'active')
             ->latest()
             ->first();
 
-        // Total sisa sesi PT
+        /*
+        |--------------------------------------------------------------------------
+        | TOTAL SISA SESI PT
+        |--------------------------------------------------------------------------
+        */
         $ptSessionsLeft = $user->ptMemberships()
             ->where('status', 'active')
             ->sum('remaining_sessions');
 
-        // Paket PT aktif
-        $ptPackages = PtPackage::where('is_active', true)->get();
-
-        // History attendance
-        $attendances = $user->attendances()
+        /*
+        |--------------------------------------------------------------------------
+        | LIST PAKET PT
+        |--------------------------------------------------------------------------
+        */
+        $ptPackages = PtPackage::where('is_active', true)
             ->latest()
-            ->take(10)
             ->get();
 
-        // History transaksi
+        /*
+|--------------------------------------------------------------------------
+| ACTIVITY HISTORY
+|--------------------------------------------------------------------------
+|
+| Gabungkan:
+| - Attendance
+| - PT Session Logs
+|
+*/
+
+        $attendanceActivities = $user->attendances()
+            ->latest()
+            ->get()
+            ->map(function ($attendance) {
+
+                return (object)[
+                    'type' => 'attendance',
+
+                    'title' => $attendance->type == 'member_package'
+                        ? 'Member Gym'
+                        : 'Visit Harian',
+
+                    'description' => 'Check-in gym',
+
+                    'date' => $attendance->created_at,
+
+                    'badge' => $attendance->type == 'member_package'
+                        ? 'MEMBER GYM'
+                        : 'VISIT HARIAN',
+
+                    'badge_class' => 'status-success',
+                ];
+            });
+
+        $ptActivities = PtSessionLog::where('user_id', $user->id)
+            ->latest()
+            ->get()
+            ->map(function ($log) {
+
+                $usedSession = $log->previous_session - $log->current_session;
+
+                return (object)[
+                    'type' => 'pt',
+
+                    'title' => 'PT Session',
+
+                    'description' => $usedSession . ' sesi digunakan',
+
+                    'date' => $log->created_at,
+
+                    'badge' => 'PT SESSION',
+
+                    'badge_class' => 'status-danger',
+                ];
+            });
+
+        $activities = $attendanceActivities
+            ->concat($ptActivities)
+            ->sortByDesc('date')
+            ->take(5)
+            ->values();
+
+        /*
+        |--------------------------------------------------------------------------
+        | RIWAYAT MEMBERSHIP
+        |--------------------------------------------------------------------------
+        | Hanya:
+        | - activation
+        | - monthly
+        | - pt
+        |
+        | Retail tidak ditampilkan
+        |--------------------------------------------------------------------------
+        */
+        // History transaksi membership saja
         $transactions = $user->transactions()
+            ->with('ptPackage')
+            ->whereIn('category', [
+                'activation',
+                'monthly',
+                'pt'
+            ])
             ->latest()
-            ->take(10)
+            ->take(5)
             ->get();
 
+        /*
+        |--------------------------------------------------------------------------
+        | PT MEMBERSHIP AKTIF
+        |--------------------------------------------------------------------------
+        */
         $ptMemberships = $user->ptMemberships()
             ->where('status', 'active')
             ->with('package')
@@ -58,34 +161,45 @@ class DashboardController extends Controller
 
         /*
         |--------------------------------------------------------------------------
-        | Pending / Rejected
+        | PENDING / REJECTED TRANSACTIONS
         |--------------------------------------------------------------------------
-        | Dipakai buat:
-        | - badge notif di tab history
-        | - tombol "sedang diproses"
-        | - tombol "perbaiki bukti"
-        |
-        | PT sekarang sudah aman karena punya package_id
+        | Dipakai untuk:
+        | - badge notif
+        | - tombol reupload
+        | - status pembayaran
         |--------------------------------------------------------------------------
         */
-        $pendingOrRejectedTransactions = Transaction::where('user_id', Auth::id())
-            ->whereIn('status', ['pending', 'rejected'])
+        $pendingOrRejectedTransactions = Transaction::where(
+            'user_id',
+            Auth::id()
+        )
+            ->whereIn('status', [
+                'pending',
+                'rejected'
+            ])
             ->latest()
             ->get();
 
         return view('member.dashboard', compact(
             'activeTab',
-            'isActivated',
-            'activePackage',
-            'ptSessionsLeft',
-            'user',
-            'attendances',
-            'transactions',
-            'ptPackages',
+
             'settings',
-            'pendingOrRejectedTransactions',
-                'hasPt',
-                'ptMemberships'
+
+            'user',
+            'isActivated',
+
+            'activePackage',
+
+            'ptPackages',
+            'ptMemberships',
+            'ptSessionsLeft',
+            'hasPt',
+
+            'transactions',
+
+            'activities',
+
+            'pendingOrRejectedTransactions'
         ));
     }
 
@@ -173,4 +287,108 @@ class DashboardController extends Controller
             'updated_at' => $trx->updated_at->format('d M Y, H:i'),
         ]);
     }
+
+    public function activities(Request $request)
+    {
+        $user = auth()->user();
+
+        /*
+    |--------------------------------------------------------------------------
+    | ATTENDANCE ACTIVITIES
+    |--------------------------------------------------------------------------
+    */
+
+        $attendanceActivities = $user->attendances()
+            ->latest()
+            ->get()
+            ->map(function ($attendance) {
+
+                return (object)[
+                    'date' => $attendance->created_at,
+
+                    'badge' => $attendance->type == 'member_package'
+                        ? 'CHECK-IN MEMBER'
+                        : 'GUEST VISIT',
+
+                    'badge_class' => 'badge-success',
+
+                    'description' => $attendance->type == 'member_package'
+                        ? 'Berhasil check-in menggunakan membership.'
+                        : 'Berhasil melakukan guest visit gym.',
+                ];
+            });
+
+        /*
+    |--------------------------------------------------------------------------
+    | PT SESSION ACTIVITIES
+    |--------------------------------------------------------------------------
+    */
+
+        $ptActivities = PtSessionLog::where('user_id', $user->id)
+            ->latest()
+            ->get()
+            ->map(function ($log) {
+
+                $used = $log->previous_session - $log->current_session;
+
+                return (object)[
+                    'date' => $log->created_at,
+
+                    'badge' => 'PT SESSION',
+
+                    'badge_class' => 'badge-info',
+
+                    'description' =>
+                    'Menggunakan '
+                        . $used .
+                        ' sesi PT bersama coach '
+                        . $log->coach_name .
+                        '. Sisa sesi: '
+                        . $log->current_session,
+                ];
+            });
+
+        /*
+    |--------------------------------------------------------------------------
+    | MERGE ACTIVITIES
+    |--------------------------------------------------------------------------
+    */
+       $limit = (int) $request->get('limit', 10);
+
+        $activities = $attendanceActivities
+            ->concat($ptActivities)
+            ->sortByDesc('date')
+            ->take($limit)
+            ->values();
+
+        return view(
+            'member.activities',
+            compact('activities', 'limit')
+        );
+    }
+    public function transactions(Request $request)
+{
+    $user = auth()->user();
+
+    $limit = (int) $request->get('limit', 10);
+
+    $transactions = $user->transactions()
+        ->with('ptPackage')
+        ->whereIn('category', [
+            'activation',
+            'monthly',
+            'pt'
+        ])
+        ->latest()
+        ->take($limit)
+        ->get();
+
+    $settings = \App\Models\Setting::pluck('value', 'key');
+
+    return view('member.transactions', compact(
+        'transactions',
+        'settings',
+        'limit'
+    ));
+}
 }

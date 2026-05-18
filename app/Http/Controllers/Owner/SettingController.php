@@ -45,6 +45,10 @@ class SettingController extends Controller
             'gym_phone'   => 'nullable|string|max:30',
             'gym_address' => 'nullable|string|max:500',
 
+            // Media Sosial
+            'instagram' => 'nullable|string|max:255',
+            
+
             // Rekening Transfer
             'bank_name'   => 'nullable|string|max:100',
             'bank_number' => 'nullable|string|max:100',

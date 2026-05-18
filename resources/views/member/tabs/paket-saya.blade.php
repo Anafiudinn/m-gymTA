@@ -1,4 +1,4 @@
-{{--
+{{-- 
 |--------------------------------------------------------------------------
 | resources/views/member/tabs/paket-saya.blade.php
 |--------------------------------------------------------------------------
@@ -9,610 +9,752 @@
     /* ============================================================
        SECTION HEADER
     ============================================================ */
-    .section-header {
-        margin-bottom: 28px;
+    .member-section-header{
+        margin-bottom:22px;
     }
 
-    .section-title {
-        font-family: 'Bebas Neue', sans-serif;
-        font-size: 32px;
-        letter-spacing: .08em;
-        line-height: 1;
-        margin-bottom: 6px;
+    .member-section-title{
+        font-family:'Bebas Neue',sans-serif;
+        font-size:clamp(20px,4vw,30px);
+        letter-spacing:.08em;
+        line-height:1;
+        margin-bottom:6px;
     }
 
-    .section-sub {
-        color: var(--muted);
-        font-size: 14px;
+    .member-section-sub{
+        color:var(--muted);
+        font-size:13px;
+        max-width:620px;
+        line-height:1.7;
     }
 
     /* ============================================================
        CARD BASE
     ============================================================ */
-    .pkg-card {
-        background: var(--bg2);
-        border: 1px solid var(--border);
-        padding: 28px 30px;
-        margin-bottom: 16px;
-        position: relative;
-        overflow: hidden;
-        transition: border-color .2s;
+    .pkg-card{
+        position:relative;
+        overflow:hidden;
+        background:linear-gradient(180deg,var(--bg2) 0%, rgba(20,20,26,.96) 100%);
+        border:1px solid var(--border);
+        border-radius:18px;
+        padding:24px;
+        margin-bottom:18px;
     }
 
-    .pkg-card::before {
-        content: '';
-        position: absolute;
-        inset: 0;
-        background: linear-gradient(120deg, rgba(255,45,45,.03) 0%, transparent 60%);
-        pointer-events: none;
-    }
-
-    .pkg-card:hover {
-        border-color: rgba(255,45,45,.25);
+    .pkg-card::before{
+        content:'';
+        position:absolute;
+        inset:0;
+        background:
+            radial-gradient(circle at top right,
+                rgba(255,45,45,.08),
+                transparent 35%);
+        pointer-events:none;
     }
 
     /* ============================================================
-       CARD HEADER ROW
+       CARD HEADER
     ============================================================ */
-    .card-head {
-        display: flex;
-        align-items: center;
-        justify-content: space-between;
-        margin-bottom: 18px;
+    .pkg-head{
+        position:relative;
+        z-index:2;
+
+        display:flex;
+        align-items:center;
+        justify-content:space-between;
+        gap:16px;
+
+        margin-bottom:22px;
     }
 
-    .card-head-left {
-        display: flex;
-        align-items: center;
-        gap: 12px;
+    .pkg-head-left{
+        display:flex;
+        align-items:center;
+        gap:14px;
+        min-width:0;
     }
 
-    .card-icon {
-        width: 38px;
-        height: 38px;
-        border-radius: 50%;
-        background: var(--red-dim);
-        border: 1px solid rgba(255,45,45,.25);
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        color: var(--red);
-        font-size: 15px;
-        flex-shrink: 0;
+    .pkg-icon{
+        width:42px;
+        height:42px;
+        border-radius:12px;
+
+        background:var(--red-dim);
+        border:1px solid rgba(255,45,45,.18);
+
+        display:flex;
+        align-items:center;
+        justify-content:center;
+
+        color:var(--red);
+        font-size:13px;
+        flex-shrink:0;
     }
 
-    .card-label {
-        font-size: 11px;
-        font-weight: 700;
-        letter-spacing: .18em;
-        text-transform: uppercase;
-        color: var(--muted);
-        font-family: 'Barlow Condensed', sans-serif;
+    .pkg-label{
+        font-size:11px;
+        font-weight:800;
+        letter-spacing:.16em;
+        text-transform:uppercase;
+        color:var(--muted);
+        margin-bottom:3px;
     }
 
-    /* Badge status */
-    .status-badge {
-        font-size: 11px;
-        font-weight: 800;
-        letter-spacing: .12em;
-        font-family: 'Barlow Condensed', sans-serif;
-        padding: 5px 12px;
-        border: 1px solid;
+    .pkg-heading{
+        font-family:'Bebas Neue',sans-serif;
+        font-size:20px;
+        letter-spacing:.05em;
+        line-height:1;
     }
 
-    .status-badge.active {
-        color: var(--green);
-        border-color: rgba(16,185,129,.3);
-        background: var(--green-dim);
+    /* ============================================================
+       STATUS BADGE
+    ============================================================ */
+    .status-badge{
+        height:34px;
+        padding:0 14px;
+        border-radius:999px;
+
+        display:inline-flex;
+        align-items:center;
+        justify-content:center;
+
+        font-size:11px;
+        font-weight:800;
+        letter-spacing:.12em;
+        text-transform:uppercase;
+        white-space:nowrap;
+        flex-shrink:0;
     }
 
-    .status-badge.inactive {
-        color: var(--muted);
-        border-color: var(--border);
-        background: transparent;
+    .status-badge.active{
+        background:var(--green-dim);
+        color:var(--green);
+        border:1px solid rgba(16,185,129,.2);
+    }
+
+    .status-badge.inactive{
+        background:rgba(255,255,255,.03);
+        color:var(--muted);
+        border:1px solid var(--border);
     }
 
     /* ============================================================
        ACTIVATION CARD
     ============================================================ */
-    .activation-card {
-        display: flex;
-        align-items: center;
-        justify-content: space-between;
-        gap: 20px;
-        flex-wrap: wrap;
+    .activation-wrap{
+        position:relative;
+        z-index:2;
+
+        display:flex;
+        align-items:center;
+        justify-content:space-between;
+        gap:20px;
     }
 
-    .activation-left {
-        display: flex;
-        align-items: center;
-        gap: 14px;
-        flex: 1;
-        min-width: 0;
+    .activation-left{
+        display:flex;
+        align-items:center;
+        gap:16px;
+        min-width:0;
+        flex:1;
     }
 
-    .activation-shield {
-        width: 44px;
-        height: 44px;
-        background: var(--red-dim);
-        border: 1px solid rgba(255,45,45,.25);
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        color: var(--red);
-        font-size: 18px;
-        flex-shrink: 0;
-        clip-path: polygon(50% 0%, 100% 25%, 100% 75%, 50% 100%, 0% 75%, 0% 25%);
+    .activation-icon{
+        width:54px;
+        height:54px;
+        border-radius:16px;
+
+        display:flex;
+        align-items:center;
+        justify-content:center;
+
+        background:var(--red-dim);
+        border:1px solid rgba(255,45,45,.2);
+
+        color:var(--red);
+        font-size:20px;
+
+        flex-shrink:0;
     }
 
-    .activation-shield.activated {
-        background: var(--green-dim);
-        border-color: rgba(16,185,129,.3);
-        color: var(--green);
+    .activation-icon.active{
+        background:var(--green-dim);
+        border-color:rgba(16,185,129,.2);
+        color:var(--green);
     }
 
-    .activation-info .label {
-        font-size: 11px;
-        font-weight: 700;
-        letter-spacing: .15em;
-        text-transform: uppercase;
-        color: var(--muted);
-        font-family: 'Barlow Condensed', sans-serif;
-        margin-bottom: 4px;
+    .activation-info{
+        min-width:0;
     }
 
-    .activation-info .value {
-        font-family: 'Bebas Neue', sans-serif;
-        font-size: 22px;
-        letter-spacing: .06em;
-        line-height: 1;
+    .activation-title{
+        font-family:'Bebas Neue',sans-serif;
+        font-size:25px;
+        letter-spacing:.05em;
+        line-height:1;
+        margin-bottom:6px;
     }
 
-    .activation-info .value.activated {
-        color: var(--green);
+    .activation-title.active{
+        color:var(--green);
     }
 
-    .activation-info .value.not-activated {
-        color: var(--red);
+    .activation-title.inactive{
+        color:var(--red);
     }
 
-    .activation-info .desc {
-        font-size: 13px;
-        color: var(--muted);
-        margin-top: 4px;
+    .activation-desc{
+        color:var(--muted);
+        font-size:12px;
+        line-height:1.7;
     }
 
-    .activation-btn {
-        height: 48px;
-        padding: 0 28px;
-        background: var(--red);
-        color: #fff;
-        font-family: 'Barlow', sans-serif;
-        font-weight: 800;
-        font-size: 13px;
-        letter-spacing: .1em;
-        border: none;
-        cursor: pointer;
-        display: flex;
-        align-items: center;
-        gap: 8px;
-        white-space: nowrap;
-        text-transform: uppercase;
-        transition: background .2s, transform .15s;
-        flex-shrink: 0;
+    .activation-desc strong{
+        color:var(--text);
     }
 
-    .activation-btn:hover {
-        background: #e01e1e;
-        transform: translateY(-1px);
+    .activation-btn{
+        height:48px;
+        padding:0 22px;
+        border-radius:12px;
+
+        background:var(--red);
+        color:#fff;
+
+        display:inline-flex;
+        align-items:center;
+        justify-content:center;
+        gap:10px;
+
+        font-size:12px;
+        font-weight:800;
+        letter-spacing:.12em;
+        text-transform:uppercase;
+
+        transition:.2s;
+        flex-shrink:0;
     }
 
-    .activated-check {
-        width: 48px;
-        height: 48px;
-        background: var(--green-dim);
-        border: 1px solid rgba(16,185,129,.3);
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        color: var(--green);
-        font-size: 20px;
-        flex-shrink: 0;
+    .activation-btn:hover{
+        transform:translateY(-2px);
+        box-shadow:0 10px 28px rgba(255,45,45,.3);
+        color:#fff;
     }
 
-    /* ============================================================
-       MONTHLY PACKAGE CARD
-    ============================================================ */
-    .pkg-name {
-        font-family: 'Bebas Neue', sans-serif;
-        font-size: 28px;
-        letter-spacing: .06em;
-        margin-bottom: 4px;
-        line-height: 1;
-    }
+    .activation-check{
+        width:52px;
+        height:52px;
+        border-radius:16px;
 
-    .pkg-expire {
-        font-size: 14px;
-        color: var(--muted);
-        margin-bottom: 20px;
-    }
+        background:var(--green-dim);
+        border:1px solid rgba(16,185,129,.2);
 
-    .pkg-expire strong {
-        color: var(--text);
-        font-weight: 700;
-    }
+        display:flex;
+        align-items:center;
+        justify-content:center;
 
-    /* Progress bar */
-    .progress-row {
-        display: flex;
-        align-items: center;
-        justify-content: space-between;
-        margin-bottom: 8px;
-    }
+        color:var(--green);
+        font-size:20px;
 
-    .progress-label {
-        font-size: 12px;
-        font-weight: 700;
-        letter-spacing: .1em;
-        color: var(--muted);
-        text-transform: uppercase;
-    }
-
-    .progress-value {
-        font-size: 13px;
-        font-weight: 800;
-        font-family: 'Barlow Condensed', sans-serif;
-        letter-spacing: .05em;
-    }
-
-    .progress-track {
-        width: 100%;
-        height: 6px;
-        background: rgba(255,255,255,.06);
-        border-radius: 0;
-        overflow: hidden;
-    }
-
-    .progress-fill {
-        height: 100%;
-        background: linear-gradient(90deg, var(--red) 0%, #ff6060 100%);
-        border-radius: 0;
-        transition: width .8s ease;
-        position: relative;
-    }
-
-    .progress-fill::after {
-        content: '';
-        position: absolute;
-        right: 0;
-        top: 0;
-        bottom: 0;
-        width: 4px;
-        background: rgba(255,255,255,.4);
-        filter: blur(2px);
-    }
-
-    .progress-fill.green {
-        background: linear-gradient(90deg, var(--green) 0%, #34d399 100%);
-    }
-
-    /* Empty state */
-    .empty-pkg {
-        display: flex;
-        align-items: center;
-        gap: 16px;
-    }
-
-    .empty-pkg-icon {
-        font-size: 32px;
-        color: var(--border);
-    }
-
-    .empty-pkg-text .title {
-        font-family: 'Bebas Neue', sans-serif;
-        font-size: 20px;
-        letter-spacing: .06em;
-        color: var(--muted);
-        margin-bottom: 4px;
-    }
-
-    .empty-pkg-text .sub {
-        font-size: 13px;
-        color: var(--muted);
-        opacity: .6;
+        flex-shrink:0;
     }
 
     /* ============================================================
-       PT CARD
+       PACKAGE CONTENT
     ============================================================ */
-    .pt-sessions {
-        margin-bottom: 20px;
+    .pkg-main-name{
+        font-family:'Bebas Neue',sans-serif;
+        font-size:20px;
+        line-height:1;
+        letter-spacing:.05em;
+        margin-bottom:10px;
     }
 
-    .pt-sessions-count {
-        display: flex;
-        align-items: baseline;
-        gap: 6px;
-        margin-bottom: 2px;
+    .pkg-meta{
+        color:var(--muted);
+        font-size:13px;
+        margin-bottom:20px;
     }
 
-    .pt-sessions-count .big {
-        font-family: 'Bebas Neue', sans-serif;
-        font-size: 52px;
-        line-height: 1;
-        color: var(--red);
+    .pkg-meta strong{
+        color:var(--text);
     }
 
-    .pt-sessions-count .of {
-        font-family: 'Bebas Neue', sans-serif;
-        font-size: 24px;
-        color: var(--muted);
-        line-height: 1;
+    /* ============================================================
+       PROGRESS
+    ============================================================ */
+    .progress-top{
+        display:flex;
+        align-items:center;
+        justify-content:space-between;
+        gap:10px;
+
+        margin-bottom:10px;
     }
 
-    .pt-start-date {
-        font-size: 13px;
-        color: var(--muted);
-        margin-bottom: 18px;
+    .progress-label{
+        font-size:11px;
+        font-weight:800;
+        color:var(--muted);
+        letter-spacing:.12em;
+        text-transform:uppercase;
     }
 
-    /* Coach box */
-    .coach-box {
-        background: var(--bg3);
-        border: 1px solid var(--border);
-        padding: 18px 20px;
-        margin-top: 20px;
+    .progress-value{
+        font-size:12px;
+        font-weight:700;
+        color:var(--text);
     }
 
-    .coach-box-label {
-        font-size: 11px;
-        font-weight: 700;
-        letter-spacing: .15em;
-        color: var(--muted);
-        text-transform: uppercase;
-        margin-bottom: 14px;
-        font-family: 'Barlow Condensed', sans-serif;
+    .progress-track{
+        width:100%;
+        height:8px;
+        border-radius:999px;
+        overflow:hidden;
+        background:rgba(255,255,255,.05);
     }
 
-    .coach-info {
-        display: flex;
-        align-items: center;
-        gap: 14px;
-        margin-bottom: 14px;
+    .progress-fill{
+        height:100%;
+        border-radius:999px;
+        background:linear-gradient(90deg,var(--red),#ff6767);
     }
 
-    .coach-avatar {
-        width: 48px;
-        height: 48px;
-        border-radius: 50%;
-        background: var(--red-dim);
-        border: 2px solid rgba(255,45,45,.3);
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        color: var(--red);
-        font-size: 18px;
-        flex-shrink: 0;
+    .progress-fill.green{
+        background:linear-gradient(90deg,var(--green),#34d399);
     }
 
-    .coach-name {
-        font-family: 'Bebas Neue', sans-serif;
-        font-size: 22px;
-        letter-spacing: .06em;
-        line-height: 1;
-        margin-bottom: 3px;
+    /* ============================================================
+       EMPTY STATE
+    ============================================================ */
+    .empty-state{
+        display:flex;
+        align-items:center;
+        gap:16px;
     }
 
-    .coach-spec {
-        font-size: 12px;
-        color: var(--muted);
-        font-family: 'Barlow Condensed', sans-serif;
-        letter-spacing: .05em;
+    .empty-icon{
+        width:56px;
+        height:56px;
+        border-radius:16px;
+
+        background:rgba(255,255,255,.03);
+        border:1px solid var(--border);
+
+        display:flex;
+        align-items:center;
+        justify-content:center;
+
+        color:var(--muted);
+        font-size:20px;
+
+        flex-shrink:0;
     }
 
-    .wa-btn {
-        display: flex;
-        align-items: stretch;
-        width: 100%;
-        gap: 1px;
-        border: none;
-        background: transparent;
-        cursor: pointer;
-        text-decoration: none;
+    .empty-title{
+        font-family:'Bebas Neue',sans-serif;
+        font-size:24px;
+        letter-spacing:.05em;
+        color:var(--muted);
+        margin-bottom:4px;
     }
 
-    .wa-btn-main {
-        flex: 1;
-        background: var(--red);
-        color: #fff;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        gap: 8px;
-        padding: 14px 20px;
-        font-family: 'Barlow', sans-serif;
-        font-weight: 800;
-        font-size: 13px;
-        letter-spacing: .1em;
-        text-transform: uppercase;
-        transition: background .2s;
+    .empty-sub{
+        font-size:13px;
+        color:var(--muted);
+        line-height:1.6;
     }
 
-    .wa-btn-main:hover {
-        background: #e01e1e;
+    /* ============================================================
+       PT
+    ============================================================ */
+    .pt-count{
+        display:flex;
+        align-items:flex-end;
+        gap:6px;
+        margin-bottom:8px;
     }
 
-    .wa-btn-phone {
-        background: var(--bg2);
-        border: 1px solid var(--border);
-        padding: 14px 18px;
-        font-size: 12px;
-        font-weight: 700;
-        font-family: 'Barlow Condensed', sans-serif;
-        letter-spacing: .04em;
-        color: var(--muted);
-        display: flex;
-        align-items: center;
-        white-space: nowrap;
-        transition: color .2s, border-color .2s;
+    .pt-count .big{
+        font-family:'Bebas Neue',sans-serif;
+        font-size:20px;
+        line-height:1;
+        color:var(--red);
     }
 
-    .wa-btn:hover .wa-btn-phone {
-        color: var(--text);
-        border-color: rgba(255,255,255,.15);
+    .pt-count .small{
+        font-family:'Bebas Neue',sans-serif;
+        font-size:20px;
+        color:var(--muted);
+        line-height:.1;
+        margin-bottom:8px;
     }
 
-    /* PT empty */
-    .pt-no-sessions {
-        font-family: 'Bebas Neue', sans-serif;
-        font-size: 22px;
-        letter-spacing: .06em;
-        color: var(--muted);
-        margin-bottom: 4px;
+    .pt-meta{
+        color:var(--muted);
+        font-size:13px;
+        margin-bottom:18px;
+    }
+
+    /* ============================================================
+       COACH BOX
+    ============================================================ */
+    .coach-box{
+        margin-top:22px;
+
+        background:rgba(255,255,255,.02);
+        border:1px solid var(--border);
+        border-radius:16px;
+
+        padding:18px;
+    }
+
+    .coach-label{
+        font-size:11px;
+        font-weight:800;
+        letter-spacing:.14em;
+        text-transform:uppercase;
+        color:var(--muted);
+
+        margin-bottom:14px;
+    }
+
+    .coach-row{
+        display:flex;
+        align-items:center;
+        gap:14px;
+
+        margin-bottom:16px;
+    }
+
+    .coach-avatar{
+        width:52px;
+        height:52px;
+        border-radius:50%;
+
+        background:var(--red-dim);
+        border:1px solid rgba(255,45,45,.2);
+
+        display:flex;
+        align-items:center;
+        justify-content:center;
+
+        color:var(--red);
+        font-size:18px;
+
+        flex-shrink:0;
+    }
+
+    .coach-name{
+        font-family:'Bebas Neue',sans-serif;
+        font-size:20px;
+        letter-spacing:.05em;
+        line-height:1;
+        margin-bottom:3px;
+    }
+
+    .coach-role{
+        font-size:12px;
+        color:var(--muted);
+    }
+
+    .coach-btn{
+        width:100%;
+        height:48px;
+        border-radius:12px;
+
+        background:var(--red);
+        color:#fff;
+
+        display:flex;
+        align-items:center;
+        justify-content:center;
+        gap:10px;
+
+        font-size:12px;
+        font-weight:800;
+        letter-spacing:.12em;
+        text-transform:uppercase;
+
+        transition:.2s;
+    }
+
+    .coach-btn:hover{
+        color:#fff;
+        transform:translateY(-2px);
+        box-shadow:0 10px 28px rgba(255,45,45,.25);
     }
 
     /* ============================================================
        RESPONSIVE
     ============================================================ */
-    @media (max-width: 640px) {
-        .pkg-card { padding: 20px 18px; }
-        .pt-sessions-count .big { font-size: 40px; }
-        .wa-btn-phone { display: none; }
-        .activation-btn { width: 100%; justify-content: center; }
+    @media (max-width:768px){
+
+        .pkg-card{
+            padding:14px;
+            border-radius:16px;
+        }
+
+        .pkg-head{
+            align-items:flex-start;
+        }
+
+        .pkg-heading{
+            font-size:21px;
+        }
+
+        .activation-wrap{
+            flex-direction:column;
+            align-items:flex-start;
+        }
+
+        .activation-btn{
+            width:100%;
+        }
+
+        .pkg-main-name{
+            font-size:15px;
+        }
+
+        .pt-count .big{
+            font-size:15px;
+        }
+
+        .pt-count .small{
+            font-size:15px;
+        }
+
+        .coach-btn{
+            font-size:11px;
+        }
+    }
+
+    @media (max-width:560px){
+
+        .member-section-sub{
+            font-size:12px;
+        }
+
+        .pkg-card{
+            padding:14px;
+        }
+
+        .pkg-head{
+            margin-bottom:18px;
+        }
+
+        .pkg-icon{
+            width:30px;
+            height:30px;
+            border-radius:10px;
+        }
+
+        .pkg-main-name{
+            font-size:16px;
+        }
+
+        .empty-state{
+            align-items:flex-start;
+            font-size: 14px;
+        }
+
+        .progress-top{
+            flex-direction:column;
+            align-items:flex-start;
+            gap:4px;
+        }
+
+        .coach-row{
+            align-items:flex-start;
+        }
     }
 </style>
 @endpush
 
 {{-- ============================================================
-     SECTION HEADER
+   HEADER
 ============================================================ --}}
-<div class="section-header">
-    <div class="section-title">PAKET SAYA</div>
-    <div class="section-sub">Pantau masa aktif paket bulanan dan sisa sesi Personal Trainer kamu di sini.</div>
+<div class="member-section-header">
+    <div class="member-section-title">PAKET SAYA</div>
+    <div class="member-section-sub">
+        Pantau status aktivasi member, paket gym aktif, dan sisa sesi Personal Trainer kamu.
+    </div>
 </div>
 
 {{-- ============================================================
-     1. STATUS AKTIVASI
+   AKTIVASI
 ============================================================ --}}
 <div class="pkg-card">
-    <div class="activation-card">
+
+    <div class="activation-wrap">
 
         <div class="activation-left">
-            {{-- Shield icon --}}
-            <div class="activation-shield {{ $isActivated ? 'activated' : '' }}">
+
+            <div class="activation-icon {{ $isActivated ? 'active' : '' }}">
                 <i class="fa-solid fa-shield-halved"></i>
             </div>
 
-            {{-- Info --}}
             <div class="activation-info">
-                <div class="label">STATUS AKTIVASI</div>
 
                 @if($isActivated)
-                    <div class="value activated">SUDAH AKTIVASI</div>
-                    <div class="desc">Kamu sudah mendapatkan tarif khusus member.</div>
+                    <div class="activation-title active">
+                        MEMBER AKTIF
+                    </div>
+
+                    <div class="activation-desc">
+                        Akun kamu sudah teraktivasi dan mendapatkan tarif khusus member.
+                    </div>
                 @else
-                    <div class="value not-activated">BELUM AKTIVASI</div>
-                    <div class="desc">Aktivasi sekali bayar
-                        <strong style="color:var(--text);">
-                            Rp {{ number_format($settings['activation_price'] ?? 80000, 0, ',', '.') }}
+                    <div class="activation-title inactive">
+                        BELUM AKTIVASI
+                    </div>
+
+                    <div class="activation-desc">
+                        Aktivasi member sekali bayar
+                        <strong>
+                            Rp {{ number_format($settings['activation_price'] ?? 80000,0,',','.') }}
                         </strong>
-                        untuk dapat tarif khusus member.
+                        untuk akses harga khusus member selamanya.
                     </div>
                 @endif
+
             </div>
+
         </div>
 
-        {{-- Action --}}
         @if($isActivated)
-            <div class="activated-check">
+
+            <div class="activation-check">
                 <i class="fa-solid fa-circle-check"></i>
             </div>
+
         @else
-            <a href="{{ route('member.dashboard', ['tab' => 'package']) }}" class="activation-btn">
+
+            <a href="{{ route('member.dashboard',['tab'=>'package']) }}"
+               class="activation-btn">
                 <i class="fa-solid fa-bolt"></i>
-                AKTIVASI
+                Aktivasi Sekarang
             </a>
+
         @endif
 
     </div>
+
 </div>
 
 {{-- ============================================================
-     2. PAKET BULANAN
+   PAKET BULANAN
 ============================================================ --}}
 <div class="pkg-card">
 
-    {{-- Card Head --}}
-    <div class="card-head">
-        <div class="card-head-left">
-            <div class="card-icon">
+    <div class="pkg-head">
+
+        <div class="pkg-head-left">
+
+            <div class="pkg-icon">
                 <i class="fa-solid fa-calendar-check"></i>
             </div>
-            <div class="card-label">PAKET BULANAN</div>
+
+            <div>
+                <div class="pkg-label">Paket Gym</div>
+                <div class="pkg-heading">PAKET BULANAN</div>
+            </div>
+
         </div>
 
         @if($activePackage)
-            <span class="status-badge active">AKTIF</span>
+            <div class="status-badge active">AKTIF</div>
         @else
-            <span class="status-badge inactive">TIDAK AKTIF</span>
+            <div class="status-badge inactive">TIDAK AKTIF</div>
         @endif
+
     </div>
 
     @if($activePackage)
+
         @php
             $startDate = \Carbon\Carbon::parse($activePackage->start_date);
             $endDate   = \Carbon\Carbon::parse($activePackage->end_date);
+
             $totalDays = (int) $startDate->diffInDays($endDate) ?: 1;
             $daysLeft  = max(0, (int) ceil(now()->floatDiffInDays($endDate, false)));
-            $pct       = min(100, round(($daysLeft / $totalDays) * 100));
+
+            $pct = min(100, round(($daysLeft / $totalDays) * 100));
         @endphp
 
-        <div class="pkg-name">{{ strtoupper($activePackage->package_name) }}</div>
-        <div class="pkg-expire">
-            Berakhir pada <strong>{{ $endDate->format('j/n/Y') }}</strong>
+        <div class="pkg-main-name">
+            {{ strtoupper($activePackage->package_name) }}
         </div>
 
-        <div class="progress-row">
-            <span class="progress-label">Sisa masa aktif</span>
-            <span class="progress-value">{{ $daysLeft }} / {{ $totalDays }} hari</span>
+        <div class="pkg-meta">
+            Aktif sampai
+            <strong>{{ $endDate->format('d M Y') }}</strong>
         </div>
+
+        <div class="progress-top">
+            <div class="progress-label">Sisa Masa Aktif</div>
+            <div class="progress-value">
+                {{ $daysLeft }} / {{ $totalDays }} hari
+            </div>
+        </div>
+
         <div class="progress-track">
-            <div class="progress-fill" style="width: {{ $pct }}%"></div>
+            <div class="progress-fill"
+                 style="width: {{ $pct }}%">
+            </div>
         </div>
 
     @else
-        <div class="empty-pkg">
-            <div class="empty-pkg-icon"><i class="fa-regular fa-calendar-xmark"></i></div>
-            <div class="empty-pkg-text">
-                <div class="title">BELUM ADA PAKET AKTIF</div>
-                <div class="sub">Beli paket bulanan untuk akses gym unlimited.</div>
+
+        <div class="empty-state">
+
+            <div class="empty-icon">
+                <i class="fa-regular fa-calendar-xmark"></i>
             </div>
+
+            <div>
+                <div class="empty-title">
+                    BELUM ADA PAKET
+                </div>
+
+                <div class="empty-sub">
+                    Kamu belum memiliki paket gym aktif saat ini.
+                </div>
+            </div>
+
         </div>
+
     @endif
 
 </div>
+
 {{-- ============================================================
-     3. PERSONAL TRAINER
+   PERSONAL TRAINER
 ============================================================ --}}
 <div class="pkg-card">
 
-    {{-- Card Head --}}
-    <div class="card-head">
-        <div class="card-head-left">
-            <div class="card-icon">
+    <div class="pkg-head">
+
+        <div class="pkg-head-left">
+
+            <div class="pkg-icon">
                 <i class="fa-solid fa-person-running"></i>
             </div>
 
-            <div class="card-label">
-                PERSONAL TRAINER
+            <div>
+                <div class="pkg-label">Coaching</div>
+                <div class="pkg-heading">PERSONAL TRAINER</div>
             </div>
+
         </div>
 
         @if($hasPt)
-            <span class="status-badge active">AKTIF</span>
+            <div class="status-badge active">AKTIF</div>
         @else
-            <span class="status-badge inactive">TIDAK AKTIF</span>
+            <div class="status-badge inactive">TIDAK AKTIF</div>
         @endif
+
     </div>
 
     @if($hasPt)
@@ -623,133 +765,110 @@
                 $package = $ptM->package;
 
                 $sessionsTotal = $package->jumlah_sesi ?? $ptM->total_sessions;
+                $sessionsLeft  = $ptM->remaining_sessions;
 
-                $sessionsLeft = $ptM->remaining_sessions;
-
-                $sessionsUsed = $sessionsTotal - $sessionsLeft;
+                $sessionsUsed  = $sessionsTotal - $sessionsLeft;
 
                 $ptPct = $sessionsTotal > 0
                     ? round(($sessionsLeft / $sessionsTotal) * 100)
                     : 0;
 
                 $startPt = \Carbon\Carbon::parse($ptM->created_at)
-                    ->format('j/n/Y');
+                    ->format('d M Y');
             @endphp
 
-            {{-- SESSION BOX --}}
-            <div class="pt-sessions">
-
-                <div class="pkg-name">
-                    {{ strtoupper($package->nama_paket ?? 'PERSONAL TRAINER') }}
-                </div>
-
-                <div class="pt-sessions-count">
-                    <span class="big">{{ $sessionsLeft }}</span>
-
-                    <span class="of">
-                        /{{ $sessionsTotal }} SESI TERSISA
-                    </span>
-                </div>
-
-                <div class="pt-start-date">
-                    Dimulai sejak {{ $startPt }}
-                </div>
-
-                <div class="progress-row">
-                    <span class="progress-label">
-                        Progress sesi
-                    </span>
-
-                    <span class="progress-value">
-                        {{ $sessionsUsed }} sesi terpakai
-                    </span>
-                </div>
-
-                <div class="progress-track">
-                    <div class="progress-fill green"
-                         style="width: {{ 100 - $ptPct }}%">
-                    </div>
-                </div>
-
+            <div class="pkg-main-name" style="margin-bottom:14px;">
+                {{ strtoupper($package->nama_paket ?? 'PERSONAL TRAINER') }}
             </div>
 
-            {{-- COACH --}}
+            <div class="pt-count">
+                <div class="big">{{ $sessionsLeft }}</div>
+                <div class="small">/{{ $sessionsTotal }} SESI</div>
+            </div>
+
+            <div class="pt-meta">
+                Dimulai sejak {{ $startPt }}
+            </div>
+
+            <div class="progress-top">
+                <div class="progress-label">Progress Sesi</div>
+
+                <div class="progress-value">
+                    {{ $sessionsUsed }} sesi digunakan
+                </div>
+            </div>
+
+            <div class="progress-track">
+                <div class="progress-fill green"
+                     style="width: {{ 100 - $ptPct }}%">
+                </div>
+            </div>
+
             @if($package && $package->coach_name)
 
-            <div class="coach-box">
+                <div class="coach-box">
 
-                <div class="coach-box-label">
-                    COACH KAMU
-                </div>
-
-                <div class="coach-info">
-
-                    <div class="coach-avatar">
-                        <i class="fa-solid fa-user-tie"></i>
+                    <div class="coach-label">
+                        Coach Kamu
                     </div>
 
-                    <div>
+                    <div class="coach-row">
 
-                        <div class="coach-name">
-                            {{ strtoupper($package->coach_name) }}
+                        <div class="coach-avatar">
+                            <i class="fa-solid fa-user-tie"></i>
                         </div>
 
-                        <div class="coach-spec">
-                            Personal Trainer
+                        <div>
+                            <div class="coach-name">
+                                {{ strtoupper($package->coach_name) }}
+                            </div>
+
+                            <div class="coach-role">
+                                Personal Trainer
+                            </div>
                         </div>
 
                     </div>
 
+                    @if($package->coach_whatsapp)
+
+                        <a href="https://wa.me/{{ preg_replace('/[^0-9]/','',$package->coach_whatsapp) }}"
+                           target="_blank"
+                           class="coach-btn">
+
+                            <i class="fa-brands fa-whatsapp"></i>
+                            Chat WhatsApp Coach
+
+                        </a>
+
+                    @endif
+
                 </div>
-
-                @if($package->coach_whatsapp)
-
-                <a href="https://wa.me/{{ preg_replace('/[^0-9]/', '', $package->coach_whatsapp) }}"
-                   target="_blank"
-                   class="wa-btn">
-
-                    <div class="wa-btn-main">
-                        <i class="fa-brands fa-whatsapp"></i>
-                        CHAT WHATSAPP COACH
-                    </div>
-
-                    <div class="wa-btn-phone">
-                        {{ $package->coach_whatsapp }}
-                    </div>
-
-                </a>
-
-                @endif
-
-            </div>
 
             @endif
 
-            {{-- Divider --}}
             @if(!$loop->last)
-                <div style="border-top:1px solid var(--border);margin:24px 0;"></div>
+                <div style="margin:24px 0;border-top:1px solid var(--border);"></div>
             @endif
 
         @endforeach
 
     @else
 
-        <div class="empty-pkg">
+        <div class="empty-state">
 
-            <div class="empty-pkg-icon">
+            <div class="empty-icon">
                 <i class="fa-solid fa-dumbbell"></i>
             </div>
 
-            <div class="empty-pkg-text">
-
-                <div class="title">
-                    BELUM ADA SESI PT AKTIF
+            <div>
+                <div class="empty-title">
+                    BELUM ADA SESI PT
                 </div>
 
-                <div class="sub">
-                    Beli paket Personal Trainer untuk sesi latihan bersama coach.
+                <div class="empty-sub">
+                    Beli paket Personal Trainer untuk latihan bersama coach.
                 </div>
-
             </div>
 
         </div>

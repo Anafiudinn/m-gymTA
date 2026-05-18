@@ -18,7 +18,9 @@ class RetailController extends Controller
      */
     public function index(Request $request)
     {
-        $products = Product::where('stok', '>', 0)->get();
+       $products = Product::where('is_active', true)
+                           ->where('stok', '>', 0)
+                           ->get();
 
         $tab = $request->get('tab', 'katalog');
 
@@ -26,7 +28,11 @@ class RetailController extends Controller
 
         // TAB HISTORY (hanya transaksi retail hari ini)
         if ($tab === 'history') {
-            $history = Transaction::with('items.product')
+
+            $history = Transaction::with([
+                'items.product',
+                'admin'
+            ])
                 ->where('category', 'retail')
                 ->whereDate('created_at', today())
                 ->latest()
@@ -49,6 +55,10 @@ class RetailController extends Controller
             'products' => 'required|array|min:1',
             'products.*.id' => 'required|exists:products,id',
             'products.*.qty' => 'required|integer|min:1',
+
+            'guest_name' => 'nullable|string|max:255',
+
+            'payment_method' => 'required|in:cash,transfer',
         ]);
 
         try {
@@ -81,9 +91,10 @@ class RetailController extends Controller
                 'invoice_code'   => 'INV-' . now()->format('YmdHis'),
                 'user_id'        => auth()->id(),
                 'admin_id'       => auth()->id(),
+                'guest_name'     => $request->guest_name,
                 'category'       => 'retail',
                 'amount'         => $grandTotal,
-                'payment_method' => 'cash',
+                'payment_method' => $request->payment_method,
                 'status'         => 'success',
                 'source'         => 'onsite',
             ]);
@@ -111,7 +122,6 @@ class RetailController extends Controller
             DB::commit();
 
             return back()->with('success', 'Transaksi retail berhasil!');
-
         } catch (\Exception $e) {
             DB::rollBack();
 

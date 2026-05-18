@@ -1,439 +1,433 @@
 @extends('layouts.admin')
 
+@section('title', 'Check-in & Kehadiran')
+@section('header-title', 'Check-in & Kehadiran')
+
 @section('content')
-{{-- ═══════════════════════════════════════════════════════════════════════════════ --}}
-{{-- PAGE HEADER --}}
-<div class="page-header">
-    <div>
-        <div class="breadcrumb">
-            <i class="fa fa-home" style="font-size:10px;"></i>
-            <span>Dashboard</span>
-            <span class="sep"><i class="fa fa-chevron-right" style="font-size:9px;"></i></span>
-            <span class="current">Kehadiran</span>
-        </div>
-        <h1 class="page-title">Kehadiran</h1>
-        <p class="page-sub">Catat kehadiran tamu harian dan check-in member</p>
+
+{{-- ═══ PAGE HEADER ═══ --}}
+<div style="margin-bottom:20px;">
+    <div style="display:flex;align-items:center;gap:6px;font-size:11px;color:var(--muted);margin-bottom:6px;">
+        <i class="fa-solid fa-house" style="font-size:10px;"></i>
+        <span>Dashboard</span>
+        <i class="fa-solid fa-chevron-right" style="font-size:9px;"></i>
+        <span style="color:var(--text);font-weight:600;">Kehadiran</span>
     </div>
+    <h1 style="font-size:20px;font-weight:800;color:var(--text);margin:0 0 2px;">Check-in & Kehadiran</h1>
+    <p style="font-size:12px;color:var(--muted);margin:0;">Catat check-in member dan kunjungan tamu harian</p>
 </div>
 
-@php $activeTab = request('tab', 'guest'); @endphp
+@php $activeTab = request('tab', 'member'); @endphp
 
-{{-- ═══════════════════════════════════════════════════════════════════════════════ --}}
-{{-- TAB NAVIGATION --}}
-<div style="display:flex;gap:8px;margin-bottom:24px;">
-    <a href="{{ route('admin.attendance.index', ['tab' => 'guest']) }}"
-        style="display:inline-flex;align-items:center;gap:8px;padding:9px 18px;border-radius:10px;font-size:13px;font-weight:600;text-decoration:none;transition:all .15s;
-              {{ $activeTab == 'guest'
-                 ? 'background:#f97316;color:#fff;box-shadow:0 4px 14px rgba(249,115,22,.25);'
-                 : 'background:#fff;color:#6b7280;border:1px solid #e5e7eb;' }}">
-        <i class="fa fa-user" style="font-size:11px;"></i> Tamu Harian
-    </a>
+{{-- ═══ TAB NAV — sinkron dengan gaya layout admin ═══ --}}
+<div style="display:flex;gap:6px;margin-bottom:20px;background:#fff;border:1px solid var(--border);border-radius:var(--radius);padding:5px;width:fit-content;">
     <a href="{{ route('admin.attendance.index', ['tab' => 'member']) }}"
-        style="display:inline-flex;align-items:center;gap:8px;padding:9px 18px;border-radius:10px;font-size:13px;font-weight:600;text-decoration:none;transition:all .15s;
+       style="display:inline-flex;align-items:center;gap:7px;padding:8px 16px;border-radius:var(--radius);font-size:12.5px;font-weight:700;text-decoration:none;transition:all .15s;
               {{ $activeTab == 'member'
-                 ? 'background:#2563eb;color:#fff;box-shadow:0 4px 14px rgba(37,99,235,.2);'
-                 : 'background:#fff;color:#6b7280;border:1px solid #e5e7eb;' }}">
-        <i class="fa fa-id-card" style="font-size:11px;"></i> Check-in Member
+                 ? 'background:var(--red);color:#fff;box-shadow:0 3px 10px rgba(239,68,68,.25);'
+                 : 'color:var(--muted);background:transparent;' }}">
+        <i class="fa-solid fa-id-card" style="font-size:11px;"></i> Check-in Member
+    </a>
+    <a href="{{ route('admin.attendance.index', ['tab' => 'guest']) }}"
+       style="display:inline-flex;align-items:center;gap:7px;padding:8px 16px;border-radius:var(--radius);font-size:12.5px;font-weight:700;text-decoration:none;transition:all .15s;
+              {{ $activeTab == 'guest'
+                 ? 'background:var(--red);color:#fff;box-shadow:0 3px 10px rgba(239,68,68,.25);'
+                 : 'color:var(--muted);background:transparent;' }}">
+        <i class="fa-solid fa-user" style="font-size:11px;"></i> Tamu Harian
     </a>
 </div>
 
-{{-- ═══════════════════════════════════════════════════════════════════════════════ --}}
-{{-- MAIN 2-COLUMN LAYOUT --}}
-<div class="attendance-grid" style="display:grid;grid-template-columns:380px 1fr;gap:20px;align-items:start;">
+{{-- ═══ 2-COLUMN GRID ═══ --}}
+<div style="display:grid;grid-template-columns:360px 1fr;gap:16px;align-items:start;">
 
-    {{-- ═══ LEFT COLUMN — FORM INPUT ═══ --}}
+    {{-- ══════════════════════════════════
+         LEFT — FORM
+    ══════════════════════════════════ --}}
     <div>
-        {{-- ═══ GUEST TAB FORM ═══ --}}
-        @if($activeTab == 'guest')
-        <div style="background:#fff;border:1px solid #e5e7eb;border-radius:16px;overflow:hidden;">
-            <div style="padding:18px 22px;border-bottom:1px solid #f3f4f6;display:flex;align-items:center;gap:12px;">
-                <div style="width:34px;height:34px;border-radius:9px;background:#fff7ed;display:flex;align-items:center;justify-content:center;">
-                    <i class="fa fa-user-plus" style="font-size:13px;color:#f97316;"></i>
-                </div>
-                <div>
-                    <p style="font-size:13.5px;font-weight:700;color:#111827;margin:0;line-height:1.3;">Daftar Tamu Baru</p>
-                    <p style="font-size:11px;color:#9ca3af;margin:0;">Day pass Rp 15.000</p>
-                </div>
-            </div>
 
-            <form action="{{ route('admin.attendance.process') }}" method="POST" style="padding:22px;display:flex;flex-direction:column;gap:16px;">
-                @csrf
-                <input type="hidden" name="type" value="guest">
-                <input type="hidden" name="amount" value="15000">
-
-                {{-- Nama Lengkap --}}
-                <div>
-                    <label style="display:block;font-size:10.5px;font-weight:700;color:#9ca3af;text-transform:uppercase;letter-spacing:.08em;margin-bottom:6px;">
-                        Nama Lengkap <span style="color:#ef4444;">*</span>
-                    </label>
-                    <input type="text" name="name" required placeholder="Nama tamu"
-                        style="width:100%;border:1px solid #e5e7eb;border-radius:10px;padding:10px 14px;font-size:13.5px;color:#111827;outline:none;font-family:inherit;box-sizing:border-box;transition:border-color .15s,box-shadow .15s;"
-                        onfocus="this.style.borderColor='#fdba74';this.style.boxShadow='0 0 0 3px #fff7ed';"
-                        onblur="this.style.borderColor='#e5e7eb';this.style.boxShadow='none';">
-                </div>
-
-                {{-- WhatsApp --}}
-                <div>
-                    <label style="display:block;font-size:10.5px;font-weight:700;color:#9ca3af;text-transform:uppercase;letter-spacing:.08em;margin-bottom:6px;">
-                        No. WhatsApp
-                    </label>
-                    <input type="text" name="whatsapp" placeholder="08xx"
-                        style="width:100%;border:1px solid #e5e7eb;border-radius:10px;padding:10px 14px;font-size:13.5px;color:#111827;outline:none;font-family:inherit;box-sizing:border-box;transition:border-color .15s,box-shadow .15s;"
-                        onfocus="this.style.borderColor='#fdba74';this.style.boxShadow='0 0 0 3px #fff7ed';"
-                        onblur="this.style.borderColor='#e5e7eb';this.style.boxShadow='none';">
-                </div>
-
-                {{-- Biaya Day Pass --}}
-                <div>
-                    <label style="display:block;font-size:10.5px;font-weight:700;color:#9ca3af;text-transform:uppercase;letter-spacing:.08em;margin-bottom:6px;">
-                        Biaya Day Pass
-                    </label>
-                    <div style="border:1px solid #fed7aa;background:#fff7ed;border-radius:10px;padding:10px 14px;display:flex;align-items:center;justify-content:space-between;">
-                        <span style="font-size:13px;color:#9ca3af;">Day Pass</span>
-                        <span style="font-size:14px;font-weight:800;color:#f97316;">Rp 15.000</span>
-                    </div>
-                </div>
-
-                {{-- Metode Pembayaran --}}
-                <div>
-                    <label style="display:block;font-size:10.5px;font-weight:700;color:#9ca3af;text-transform:uppercase;letter-spacing:.08em;margin-bottom:8px;">
-                        Metode Pembayaran
-                    </label>
-                    <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;">
-                        <label id="pay-cash-label" onclick="selectPayGuest('cash')"
-                            style="border:2px solid #f97316;background:#fff7ed;border-radius:10px;padding:11px;display:flex;align-items:center;justify-content:center;gap:8px;cursor:pointer;transition:all .15s;">
-                            <input type="radio" name="payment_method" value="cash" checked style="display:none;">
-                            <i class="fa fa-money-bill-wave" style="font-size:11px;color:#f97316;"></i>
-                            <span style="font-size:12.5px;font-weight:700;color:#ea580c;">CASH</span>
-                        </label>
-                        <label id="pay-transfer-label" onclick="selectPayGuest('transfer')"
-                            style="border:1px solid #e5e7eb;border-radius:10px;padding:11px;display:flex;align-items:center;justify-content:center;gap:8px;cursor:pointer;transition:all .15s;">
-                            <input type="radio" name="payment_method" value="transfer" style="display:none;">
-                            <i class="fa fa-qrcode" style="font-size:11px;color:#9ca3af;"></i>
-                            <span style="font-size:12.5px;font-weight:700;color:#6b7280;">TRANSFER</span>
-                        </label>
-                    </div>
-                </div>
-
-                {{-- Submit Button --}}
-                <button type="submit"
-                    data-confirm
-                    data-confirm-title="Catat Kehadiran Tamu?"
-                    data-confirm-desc="Pastikan nama tamu dan metode pembayaran sudah benar sebelum menyimpan."
-                    data-confirm-type="info"
-                    data-confirm-label="Ya, Catat Sekarang"
-                    style="width:100%;background:#f97316;color:#fff;font-weight:700;font-size:13.5px;padding:13px;border-radius:10px;border:none;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px;transition:filter .15s;font-family:inherit;box-shadow:0 4px 14px rgba(249,115,22,.25);"
-                    onmouseover="this.style.filter='brightness(1.07)'" onmouseout="this.style.filter='none'">
-                    <i class="fa fa-check-circle"></i> Catat Kehadiran
-                </button>
-            </form>
-        </div>
-        @endif
-
-        {{-- ═══ MEMBER TAB FORM ═══ --}}
+        {{-- ═══ MEMBER TAB ═══ --}}
         @if($activeTab == 'member')
-        <div style="background:#fff;border:1px solid #e5e7eb;border-radius:16px;overflow:hidden;">
-            <div style="padding:18px 22px;border-bottom:1px solid #f3f4f6;display:flex;align-items:center;gap:12px;">
-                <div style="width:34px;height:34px;border-radius:9px;background:#eff6ff;display:flex;align-items:center;justify-content:center;">
-                    <i class="fa fa-id-card" style="font-size:13px;color:#2563eb;"></i>
+        <div class="card" style="padding:0;overflow:hidden;">
+
+            {{-- Card Header --}}
+            <div style="padding:16px 18px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:10px;">
+                <div style="width:32px;height:32px;border-radius:var(--radius);background:rgba(239,68,68,.08);display:flex;align-items:center;justify-content:center;flex-shrink:0;">
+                    <i class="fa-solid fa-id-card" style="font-size:12px;color:var(--red);"></i>
                 </div>
                 <div>
-                    <p style="font-size:13.5px;font-weight:700;color:#111827;margin:0;line-height:1.3;">Cari / Scan Member</p>
-                    <p style="font-size:11px;color:#9ca3af;margin:0;">ID Member atau No. WhatsApp</p>
+                    <p style="font-size:13px;font-weight:700;color:var(--text);margin:0;line-height:1.3;">Cari / Scan Member</p>
+                    <p style="font-size:11px;color:var(--muted);margin:0;">ID Member atau No. WhatsApp</p>
                 </div>
             </div>
 
-            <div style="padding:22px;">
+            <div style="padding:18px;">
+
                 {{-- Search Form --}}
-                <form action="{{ route('admin.attendance.index') }}" method="GET" style="display:flex;gap:8px;margin-bottom:20px;">
+                <form action="{{ route('admin.attendance.index') }}" method="GET" style="display:flex;gap:8px;margin-bottom:16px;">
                     <input type="hidden" name="tab" value="member">
-                    <input type="text" name="search" value="{{ request('search') }}" autofocus
-                        placeholder="ID Member / No WA..."
-                        style="flex:1;border:1px solid #e5e7eb;border-radius:10px;padding:10px 14px;font-size:13.5px;color:#111827;outline:none;font-family:inherit;transition:border-color .15s,box-shadow .15s;"
-                        onfocus="this.style.borderColor='#93c5fd';this.style.boxShadow='0 0 0 3px #eff6ff';"
-                        onblur="this.style.borderColor='#e5e7eb';this.style.boxShadow='none';">
+                    <div style="flex:1;position:relative;">
+                        <i class="fa-solid fa-magnifying-glass" style="position:absolute;left:11px;top:50%;transform:translateY(-50%);font-size:11px;color:var(--muted);pointer-events:none;"></i>
+                        <input type="text" name="search" value="{{ request('search') }}" autofocus
+                            placeholder="ID Member / No WA..."
+                            style="width:100%;border:1px solid var(--border);border-radius:var(--radius);padding:9px 12px 9px 32px;font-size:13px;color:var(--text);outline:none;font-family:'Outfit',sans-serif;box-sizing:border-box;background:#fff;transition:border-color .15s,box-shadow .15s;"
+                            onfocus="this.style.borderColor='var(--red)';this.style.boxShadow='0 0 0 3px rgba(239,68,68,.08)';"
+                            onblur="this.style.borderColor='var(--border)';this.style.boxShadow='none';">
+                    </div>
                     <button type="submit"
-                        style="background:#1e293b;color:#fff;font-weight:700;font-size:13px;padding:10px 18px;border-radius:10px;border:none;cursor:pointer;white-space:nowrap;font-family:inherit;transition:background .15s;"
-                        onmouseover="this.style.background='#334155'" onmouseout="this.style.background='#1e293b'">
-                        <i class="fa fa-search" style="margin-right:4px;font-size:11px;"></i> Cari
+                        style="background:var(--red);color:#fff;font-weight:700;font-size:12.5px;padding:9px 16px;border-radius:var(--radius);border:none;cursor:pointer;white-space:nowrap;font-family:'Outfit',sans-serif;transition:background .15s;"
+                        onmouseover="this.style.background='var(--red-dark)'" onmouseout="this.style.background='var(--red)'">
+                        Cari
                     </button>
                 </form>
 
                 @if($user)
-                {{-- Member Found Card --}}
-                <div style="background:#f8faff;border:1px solid #dbeafe;border-radius:14px;overflow:hidden;">
-                    <div style="padding:20px;text-align:center;border-bottom:1px solid #dbeafe;">
-                        <div style="width:52px;height:52px;border-radius:50%;background:linear-gradient(135deg,#2563eb,#7c3aed);display:flex;align-items:center;justify-content:center;margin:0 auto 12px;box-shadow:0 4px 14px rgba(37,99,235,.25);">
-                            <i class="fa fa-user" style="color:#fff;font-size:18px;"></i>
+                {{-- ─── Member Found ─── --}}
+                <div style="border:1px solid var(--border);border-radius:var(--radius);overflow:hidden;">
+
+                    {{-- Member Info --}}
+                    <div style="padding:16px;background:#fafafa;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:12px;">
+                        <div style="width:42px;height:42px;border-radius:50%;background:linear-gradient(135deg,var(--red),#991b1b);display:flex;align-items:center;justify-content:center;flex-shrink:0;box-shadow:0 3px 10px rgba(239,68,68,.2);">
+                            <span style="font-size:13px;font-weight:800;color:#fff;">{{ strtoupper(substr($user->name,0,2)) }}</span>
                         </div>
-                        <span style="display:inline-block;font-size:10px;font-weight:700;padding:4px 12px;border-radius:20px;margin-bottom:8px;
-                                {{ $price == 0 ? 'background:#22c55e;color:#fff;' : 'background:#2563eb;color:#fff;' }}">
+                        <div style="flex:1;min-width:0;">
+                            <p style="font-size:13.5px;font-weight:800;color:var(--text);margin:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">{{ $user->name }}</p>
+                            <p style="font-size:11px;color:var(--muted);margin:2px 0 0;">{{ $user->member_code ?? $user->whatsapp }}</p>
+                        </div>
+                        <span style="font-size:10px;font-weight:800;padding:4px 10px;border-radius:999px;white-space:nowrap;flex-shrink:0;
+                              {{ $price == 0 ? 'background:rgba(34,197,94,.12);color:#15803d;' : 'background:rgba(239,68,68,.1);color:var(--red);' }}">
                             {{ strtoupper($status_label) }}
                         </span>
-                        <h4 style="font-size:16px;font-weight:800;color:#111827;margin:0 0 4px;">{{ $user->name }}</h4>
-                        <p style="font-size:11.5px;color:#9ca3af;margin:0;">{{ $user->member_code ?? $user->whatsapp }}</p>
                     </div>
 
-                    <form action="{{ route('admin.attendance.process') }}" method="POST" style="padding:18px;display:flex;flex-direction:column;gap:12px;">
+                    <form action="{{ route('admin.attendance.process') }}" method="POST" style="padding:16px;display:flex;flex-direction:column;gap:12px;">
                         @csrf
                         <input type="hidden" name="type" value="member">
                         <input type="hidden" name="user_id_found" value="{{ $user->id }}">
                         <input type="hidden" name="amount" value="{{ $price }}">
 
                         @if($price > 0)
-                        {{-- Paid Member Check-in --}}
-                        <div style="background:#fff;border:1px solid #dbeafe;border-radius:12px;padding:16px;text-align:center;">
-                            <p style="font-size:11px;color:#9ca3af;margin:0 0 4px;">Biaya Kunjungan</p>
-                            <p style="font-size:22px;font-weight:800;color:#2563eb;margin:0;">Rp {{ number_format($price, 0, ',', '.') }}</p>
-                            <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:12px;">
-                                <label id="mem-cash-label" onclick="selectPayMember('cash')"
-                                    style="border:2px solid #2563eb;background:#eff6ff;border-radius:8px;padding:9px;display:flex;align-items:center;justify-content:center;gap:6px;cursor:pointer;transition:all .15s;">
+                        {{-- Paid --}}
+                        <div style="background:#fafafa;border:1px solid var(--border);border-radius:var(--radius);padding:14px;text-align:center;">
+                            <p style="font-size:10.5px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.07em;margin:0 0 4px;">Biaya Kunjungan</p>
+                            <p style="font-size:22px;font-weight:800;color:var(--text);margin:0;">Rp {{ number_format($price,0,',','.') }}</p>
+                        </div>
+
+                        {{-- Payment Method --}}
+                        <div>
+                            <p style="font-size:10.5px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.07em;margin:0 0 8px;">Metode Pembayaran</p>
+                            <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;">
+                                <label id="mem-cash-label" onclick="selectPay('mem','cash','var(--red)')"
+                                    style="border:2px solid var(--red);background:rgba(239,68,68,.06);border-radius:var(--radius);padding:10px;display:flex;align-items:center;justify-content:center;gap:7px;cursor:pointer;transition:all .15s;">
                                     <input type="radio" name="payment_method" value="cash" checked style="display:none;">
-                                    <i class="fa fa-money-bill-wave" style="font-size:10px;color:#2563eb;"></i>
-                                    <span style="font-size:12px;font-weight:700;color:#1d4ed8;">CASH</span>
+                                    <i class="fa-solid fa-money-bill-wave" style="font-size:11px;color:var(--red);"></i>
+                                    <span style="font-size:12px;font-weight:700;color:var(--red);">CASH</span>
                                 </label>
-                                <label id="mem-transfer-label" onclick="selectPayMember('transfer')"
-                                    style="border:1px solid #e5e7eb;border-radius:8px;padding:9px;display:flex;align-items:center;justify-content:center;gap:6px;cursor:pointer;transition:all .15s;">
+                                <label id="mem-transfer-label" onclick="selectPay('mem','transfer','var(--red)')"
+                                    style="border:1px solid var(--border);border-radius:var(--radius);padding:10px;display:flex;align-items:center;justify-content:center;gap:7px;cursor:pointer;transition:all .15s;">
                                     <input type="radio" name="payment_method" value="transfer" style="display:none;">
-                                    <i class="fa fa-qrcode" style="font-size:10px;color:#9ca3af;"></i>
-                                    <span style="font-size:12px;font-weight:700;color:#6b7280;">TRANSFER</span>
+                                    <i class="fa-solid fa-qrcode" style="font-size:11px;color:var(--muted);"></i>
+                                    <span style="font-size:12px;font-weight:700;color:var(--muted);">TRANSFER</span>
                                 </label>
                             </div>
                         </div>
 
                         <button type="submit"
-                            data-confirm
+                            data-confirm="Member akan dikenakan biaya Rp {{ number_format($price,0,',','.') }}. Pastikan pembayaran sudah diterima."
                             data-confirm-title="Check-in Member Berbayar?"
-                            data-confirm-desc="Member akan dikenakan biaya Rp {{ number_format($price, 0, ',', '.') }}. Pastikan pembayaran sudah diterima."
-                            data-confirm-type="warning"
-                            data-confirm-label="Ya, Check-in"
-                            style="width:100%;background:#2563eb;color:#fff;font-weight:700;font-size:13.5px;padding:13px;border-radius:10px;border:none;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px;font-family:inherit;box-shadow:0 4px 14px rgba(37,99,235,.2);transition:filter .15s;"
-                            onmouseover="this.style.filter='brightness(1.08)'" onmouseout="this.style.filter='none'">
-                            <i class="fa fa-sign-in-alt"></i> Check-in Sekarang
+                            data-confirm-type="warn"
+                            data-confirm-ok="Ya, Check-in"
+                            style="width:100%;background:var(--red);color:#fff;font-weight:700;font-size:13px;padding:12px;border-radius:var(--radius);border:none;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px;font-family:'Outfit',sans-serif;box-shadow:0 4px 12px rgba(239,68,68,.25);transition:background .15s;"
+                            onmouseover="this.style.background='var(--red-dark)'" onmouseout="this.style.background='var(--red)'">
+                            <i class="fa-solid fa-right-to-bracket"></i> Check-in Sekarang
                         </button>
 
                         @else
-                        {{-- Free Member Check-in --}}
+                        {{-- Free --}}
                         <input type="hidden" name="payment_method" value="cash">
-                        <div style="background:#22c55e;color:#fff;border-radius:10px;padding:12px;display:flex;align-items:center;justify-content:center;gap:8px;font-size:13px;font-weight:700;">
-                            <i class="fa fa-check-circle"></i> Paket Aktif — Gratis
+                        <div style="background:rgba(34,197,94,.08);border:1px solid rgba(34,197,94,.2);border-radius:var(--radius);padding:11px;display:flex;align-items:center;justify-content:center;gap:8px;font-size:13px;font-weight:700;color:#15803d;">
+                            <i class="fa-solid fa-circle-check"></i> Paket Aktif — Gratis
                         </div>
                         <button type="submit"
-                            data-confirm
+                            data-confirm="Paket member aktif. Konfirmasi check-in {{ $user->name }} sekarang?"
                             data-confirm-title="Check-in Member Gratis?"
-                            data-confirm-desc="Paket member aktif. Konfirmasi check-in {{ $user->name }} sekarang?"
-                            data-confirm-type="success"
-                            data-confirm-label="Ya, Check-in"
-                            style="width:100%;background:#1e293b;color:#fff;font-weight:700;font-size:13.5px;padding:13px;border-radius:10px;border:none;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px;font-family:inherit;transition:background .15s;"
-                            onmouseover="this.style.background='#334155'" onmouseout="this.style.background='#1e293b'">
-                            <i class="fa fa-sign-in-alt"></i> Check-in Sekarang
+                            data-confirm-type="info"
+                            data-confirm-ok="Ya, Check-in"
+                            style="width:100%;background:var(--text);color:#fff;font-weight:700;font-size:13px;padding:12px;border-radius:var(--radius);border:none;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px;font-family:'Outfit',sans-serif;transition:background .15s;"
+                            onmouseover="this.style.background='#333'" onmouseout="this.style.background='var(--text)'">
+                            <i class="fa-solid fa-right-to-bracket"></i> Check-in Sekarang
                         </button>
                         @endif
                     </form>
                 </div>
 
                 @elseif(request('search'))
-                {{-- Member Not Found --}}
-                <div style="background:#fff1f2;border:1px solid #fecdd3;border-radius:12px;padding:24px;text-align:center;">
-                    <i class="fa fa-user-times" style="font-size:28px;color:#fca5a5;display:block;margin-bottom:10px;"></i>
-                    <p style="font-size:13px;font-weight:700;color:#b91c1c;margin:0 0 4px;">Member tidak ditemukan</p>
-                    <p style="font-size:11.5px;color:#9ca3af;margin:0;">Coba dengan ID lain atau periksa kembali</p>
+                {{-- ─── Not Found ─── --}}
+                <div style="border:1px solid var(--border);border-radius:var(--radius);padding:28px;text-align:center;">
+                    <div style="width:44px;height:44px;border-radius:var(--radius);background:#fafafa;display:flex;align-items:center;justify-content:center;margin:0 auto 10px;">
+                        <i class="fa-solid fa-user-slash" style="font-size:18px;color:#ddd;"></i>
+                    </div>
+                    <p style="font-size:13px;font-weight:700;color:var(--text);margin:0 0 3px;">Member tidak ditemukan</p>
+                    <p style="font-size:11.5px;color:var(--muted);margin:0;">Coba ID atau nomor lain</p>
                 </div>
+
                 @else
-                {{-- No Search --}}
-                <div style="background:#f9fafb;border:1px solid #f3f4f6;border-radius:12px;padding:24px;text-align:center;">
-                    <i class="fa fa-search" style="font-size:28px;color:#e5e7eb;display:block;margin-bottom:10px;"></i>
-                    <p style="font-size:13px;color:#9ca3af;font-weight:500;margin:0;">Masukkan ID atau nomor WA member</p>
+                {{-- ─── Empty State ─── --}}
+                <div style="border:1px solid var(--border);border-radius:var(--radius);padding:28px;text-align:center;background:#fafafa;">
+                    <div style="width:44px;height:44px;border-radius:var(--radius);background:#f0f0f0;display:flex;align-items:center;justify-content:center;margin:0 auto 10px;">
+                        <i class="fa-solid fa-magnifying-glass" style="font-size:18px;color:#ccc;"></i>
+                    </div>
+                    <p style="font-size:13px;color:var(--muted);font-weight:500;margin:0;">Masukkan ID atau nomor WA member</p>
                 </div>
                 @endif
+
             </div>
         </div>
         @endif
-    </div>
 
-    {{-- ═══ RIGHT COLUMN — ATTENDANCE HISTORY ═══ --}}
-    <div style="background:#fff;border:1px solid #e5e7eb;border-radius:16px;overflow:hidden;">
-        {{-- Header --}}
-        <div style="padding:18px 22px;border-bottom:1px solid #f3f4f6;display:flex;align-items:center;justify-content:space-between;">
-            <div style="display:flex;align-items:center;gap:12px;">
-                <div style="width:34px;height:34px;border-radius:9px;background:#f8fafc;display:flex;align-items:center;justify-content:center;">
-                    <i class="fa fa-clock" style="font-size:13px;color:#475569;"></i>
+        {{-- ═══ GUEST TAB ═══ --}}
+        @if($activeTab == 'guest')
+        <div class="card" style="padding:0;overflow:hidden;">
+
+            {{-- Card Header --}}
+            <div style="padding:16px 18px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:10px;">
+                <div style="width:32px;height:32px;border-radius:var(--radius);background:rgba(239,68,68,.08);display:flex;align-items:center;justify-content:center;flex-shrink:0;">
+                    <i class="fa-solid fa-user-plus" style="font-size:12px;color:var(--red);"></i>
                 </div>
                 <div>
-                    <p style="font-size:13.5px;font-weight:700;color:#111827;margin:0;line-height:1.3;">Riwayat Kehadiran Hari Ini</p>
-                    <p style="font-size:11px;color:#9ca3af;margin:0;">{{ now()->format('l, d F Y') }}</p>
+                    <p style="font-size:13px;font-weight:700;color:var(--text);margin:0;line-height:1.3;">Daftar Tamu Baru</p>
+                    <p style="font-size:11px;color:var(--muted);margin:0;">Day pass Rp 15.000</p>
                 </div>
             </div>
-            <span style="background:#f1f5f9;color:#334155;font-size:11.5px;font-weight:700;padding:5px 12px;border-radius:20px;white-space:nowrap;">
+
+            <form action="{{ route('admin.attendance.process') }}" method="POST" style="padding:18px;display:flex;flex-direction:column;gap:14px;">
+                @csrf
+                <input type="hidden" name="type" value="guest">
+                <input type="hidden" name="amount" value="15000">
+
+                {{-- Nama Lengkap --}}
+                <div>
+                    <label style="display:block;font-size:10.5px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.08em;margin-bottom:6px;">
+                        Nama Lengkap <span style="color:var(--red);">*</span>
+                    </label>
+                    <input type="text" name="name" required placeholder="Nama tamu"
+                        style="width:100%;border:1px solid var(--border);border-radius:var(--radius);padding:9px 12px;font-size:13px;color:var(--text);outline:none;font-family:'Outfit',sans-serif;box-sizing:border-box;background:#fff;transition:border-color .15s,box-shadow .15s;"
+                        onfocus="this.style.borderColor='var(--red)';this.style.boxShadow='0 0 0 3px rgba(239,68,68,.08)';"
+                        onblur="this.style.borderColor='var(--border)';this.style.boxShadow='none';">
+                </div>
+
+                {{-- WhatsApp --}}
+                <div>
+                    <label style="display:block;font-size:10.5px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.08em;margin-bottom:6px;">
+                        No. WhatsApp
+                    </label>
+                    <input type="text" name="whatsapp" placeholder="08xx"
+                        style="width:100%;border:1px solid var(--border);border-radius:var(--radius);padding:9px 12px;font-size:13px;color:var(--text);outline:none;font-family:'Outfit',sans-serif;box-sizing:border-box;background:#fff;transition:border-color .15s,box-shadow .15s;"
+                        onfocus="this.style.borderColor='var(--red)';this.style.boxShadow='0 0 0 3px rgba(239,68,68,.08)';"
+                        onblur="this.style.borderColor='var(--border)';this.style.boxShadow='none';">
+                </div>
+
+                {{-- Biaya Day Pass --}}
+                <div>
+                    <label style="display:block;font-size:10.5px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.08em;margin-bottom:6px;">Biaya Day Pass</label>
+                    <div style="border:1px solid var(--border);background:#fafafa;border-radius:var(--radius);padding:10px 12px;display:flex;align-items:center;justify-content:space-between;">
+                        <span style="font-size:12.5px;color:var(--muted);">Day Pass</span>
+                        <span style="font-size:14px;font-weight:800;color:var(--text);">Rp 15.000</span>
+                    </div>
+                </div>
+
+                {{-- Metode Pembayaran --}}
+                <div>
+                    <label style="display:block;font-size:10.5px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.08em;margin-bottom:8px;">Metode Pembayaran</label>
+                    <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;">
+                        <label id="gst-cash-label" onclick="selectPay('gst','cash','var(--red)')"
+                            style="border:2px solid var(--red);background:rgba(239,68,68,.06);border-radius:var(--radius);padding:10px;display:flex;align-items:center;justify-content:center;gap:7px;cursor:pointer;transition:all .15s;">
+                            <input type="radio" name="payment_method" value="cash" checked style="display:none;">
+                            <i class="fa-solid fa-money-bill-wave" style="font-size:11px;color:var(--red);"></i>
+                            <span style="font-size:12px;font-weight:700;color:var(--red);">CASH</span>
+                        </label>
+                        <label id="gst-transfer-label" onclick="selectPay('gst','transfer','var(--red)')"
+                            style="border:1px solid var(--border);border-radius:var(--radius);padding:10px;display:flex;align-items:center;justify-content:center;gap:7px;cursor:pointer;transition:all .15s;">
+                            <input type="radio" name="payment_method" value="transfer" style="display:none;">
+                            <i class="fa-solid fa-qrcode" style="font-size:11px;color:var(--muted);"></i>
+                            <span style="font-size:12px;font-weight:700;color:var(--muted);">TRANSFER</span>
+                        </label>
+                    </div>
+                </div>
+
+                {{-- Submit --}}
+                <button type="submit"
+                    data-confirm="Pastikan nama tamu dan metode pembayaran sudah benar sebelum menyimpan."
+                    data-confirm-title="Catat Kehadiran Tamu?"
+                    data-confirm-type="info"
+                    data-confirm-ok="Ya, Catat Sekarang"
+                    style="width:100%;background:var(--red);color:#fff;font-weight:700;font-size:13px;padding:12px;border-radius:var(--radius);border:none;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px;font-family:'Outfit',sans-serif;box-shadow:0 4px 12px rgba(239,68,68,.25);transition:background .15s;"
+                    onmouseover="this.style.background='var(--red-dark)'" onmouseout="this.style.background='var(--red)'">
+                    <i class="fa-solid fa-circle-check"></i> Catat Kehadiran
+                </button>
+            </form>
+        </div>
+        @endif
+
+    </div>
+
+    {{-- ══════════════════════════════════
+         RIGHT — RIWAYAT
+    ══════════════════════════════════ --}}
+    <div class="card" style="padding:0;overflow:hidden;">
+
+        {{-- Header --}}
+        <div style="padding:16px 18px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;">
+            <div style="display:flex;align-items:center;gap:10px;">
+                <div style="width:32px;height:32px;border-radius:var(--radius);background:#fafafa;border:1px solid var(--border);display:flex;align-items:center;justify-content:center;">
+                    <i class="fa-solid fa-clock-rotate-left" style="font-size:12px;color:var(--muted);"></i>
+                </div>
+                <div>
+                    <p style="font-size:13px;font-weight:700;color:var(--text);margin:0;line-height:1.3;">Riwayat Kehadiran Hari Ini</p>
+                    <p style="font-size:11px;color:var(--muted);margin:0;">{{ now()->isoFormat('dddd, D MMMM Y') }}</p>
+                </div>
+            </div>
+            <span style="background:#fafafa;border:1px solid var(--border);color:var(--muted);font-size:11.5px;font-weight:700;padding:4px 12px;border-radius:999px;white-space:nowrap;">
                 {{ $attendanceHistory->count() }} aktivitas
             </span>
         </div>
 
         @if($attendanceHistory->isEmpty())
-        {{-- Empty State --}}
-        <div style="display:flex;flex-direction:column;align-items:center;justify-content:center;padding:80px 24px;gap:12px;">
-            <div style="width:56px;height:56px;border-radius:14px;background:#f9fafb;display:flex;align-items:center;justify-content:center;">
-                <i class="fa fa-clock" style="font-size:24px;color:#e5e7eb;"></i>
+        {{-- Empty --}}
+        <div style="display:flex;flex-direction:column;align-items:center;justify-content:center;padding:72px 24px;gap:10px;">
+            <div style="width:48px;height:48px;border-radius:var(--radius);background:#fafafa;border:1px solid var(--border);display:flex;align-items:center;justify-content:center;">
+                <i class="fa-regular fa-clock" style="font-size:20px;color:#ddd;"></i>
             </div>
-            <p style="font-size:13px;color:#9ca3af;font-weight:500;margin:0;">Belum ada aktivitas hari ini</p>
+            <p style="font-size:13px;color:var(--muted);font-weight:500;margin:0;">Belum ada aktivitas hari ini</p>
         </div>
+
         @else
-        {{-- ═══ SUMMARY CARDS ═══ --}}
+
+        {{-- Summary Stat Bar --}}
         @php
-        $totalGuest = $attendanceHistory->whereIn('type', ['guest', 'paid_visit'])->count();
-        $totalMember = $attendanceHistory->where('type', 'member_package')->count();
-        $totalIncome = $attendanceHistory->sum('amount');
+            $totalGuest   = $attendanceHistory->whereIn('type', ['guest','paid_visit'])->count();
+            $totalMember  = $attendanceHistory->where('type', 'member_package')->count();
+            $totalIncome  = $attendanceHistory->sum('amount');
         @endphp
 
-        <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:1px;background:#f3f4f6;border-bottom:1px solid #f3f4f6;">
-            {{-- Tamu / Visit --}}
-            <div style="background:#fff;padding:14px 18px;text-align:center;">
-                <p style="font-size:10.5px;font-weight:700;color:#9ca3af;text-transform:uppercase;letter-spacing:.06em;margin:0 0 4px;">Tamu / Visit</p>
-                <p style="font-size:20px;font-weight:800;color:#f97316;margin:0;">{{ $totalGuest }}</p>
+        <div style="display:grid;grid-template-columns:1fr 1fr 1fr;background:#fafafa;border-bottom:1px solid var(--border);">
+            <div style="padding:12px 16px;text-align:center;border-right:1px solid var(--border);">
+                <p style="font-size:10px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;margin:0 0 3px;">Tamu / Visit</p>
+                <p style="font-size:20px;font-weight:800;color:var(--text);margin:0;">{{ $totalGuest }}</p>
             </div>
-
-            {{-- Member Paket --}}
-            <div style="background:#fff;padding:14px 18px;text-align:center;">
-                <p style="font-size:10.5px;font-weight:700;color:#9ca3af;text-transform:uppercase;letter-spacing:.06em;margin:0 0 4px;">Member Paket</p>
-                <p style="font-size:20px;font-weight:800;color:#2563eb;margin:0;">{{ $totalMember }}</p>
+            <div style="padding:12px 16px;text-align:center;border-right:1px solid var(--border);">
+                <p style="font-size:10px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;margin:0 0 3px;">Member Paket</p>
+                <p style="font-size:20px;font-weight:800;color:var(--text);margin:0;">{{ $totalMember }}</p>
             </div>
-
-            {{-- Pemasukan --}}
-            <div style="background:#fff;padding:14px 18px;text-align:center;">
-                <p style="font-size:10.5px;font-weight:700;color:#9ca3af;text-transform:uppercase;letter-spacing:.06em;margin:0 0 4px;">Pemasukan</p>
-                <p style="font-size:16px;font-weight:800;color:#111827;margin:0;">Rp {{ number_format($totalIncome,0,',','.') }}</p>
+            <div style="padding:12px 16px;text-align:center;">
+                <p style="font-size:10px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;margin:0 0 3px;">Pemasukan</p>
+                <p style="font-size:15px;font-weight:800;color:var(--text);margin:0;">Rp {{ number_format($totalIncome,0,',','.') }}</p>
             </div>
         </div>
 
-        {{-- ═══ ATTENDANCE LIST ═══ --}}
-        <div style="padding:8px;max-height:600px;overflow-y:auto;">
+        {{-- List --}}
+        <div style="max-height:580px;overflow-y:auto;">
             @foreach($attendanceHistory as $item)
             @php
-            $isGuest = $item->guest_name != null;
-            $isPackage = $item->type == 'member_package';
+                $isGuest   = $item->guest_name != null;
+                $isPackage = $item->type == 'member_package';
             @endphp
 
-            <div style="display:flex;align-items:center;justify-content:space-between;padding:13px 14px;border-radius:10px;transition:background .15s;"
-                onmouseover="this.style.background='#f9fafb'" onmouseout="this.style.background='transparent'">
+            <div style="display:flex;align-items:center;gap:12px;padding:12px 16px;border-bottom:1px solid var(--border);transition:background .12s;"
+                 onmouseover="this.style.background='#fafafa'" onmouseout="this.style.background='transparent'">
 
-                {{-- LEFT: Avatar + Name --}}
-                <div style="display:flex;align-items:center;gap:12px;">
-                    <div style="width:38px;height:38px;border-radius:50%;flex-shrink:0;
-                                        {{ $isGuest ? 'background:#fff7ed;' : 'background:#eff6ff;' }}
-                                        display:flex;align-items:center;justify-content:center;">
-                        <i class="fa fa-user" style="font-size:13px;
-                                    {{ $isGuest ? 'color:#f97316;' : 'color:#2563eb;' }}"></i>
-                    </div>
-                    <div>
-                        <p style="font-size:13.5px;font-weight:700;color:#111827;margin:0;line-height:1.3;">
-                            {{ $item->guest_name ?? optional($item->user)->name ?? '-' }}
-                        </p>
-                        <p style="font-size:11.5px;color:#9ca3af;margin:2px 0 0;">
-                            @if($isGuest)
-                            Visit Harian
-                            @elseif($isPackage)
-                            Membership Aktif
-                            @else
-                            Visit Harian Member
-                            @endif
-                        </p>
-                    </div>
+                {{-- Avatar --}}
+                <div style="width:36px;height:36px;border-radius:50%;flex-shrink:0;border:1px solid var(--border);
+                            background:{{ $isGuest ? '#fff7ed' : ($isPackage ? 'rgba(34,197,94,.08)' : 'rgba(239,68,68,.06)') }};
+                            display:flex;align-items:center;justify-content:center;">
+                    <i class="fa-solid fa-user" style="font-size:12px;color:{{ $isGuest ? '#f97316' : ($isPackage ? '#16a34a' : 'var(--red)') }};"></i>
                 </div>
 
-                {{-- RIGHT: Amount + Time + Status --}}
-                <div style="display:flex;align-items:center;gap:14px;flex-shrink:0;">
-                    {{-- Amount / Status --}}
-                    <div style="text-align:right;">
-                        @if($isPackage)
-                        <span style="display:block;font-size:13px;font-weight:800;color:#16a34a;">GRATIS</span>
-                        <span style="display:inline-block;font-size:10.5px;font-weight:600;padding:2px 8px;border-radius:20px;background:#f0fdf4;color:#15803d;margin-top:2px;">
-                            Membership
-                        </span>
-                        @else
-                        <span style="display:block;font-size:13px;font-weight:800;
-                                        {{ $isGuest ? 'color:#f97316;' : 'color:#2563eb;' }}">
-                            Rp {{ number_format($item->amount ?? 0,0,',','.') }}
-                        </span>
-                        <span style="display:inline-flex;align-items:center;gap:4px;font-size:10.5px;font-weight:600;padding:2px 8px;border-radius:20px;margin-top:2px;
-                                        {{ $isGuest ? 'background:#fff7ed;color:#c2410c;' : 'background:#eff6ff;color:#1d4ed8;' }}">
-                            <i class="fa {{ $isGuest ? 'fa-money-bill-wave' : 'fa-id-card' }}" style="font-size:9px;"></i>
-                            {{ ucfirst($item->payment_method ?? 'cash') }}
-                        </span>
+                {{-- Name & Type --}}
+                <div style="flex:1;min-width:0;">
+                    <p style="font-size:13px;font-weight:700;color:var(--text);margin:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">
+                        {{ $item->guest_name ?? optional($item->user)->name ?? '-' }}
+                    </p>
+                    <p style="font-size:11px;color:var(--muted);margin:2px 0 0;">
+                        @if($isGuest) Visit Harian
+                        @elseif($isPackage) Membership Aktif
+                        @else Visit Harian Member
                         @endif
-                    </div>
-
-                    {{-- Time --}}
-                    <div style="text-align:right;">
-                        <p style="font-size:13px;font-weight:700;color:#374151;margin:0;font-family:'DM Mono',monospace;">
-                            {{ $item->created_at->format('H:i') }}
-                        </p>
-                        <p style="font-size:10.5px;color:#9ca3af;margin:2px 0 0;">WIB</p>
-                    </div>
-
-                    {{-- Check Icon --}}
-                    <div style="width:28px;height:28px;border-radius:50%;background:#f0fdf4;display:flex;align-items:center;justify-content:center;flex-shrink:0;">
-                        <i class="fa fa-check" style="font-size:10px;color:#16a34a;"></i>
-                    </div>
+                    </p>
                 </div>
-            </div>
 
-            @if(!$loop->last)
-            <div style="border-bottom:1px solid #f9fafb;margin:0 14px;"></div>
-            @endif
+                {{-- Amount / Badge --}}
+                <div style="text-align:right;flex-shrink:0;">
+                    @if($isPackage)
+                    <span style="font-size:12.5px;font-weight:800;color:#16a34a;">GRATIS</span><br>
+                    <span style="font-size:10px;font-weight:600;padding:2px 8px;border-radius:999px;background:rgba(34,197,94,.1);color:#15803d;">Membership</span>
+                    @else
+                    <span style="font-size:12.5px;font-weight:800;color:var(--text);">Rp {{ number_format($item->amount ?? 0,0,',','.') }}</span><br>
+                    <span style="font-size:10px;font-weight:600;padding:2px 8px;border-radius:999px;background:#fafafa;border:1px solid var(--border);color:var(--muted);">
+                        {{ ucfirst($item->payment_method ?? 'cash') }}
+                    </span>
+                    @endif
+                </div>
+
+                {{-- Time --}}
+                <div style="text-align:right;flex-shrink:0;min-width:38px;">
+                    <p style="font-size:12.5px;font-weight:700;color:var(--text);margin:0;font-variant-numeric:tabular-nums;">{{ $item->created_at->format('H:i') }}</p>
+                    <p style="font-size:10px;color:var(--muted);margin:1px 0 0;">WIB</p>
+                </div>
+
+                {{-- Check --}}
+                <div style="width:26px;height:26px;border-radius:50%;background:rgba(34,197,94,.1);display:flex;align-items:center;justify-content:center;flex-shrink:0;">
+                    <i class="fa-solid fa-check" style="font-size:9px;color:#16a34a;"></i>
+                </div>
+
+            </div>
             @endforeach
         </div>
+
         @endif
     </div>
+
 </div>
+
+{{-- ═══ RESPONSIVE MOBILE ═══ --}}
+<style>
+@media(max-width:900px){
+    .attendance-grid-wrap > div:first-child,
+    div[style*="grid-template-columns:360px"] {
+        grid-template-columns: 1fr !important;
+    }
+}
+</style>
 
 @endsection
 
 @push('scripts')
 <script>
-    function selectPayGuest(method) {
-        const cash = document.getElementById('pay-cash-label');
-        const transfer = document.getElementById('pay-transfer-label');
+/**
+ * Unified payment selector
+ * prefix: 'mem' | 'gst'
+ * method: 'cash' | 'transfer'
+ * accent: CSS color value
+ */
+function selectPay(prefix, method, accent) {
+    const cashEl     = document.getElementById(prefix + '-cash-label');
+    const transferEl = document.getElementById(prefix + '-transfer-label');
+    if (!cashEl || !transferEl) return;
 
-        if (method === 'cash') {
-            cash.style.cssText += ';border:2px solid #f97316;background:#fff7ed;';
-            transfer.style.cssText += ';border:1px solid #e5e7eb;background:transparent;';
-            cash.querySelector('i').style.color = '#f97316';
-            cash.querySelector('span').style.color = '#ea580c';
-            transfer.querySelector('i').style.color = '#9ca3af';
-            transfer.querySelector('span').style.color = '#6b7280';
-        } else {
-            transfer.style.cssText += ';border:2px solid #f97316;background:#fff7ed;';
-            cash.style.cssText += ';border:1px solid #e5e7eb;background:transparent;';
-            transfer.querySelector('i').style.color = '#f97316';
-            transfer.querySelector('span').style.color = '#ea580c';
-            cash.querySelector('i').style.color = '#9ca3af';
-            cash.querySelector('span').style.color = '#6b7280';
-        }
-        document.querySelector(`input[name="payment_method"][value="${method}"]`).checked = true;
-    }
+    const active   = method === 'cash' ? cashEl : transferEl;
+    const inactive = method === 'cash' ? transferEl : cashEl;
 
-    function selectPayMember(method) {
-        const cash = document.getElementById('mem-cash-label');
-        const transfer = document.getElementById('mem-transfer-label');
+    active.style.border   = '2px solid var(--red)';
+    active.style.background = 'rgba(239,68,68,.06)';
+    active.querySelector('i').style.color    = 'var(--red)';
+    active.querySelector('span').style.color = 'var(--red)';
 
-        if (!cash || !transfer) return;
+    inactive.style.border   = '1px solid var(--border)';
+    inactive.style.background = 'transparent';
+    inactive.querySelector('i').style.color    = 'var(--muted)';
+    inactive.querySelector('span').style.color = 'var(--muted)';
 
-        if (method === 'cash') {
-            cash.style.cssText += ';border:2px solid #2563eb;background:#eff6ff;';
-            transfer.style.cssText += ';border:1px solid #e5e7eb;background:transparent;';
-            cash.querySelector('i').style.color = '#2563eb';
-            cash.querySelector('span').style.color = '#1d4ed8';
-            transfer.querySelector('i').style.color = '#9ca3af';
-            transfer.querySelector('span').style.color = '#6b7280';
-        } else {
-            transfer.style.cssText += ';border:2px solid #2563eb;background:#eff6ff;';
-            cash.style.cssText += ';border:1px solid #e5e7eb;background:transparent;';
-            transfer.querySelector('i').style.color = '#2563eb';
-            transfer.querySelector('span').style.color = '#1d4ed8';
-            cash.querySelector('i').style.color = '#9ca3af';
-            cash.querySelector('span').style.color = '#6b7280';
-        }
-        document.querySelector(`input[name="payment_method"][value="${method}"]`).checked = true;
-    }
+    const radio = document.querySelector(`input[name="payment_method"][value="${method}"]`);
+    if (radio) radio.checked = true;
+}
 </script>
 @endpush

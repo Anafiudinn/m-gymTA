@@ -6,214 +6,168 @@
 
 @section('content')
 
-<div class="p-6">
+<div style="display:flex; flex-direction:column; gap:24px;">
 
-    {{-- HEADER --}}
-    <div class="bg-white border border-gray-100 rounded-2xl p-6 mb-6">
+    {{-- HEADER CARD --}}
+    <div class="card">
+        <div style="display:flex; flex-wrap:wrap; align-items:center; justify-content:space-between; gap:16px;">
 
-        <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-5">
-
-            <div>
-
-                <h1 class="text-2xl font-bold text-gray-900">
-                    {{ $product->nama_produk }}
-                </h1>
-
-                <div class="mt-2 text-sm text-gray-500">
-                    Monitoring detail penjualan produk
+            {{-- LEFT --}}
+            <div style="display:flex; align-items:center; gap:16px;">
+                <div style="width:52px; height:52px; border-radius:1px; background:linear-gradient(135deg,var(--red),#991b1b); display:flex; align-items:center; justify-content:center; flex-shrink:0;">
+                    <i class="fa-solid fa-box" style="color:#fff; font-size:20px;"></i>
                 </div>
-
+                <div>
+                    <div style="font-size:20px; font-weight:800; color:#111;">{{ $product->nama_produk }}</div>
+                    <div style="font-size:13px; color:#aaa; margin-top:3px;">Monitoring detail penjualan produk</div>
+                </div>
             </div>
 
-            <div>
-
-                @if($product->stok <= 5)
-
-                    <span class="inline-flex items-center px-4 py-2 rounded-full text-sm font-semibold bg-red-100 text-red-700">
-                        Stok Menipis
-                    </span>
-
-                @else
-
-                    <span class="inline-flex items-center px-4 py-2 rounded-full text-sm font-semibold bg-emerald-100 text-emerald-700">
-                        Stok Aman
-                    </span>
-
-                @endif
-
-            </div>
+            {{-- STOCK BADGE --}}
+            @if($product->stok <= 5)
+                <span style="display:inline-flex; align-items:center; gap:6px; padding:8px 16px; border-radius:1px; font-size:13px; font-weight:700; background:#fff1f2; color:#be123c; border:1px solid #fecdd3;">
+                    <i class="fa-solid fa-triangle-exclamation" style="font-size:11px;"></i> Stok Menipis
+                </span>
+            @else
+                <span style="display:inline-flex; align-items:center; gap:6px; padding:8px 16px; border-radius:1px; font-size:13px; font-weight:700; background:#f0fdf4; color:#15803d; border:1px solid #bbf7d0;">
+                    <i class="fa-solid fa-circle-check" style="font-size:11px;"></i> Stok Aman
+                </span>
+            @endif
 
         </div>
-
     </div>
 
-    {{-- SUMMARY --}}
-    <div class="grid grid-cols-1 md:grid-cols-3 gap-5 mb-6">
+    {{-- STATS --}}
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-5">
 
-        <div class="bg-white border border-gray-100 rounded-2xl p-5">
-
-            <p class="text-xs text-gray-500 mb-2">
-                HARGA PRODUK
-            </p>
-
-            <h2 class="text-3xl font-bold text-gray-900">
-                Rp {{ number_format($product->harga, 0, ',', '.') }}
-            </h2>
-
+        <div class="card" style="display:flex; align-items:center; gap:16px;">
+            <div style="width:48px; height:48px; border-radius:1px; background:rgba(0,0,0,.05); display:flex; align-items:center; justify-content:center; flex-shrink:0;">
+                <i class="fa-solid fa-tag" style="color:#555; font-size:18px;"></i>
+            </div>
+            <div>
+                <div style="font-size:12px; color:#999; font-weight:600; text-transform:uppercase; letter-spacing:.08em;">Harga Produk</div>
+                <div style="font-size:20px; font-weight:800; color:#111; line-height:1.2; margin-top:2px;">Rp {{ number_format($product->harga, 0, ',', '.') }}</div>
+            </div>
         </div>
 
-        <div class="bg-white border border-gray-100 rounded-2xl p-5">
-
-            <p class="text-xs text-gray-500 mb-2">
-                TOTAL TERJUAL
-            </p>
-
-            <h2 class="text-3xl font-bold text-blue-600">
-                {{ $totalSold }}
-            </h2>
-
+        <div class="card" style="display:flex; align-items:center; gap:16px;">
+            <div style="width:48px; height:48px; border-radius:1px; background:#eff6ff; display:flex; align-items:center; justify-content:center; flex-shrink:0;">
+                <i class="fa-solid fa-cart-shopping" style="color:#1d4ed8; font-size:18px;"></i>
+            </div>
+            <div>
+                <div style="font-size:12px; color:#999; font-weight:600; text-transform:uppercase; letter-spacing:.08em;">Total Terjual</div>
+                <div style="font-size:28px; font-weight:800; color:#1d4ed8; line-height:1.2; margin-top:2px;">{{ $totalSold }}</div>
+            </div>
         </div>
 
-        <div class="bg-white border border-gray-100 rounded-2xl p-5">
-
-            <p class="text-xs text-gray-500 mb-2">
-                TOTAL OMZET
-            </p>
-
-            <h2 class="text-3xl font-bold text-emerald-600">
-                Rp {{ number_format($totalRevenue, 0, ',', '.') }}
-            </h2>
-
+        <div class="card" style="display:flex; align-items:center; gap:16px;">
+            <div style="width:48px; height:48px; border-radius:1px; background:#f0fdf4; display:flex; align-items:center; justify-content:center; flex-shrink:0;">
+                <i class="fa-solid fa-sack-dollar" style="color:#16a34a; font-size:18px;"></i>
+            </div>
+            <div>
+                <div style="font-size:12px; color:#999; font-weight:600; text-transform:uppercase; letter-spacing:.08em;">Total Omzet</div>
+                <div style="font-size:20px; font-weight:800; color:#16a34a; line-height:1.2; margin-top:2px;">Rp {{ number_format($totalRevenue, 0, ',', '.') }}</div>
+            </div>
         </div>
 
     </div>
 
     {{-- PRODUCT INFO --}}
-    <div class="bg-white border border-gray-100 rounded-2xl p-5 mb-6">
+    <div class="card">
+        <div style="font-size:14px; font-weight:700; color:#111; margin-bottom:16px;">
+            <i class="fa-solid fa-circle-info" style="color:var(--red); margin-right:8px;"></i>Informasi Produk
+        </div>
 
-        <h2 class="font-semibold text-gray-900 mb-4">
-            Informasi Produk
-        </h2>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
 
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
-
-            <div>
-
-                <p class="text-xs text-gray-500 mb-1">
-                    Nama Produk
-                </p>
-
-                <div class="text-sm font-semibold text-gray-900">
-                    {{ $product->nama_produk }}
-                </div>
-
+            <div style="background:#f9f9f9; border-radius:1px; padding:14px 16px;">
+                <div style="font-size:11px; color:#aaa; font-weight:600; text-transform:uppercase; letter-spacing:.08em; margin-bottom:6px;">Nama Produk</div>
+                <div style="font-size:14px; font-weight:700; color:#111;">{{ $product->nama_produk }}</div>
             </div>
 
-            <div>
-
-                <p class="text-xs text-gray-500 mb-1">
-                    Stok Saat Ini
-                </p>
-
-                <div class="text-sm font-semibold text-gray-900">
-                    {{ $product->stok }}
+            <div style="background:#f9f9f9; border-radius:1px; padding:14px 16px;">
+                <div style="font-size:11px; color:#aaa; font-weight:600; text-transform:uppercase; letter-spacing:.08em; margin-bottom:6px;">Stok Saat Ini</div>
+                <div style="display:flex; align-items:center; gap:10px;">
+                    <div style="font-size:14px; font-weight:700; color:#111;">{{ $product->stok }} unit</div>
+                    @if($product->stok <= 5)
+                        <span style="font-size:11px; font-weight:700; color:#be123c; background:#fff1f2; padding:3px 8px; border-radius:1px; border:1px solid #fecdd3;">Menipis</span>
+                    @else
+                        <span style="font-size:11px; font-weight:700; color:#15803d; background:#f0fdf4; padding:3px 8px; border-radius:1px; border:1px solid #bbf7d0;">Aman</span>
+                    @endif
                 </div>
-
             </div>
 
         </div>
-
     </div>
 
     {{-- SALES HISTORY --}}
-    <div class="bg-white border border-gray-100 rounded-2xl overflow-hidden">
+    <div class="card" style="padding:0; overflow:hidden;">
 
-        <div class="px-5 py-4 border-b border-gray-100">
-            <h2 class="font-semibold text-gray-900">
-                Riwayat Penjualan
-            </h2>
+        <div style="padding:18px 22px; border-bottom:1px solid var(--border); display:flex; align-items:center; justify-content:space-between;">
+            <span style="font-size:14px; font-weight:700; color:#111;">
+                <i class="fa-solid fa-chart-line" style="color:var(--red); margin-right:8px;"></i>Riwayat Penjualan
+            </span>
+            @if($salesHistory->count() > 0)
+                <span style="font-size:12px; color:#999;">{{ $salesHistory->total() }} transaksi</span>
+            @endif
         </div>
 
         @if($salesHistory->count() == 0)
-
-            <div class="py-16 text-center text-gray-400 text-sm">
+            <div style="padding:56px; text-align:center; color:#bbb; font-size:14px;">
+                <i class="fa-solid fa-chart-simple" style="font-size:32px; display:block; margin-bottom:10px; opacity:.35;"></i>
                 Belum ada riwayat penjualan
             </div>
-
         @else
-
-            <div class="overflow-x-auto">
-
-                <table class="w-full">
-
-                    <thead class="bg-gray-50">
-
-                        <tr>
-
-                            <th class="px-5 py-3 text-left text-xs font-semibold text-gray-400 uppercase">
-                                Invoice
-                            </th>
-
-                            <th class="px-5 py-3 text-left text-xs font-semibold text-gray-400 uppercase">
-                                Qty
-                            </th>
-
-                            <th class="px-5 py-3 text-left text-xs font-semibold text-gray-400 uppercase">
-                                Harga
-                            </th>
-
-                            <th class="px-5 py-3 text-left text-xs font-semibold text-gray-400 uppercase">
-                                Subtotal
-                            </th>
-
-                            <th class="px-5 py-3 text-left text-xs font-semibold text-gray-400 uppercase">
-                                Tanggal
-                            </th>
-
+            <div style="overflow-x:auto;">
+                <table style="width:100%; border-collapse:collapse;">
+                    <thead>
+                        <tr style="background:#f9f9f9;">
+                            <th style="padding:12px 22px; text-align:left; font-size:11px; font-weight:700; color:#aaa; text-transform:uppercase; letter-spacing:.1em;">Invoice</th>
+                            <th style="padding:12px 22px; text-align:left; font-size:11px; font-weight:700; color:#aaa; text-transform:uppercase; letter-spacing:.1em;">Qty</th>
+                            <th style="padding:12px 22px; text-align:left; font-size:11px; font-weight:700; color:#aaa; text-transform:uppercase; letter-spacing:.1em;">Harga</th>
+                            <th style="padding:12px 22px; text-align:left; font-size:11px; font-weight:700; color:#aaa; text-transform:uppercase; letter-spacing:.1em;">Subtotal</th>
+                            <th style="padding:12px 22px; text-align:left; font-size:11px; font-weight:700; color:#aaa; text-transform:uppercase; letter-spacing:.1em;">Tanggal</th>
                         </tr>
-
                     </thead>
-
-                    <tbody class="divide-y divide-gray-100">
-
+                    <tbody>
                         @foreach($salesHistory as $item)
+                            <tr style="border-top:1px solid var(--border); transition:.15s;"
+                                onmouseover="this.style.background='#fafafa'"
+                                onmouseout="this.style.background='transparent'">
 
-                            <tr>
-
-                                <td class="px-5 py-4 text-sm font-medium text-gray-900">
-                                    {{ $item->transaction->invoice_code ?? '-' }}
+                                <td style="padding:14px 22px;">
+                                    <span style="font-size:12px; font-weight:700; color:#555; background:#f5f5f5; padding:3px 10px; border-radius:8px; font-family:monospace;">
+                                        {{ $item->transaction->invoice_code ?? '-' }}
+                                    </span>
                                 </td>
 
-                                <td class="px-5 py-4 text-sm text-gray-700">
-                                    {{ $item->qty }}
+                                <td style="padding:14px 22px;">
+                                    <span style="display:inline-flex; align-items:center; gap:4px; padding:4px 12px; border-radius:999px; font-size:12px; font-weight:700; background:#eff6ff; color:#1d4ed8; border:1px solid #bfdbfe;">
+                                        {{ $item->qty }}x
+                                    </span>
                                 </td>
 
-                                <td class="px-5 py-4 text-sm text-gray-700">
+                                <td style="padding:14px 22px; font-size:13px; color:#555;">
                                     Rp {{ number_format($item->price, 0, ',', '.') }}
                                 </td>
 
-                                <td class="px-5 py-4 text-sm font-semibold text-gray-900">
+                                <td style="padding:14px 22px; font-size:14px; font-weight:700; color:#111;">
                                     Rp {{ number_format($item->subtotal, 0, ',', '.') }}
                                 </td>
 
-                                <td class="px-5 py-4 text-sm text-gray-500">
+                                <td style="padding:14px 22px; font-size:13px; color:#999;">
                                     {{ $item->created_at->format('d M Y H:i') }}
                                 </td>
 
                             </tr>
-
                         @endforeach
-
                     </tbody>
-
                 </table>
-
             </div>
 
-            <div class="px-5 py-4 border-t border-gray-100">
+            <div style="padding:16px 22px; border-top:1px solid var(--border);">
                 {{ $salesHistory->links() }}
             </div>
-
         @endif
 
     </div>
