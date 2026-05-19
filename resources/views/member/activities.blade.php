@@ -19,225 +19,234 @@
     .activity-header {
         display: flex;
         justify-content: space-between;
-        align-items: flex-end;
+        align-items: center;
         gap: 20px;
-        margin-bottom: 32px;
+        margin-bottom: 28px;
         flex-wrap: wrap;
     }
 
     .activity-title h1 {
         margin: 0;
         color: var(--text);
-        font-size: 34px;
+        font-size: 28px;
         font-weight: 900;
-        letter-spacing: .03em;
+        letter-spacing: .02em;
     }
 
     .activity-title p {
-        margin-top: 8px;
+        margin-top: 6px;
         color: var(--muted);
-        font-size: 14px;
+        font-size: 13px;
+        line-height: 1.5;
     }
 
     .back-btn {
         display: inline-flex;
         align-items: center;
-        gap: 10px;
-        padding: 12px 18px;
-        border-radius: 12px;
+        gap: 8px;
+        padding: 10px 16px;
+        border-radius: 10px;
         background: var(--bg2);
         border: 1px solid var(--border);
         color: var(--text);
         text-decoration: none;
-        font-size: 13px;
+        font-size: 12px;
         font-weight: 700;
-        transition: .2s;
+        transition: .2s ease;
     }
 
     .back-btn:hover {
         border-color: rgba(255, 255, 255, .12);
-        transform: translateY(-2px);
+        background: rgba(255, 255, 255, .02);
+        transform: translateY(-1px);
     }
 
-    /* ======================================================
-       TIMELINE
-    ====================================================== */
-
-    .timeline {
-        position: relative;
-        margin-top: 10px;
-    }
-
-    .timeline::before {
-        content: '';
-        position: absolute;
-        left: 23px;
-        top: 0;
-        width: 2px;
-        height: 100%;
-        background: rgba(255, 255, 255, .08);
-    }
-
-    .timeline-item {
-        position: relative;
-        padding-left: 70px;
-        margin-bottom: 24px;
-    }
-
-    .timeline-dot {
-        position: absolute;
-        left: 10px;
-        top: 8px;
-        width: 28px;
-        height: 28px;
-        border-radius: 50%;
-        background: var(--red);
-        border: 4px solid var(--bg);
-        z-index: 2;
-    }
-
-    .timeline-card {
-        background: var(--bg2);
+    /* ============================================================
+        CONTAINER WRAPPER & TABLE
+    ============================================================ */
+    .activity-container {
+        background: linear-gradient(180deg, rgba(255, 255, 255, .02), rgba(255, 255, 255, .01));
         border: 1px solid var(--border);
-        border-radius: 18px;
-        padding: 22px;
-        transition: .2s;
+        border-radius: 16px;
+        padding: 20px;
+        backdrop-filter: blur(10px);
+        position: relative;
     }
 
-    .timeline-card:hover {
-        border-color: rgba(255, 255, 255, .12);
-        transform: translateY(-2px);
+    .activity-table {
+        width: 100%;
+        border-collapse: collapse;
     }
 
-    .timeline-top {
+    .activity-table th {
+        text-align: left;
+        font-size: 10px;
+        color: #7b7b7b;
+        text-transform: uppercase;
+        letter-spacing: .12em;
+        padding-bottom: 12px;
+        border-bottom: 1px solid rgba(255, 255, 255, .06);
+        font-weight: 800;
+    }
+
+    .activity-table td {
+        padding: 14px 0;
+        font-size: 13px;
+        border-bottom: 1px solid rgba(255, 255, 255, .04);
+        vertical-align: middle;
+    }
+
+    .activity-table tr:last-child td {
+        border-bottom: none;
+    }
+
+    .activity-table tr {
+        transition: .2s ease;
+    }
+
+    .activity-table tr:hover {
+        transform: translateX(2px);
+    }
+
+    /* ============================================================
+        COMPONENTS & BADGES
+    ============================================================ */
+    .status-pill {
+        padding: 4px 8px;
+        border-radius: 6px;
+        font-size: 9px;
+        font-weight: 900;
+        letter-spacing: .05em;
+        text-transform: uppercase;
+        white-space: nowrap;
+        width: fit-content;
+        display: inline-block;
+    }
+
+    .badge-success { background: rgba(34, 197, 94, .1); color: #22c55e; border: 1px solid rgba(34, 197, 94, .15); }
+    .badge-info    { background: rgba(59, 130, 246, .1); color: #3b82f6; border: 1px solid rgba(59, 130, 246, .15); }
+    .badge-warning { background: rgba(234, 179, 8, .1); color: #facc15; border: 1px solid rgba(234, 179, 8, .15); }
+
+    .muted-text {
+        font-size: 11px;
+        color: var(--muted);
+        line-height: 1.5;
+    }
+
+    .meta-inline {
+        display: flex;
+        gap: 6px;
+        flex-wrap: wrap;
+        margin-top: 5px;
+    }
+
+    .meta-inline span {
+        padding: 2px 6px;
+        border-radius: 4px;
+        background: rgba(255, 255, 255, .03);
+        border: 1px solid rgba(255, 255, 255, .05);
+        color: var(--muted);
+        font-size: 10px;
+    }
+
+    /* ============================================================
+        MOBILE CARD LIST (Sembunyi di Desktop)
+    ============================================================ */
+    .mobile-activity-list {
+        display: none;
+        flex-direction: column;
+        gap: 12px;
+    }
+
+    .mobile-activity-card {
+        background: rgba(255, 255, 255, 0.01);
+        border: 1px solid rgba(255, 255, 255, 0.04);
+        border-radius: 12px;
+        padding: 14px;
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+    }
+
+    .mobile-card-row {
         display: flex;
         justify-content: space-between;
-        align-items: flex-start;
-        gap: 20px;
-        margin-bottom: 14px;
-        flex-wrap: wrap;
-    }
-
-    .timeline-badge {
-        display: inline-flex;
         align-items: center;
-        gap: 8px;
-        padding: 7px 12px;
-        border-radius: 999px;
-        font-size: 11px;
-        font-weight: 800;
-        letter-spacing: .08em;
-        text-transform: uppercase;
-    }
-
-    .badge-success {
-        background: rgba(34, 197, 94, .12);
-        color: #22c55e;
-        border: 1px solid rgba(34, 197, 94, .2);
-    }
-
-    .badge-info {
-        background: rgba(59, 130, 246, .12);
-        color: #60a5fa;
-        border: 1px solid rgba(59, 130, 246, .2);
-    }
-
-    .badge-warning {
-        background: rgba(234, 179, 8, .12);
-        color: #facc15;
-        border: 1px solid rgba(234, 179, 8, .2);
-    }
-
-    .timeline-date {
-        color: var(--muted);
-        font-size: 12px;
-        white-space: nowrap;
-    }
-
-    .timeline-description {
-        color: var(--text);
-        font-size: 14px;
-        line-height: 1.7;
-    }
-
-    .timeline-meta {
-        margin-top: 16px;
-        display: flex;
         gap: 10px;
-        flex-wrap: wrap;
     }
 
-    .timeline-meta span {
-        padding: 6px 10px;
-        border-radius: 10px;
-        background: rgba(255, 255, 255, .03);
-        border: 1px solid var(--border);
-        color: var(--muted);
-        font-size: 11px;
-    }
-
-    /* ======================================================
-       EMPTY
-    ====================================================== */
-
+    /* ============================================================
+        EMPTY STATE & LOAD MORE
+    ============================================================ */
     .empty-state {
         background: var(--bg2);
         border: 1px solid var(--border);
-        border-radius: 24px;
-        padding: 80px 30px;
+        border-radius: 20px;
+        padding: 60px 20px;
         text-align: center;
     }
 
     .empty-icon {
-        width: 80px;
-        height: 80px;
+        width: 60px;
+        height: 60px;
         margin: auto;
-        border-radius: 20px;
-        background: rgba(255, 255, 255, .03);
+        border-radius: 16px;
+        background: rgba(255, 255, 255, .02);
         border: 1px solid var(--border);
         display: flex;
         align-items: center;
         justify-content: center;
         color: var(--muted);
-        font-size: 28px;
-        margin-bottom: 24px;
+        font-size: 22px;
+        margin-bottom: 16px;
     }
 
     .empty-state h3 {
         color: var(--text);
-        margin-bottom: 10px;
-        font-size: 20px;
+        margin-bottom: 6px;
+        font-size: 16px;
+        font-weight: 800;
     }
 
-    .empty-state p {
-        color: var(--muted);
-        font-size: 14px;
+    .load-more-btn {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        padding: 10px 16px;
+        border-radius: 10px;
+        background: rgba(255,255,255,.03);
+        border: 1px solid var(--border);
+        color: var(--text);
+        text-decoration: none;
+        font-weight: 700;
+        font-size: 12px;
+        transition: .2s ease;
     }
 
-    /* ======================================================
-       PAGINATION
-    ====================================================== */
-
-    .pagination-wrapper {
-        margin-top: 35px;
+    .load-more-btn:hover {
+        background: rgba(239, 68, 68, .06);
+        border-color: rgba(239, 68, 68, .16);
+        transform: translateY(-1px);
     }
 
+    /* ============================================================
+        RESPONSIVE BREAKPOINTS
+    ============================================================ */
     @media(max-width:768px) {
-
         .activity-page {
-            padding: 20px;
-        }
-
-        .timeline-item {
-            padding-left: 58px;
-        }
-
-        .timeline-card {
-            padding: 18px;
+            padding: 16px;
         }
 
         .activity-title h1 {
-            font-size: 28px;
+            font-size: 24px;
+        }
+
+        .activity-table {
+            display: none;
+        }
+
+        .mobile-activity-list {
+            display: flex;
         }
     }
 </style>
@@ -246,122 +255,122 @@
 
     {{-- HEADER --}}
     <div class="activity-header">
-
         <div class="activity-title">
             <h1>Aktivitas Gym</h1>
-            <p>
-                Riwayat lengkap aktivitas membership, check-in gym, dan sesi personal trainer.
-            </p>
+            <p>Riwayat lengkap aktivitas membership, check-in gym, dan sesi personal trainer.</p>
         </div>
 
-        <a href="{{ route('member.dashboard', ['tab' => 'history']) }}"
-            class="back-btn">
-
-            <i class="fa-solid fa-arrow-left"></i>
-            Kembali ke Dashboard
-
+        <a href="{{ route('member.dashboard', ['tab' => 'history']) }}" class="back-btn">
+            <i class="fa-solid fa-arrow-left"></i> Kembali ke Dashboard
         </a>
-
     </div>
 
-    {{-- EMPTY --}}
     @if($activities->isEmpty())
-
+    {{-- EMPTY --}}
     <div class="empty-state">
-
         <div class="empty-icon">
             <i class="fa-solid fa-clock-rotate-left"></i>
         </div>
-
         <h3>Belum Ada Aktivitas</h3>
-
-        <p>
-            Aktivitas gym dan penggunaan sesi PT akan muncul di halaman ini.
-        </p>
-
+        <p>Aktivitas gym dan penggunaan sesi PT akan muncul di halaman ini.</p>
     </div>
-
     @else
 
-    {{-- TIMELINE --}}
-    <div class="timeline">
+    {{-- CONTAINER UTAMA --}}
+    <div class="activity-container">
 
-        @foreach($activities as $activity)
+        {{-- Desktop Table View --}}
+        <table class="activity-table">
+            <thead>
+                <tr>
+                    <th style="width: 20%;">TANGGAL</th>
+                    <th style="width: 60%;">AKTIVITAS / DETAIL</th>
+                    <th style="width: 20%; text-align: right;">JAM</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach($activities as $activity)
+                <tr>
+                    {{-- DATE --}}
+                    <td style="font-weight:700; color: var(--text);">
+                        {{ $activity->date->format('d M Y') }}
+                    </td>
 
-        <div class="timeline-item">
+                    {{-- ACTIVITY CONTENT --}}
+                    <td>
+                        <div style="display: flex; flex-direction: column; gap: 4px;">
+                            <div>
+                                <span class="status-pill {{ $activity->badge_class }}">
+                                    {{ $activity->badge }}
+                                </span>
+                            </div>
+                            <div class="muted-text">
+                                {{ $activity->description }}
+                            </div>
 
-            <div class="timeline-dot"></div>
+                            @if(isset($activity->meta) && is_array($activity->meta))
+                            <div class="meta-inline">
+                                @foreach($activity->meta as $meta)
+                                <span>{{ $meta }}</span>
+                                @endforeach
+                            </div>
+                            @endif
+                        </div>
+                    </td>
 
-            <div class="timeline-card">
+                    {{-- TIME --}}
+                    <td style="color:var(--muted); font-size:12px; text-align: right;">
+                        {{ $activity->date->format('H:i') }} WIB
+                    </td>
+                </tr>
+                @endforeach
+            </tbody>
+        </table>
 
-                <div class="timeline-top">
-
+        {{-- Mobile Card View --}}
+        <div class="mobile-activity-list">
+            @foreach($activities as $activity)
+            <div class="mobile-activity-card">
+                <div class="mobile-card-row">
+                    <span style="font-weight: 700; font-size: 13px; color: var(--text);">
+                        {{ $activity->date->format('d M Y') }}
+                    </span>
+                    <span class="muted-text" style="font-size: 11px;">
+                        {{ $activity->date->format('H:i') }} WIB
+                    </span>
+                </div>
+                
+                <div style="display: flex; flex-direction: column; gap: 4px;">
                     <div>
-
-                        <span class="timeline-badge {{ $activity->badge_class }}">
-
-                            <i class="fa-solid fa-bolt"></i>
-
+                        <span class="status-pill {{ $activity->badge_class }}">
                             {{ $activity->badge }}
-
                         </span>
-
+                    </div>
+                    <div class="muted-text" style="font-size: 12px;">
+                        {{ $activity->description }}
                     </div>
 
-                    <div class="timeline-date">
-                        {{ $activity->date->format('d M Y • H:i') }} WIB
+                    @if(isset($activity->meta) && is_array($activity->meta))
+                    <div class="meta-inline">
+                        @foreach($activity->meta as $meta)
+                        <span>{{ $meta }}</span>
+                        @endforeach
                     </div>
-
+                    @endif
                 </div>
-
-                <div class="timeline-description">
-                    {{ $activity->description }}
-                </div>
-
-                @if(isset($activity->meta))
-                <div class="timeline-meta">
-
-                    @foreach($activity->meta as $meta)
-                    <span>{{ $meta }}</span>
-                    @endforeach
-
-                </div>
-                @endif
-
             </div>
-
+            @endforeach
         </div>
 
-        @endforeach
-
     </div>
 
+    {{-- BUTTON LOAD MORE --}}
     @if($activities->count() >= $limit)
-
-    <div style="margin-top:24px; text-align:center;">
-
-        <a href="{{ route('member.activities', ['limit' => $limit + 10]) }}"
-            style="
-            display:inline-flex;
-            align-items:center;
-            gap:8px;
-            padding:12px 18px;
-            border-radius:12px;
-            background:rgba(255,255,255,.04);
-            border:1px solid var(--border);
-            color:var(--text);
-            text-decoration:none;
-            font-weight:700;
-            font-size:13px;
-       ">
-
-            <i class="fa-solid fa-clock-rotate-left"></i>
-            LOAD MORE
-
+    <div style="margin-top: 20px; text-align: center;">
+        <a href="{{ route('member.activities', ['limit' => $limit + 10]) }}" class="load-more-btn">
+            <i class="fa-solid fa-clock-rotate-left"></i> LOAD MORE
         </a>
-
     </div>
-
     @endif
 
     @endif

@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>@yield('title', 'Dashboard') — UB GYM Admin</title>
+    <title>@yield('title', 'Dashboard') — {{ $settings['gym_name'] ?? 'Satrio Gym Fitness' }} Admin</title>
 
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
@@ -374,39 +374,250 @@
             cursor:pointer; margin-right:10px;
         }
 
-        .hdr-title{ font-size:14px; font-weight:700; color:#111; }
+    .hdr-title { 
+    font-size: 14px; 
+    font-weight: 700; 
+    color: #111; 
+}
 
-        .hdr-right{
-            margin-left:auto;
-            display:flex; align-items:center; gap:10px;
-        }
+.hdr-right {
+    margin-left: auto;
+    display: flex; 
+    align-items: center; 
+    gap: 10px;
+}
 
-        .hdr-btn{
-            width:36px; height:36px;
-            border-radius:var(--radius);
-            border:1px solid var(--border);
-            background:rgba(0,0,0,.02);
-            display:flex; align-items:center; justify-content:center;
-            color:#555; cursor:pointer;
-            transition:.15s ease; position:relative;
-        }
+/* 🌟 Modifikasi tombol WA status */
+.hdr-btn {
+    width: 36px; 
+    height: 36px;
+    border-radius: var(--radius);
+    border: 1px solid var(--border);
+    background: rgba(37, 211, 102, 0.03); /* Sentuhan warna hijau WA transparan */
+    display: flex; 
+    align-items: center; 
+    justify-content: center;
+    cursor: pointer;
+    transition: .15s ease; 
+    position: relative;
+}
 
-        .hdr-btn:hover{ background:rgba(0,0,0,.05); color:#111; }
+.hdr-btn:hover { 
+    background: rgba(37, 211, 102, 0.1); /* Agak terang pas di-hover */
+}
 
-        .notif-dot{
-            width:6px; height:6px;
-            border-radius:50%;
-            background:var(--red);
-            position:absolute; top:8px; right:8px;
-        }
+.notif-dot {
+    width: 8px; /* Sedikit diperbesar dari 6px agar lebih kelihatan */
+    height: 8px;
+    border-radius: 50%;
+    position: absolute; 
+    top: 6px; 
+    right: 6px;
+    border: 1.5px solid #fff; /* Biar ada garis pembatas putih dengan background */
+}
 
-        .user-chip{
-            display:flex; align-items:center; gap:8px;
-            padding:4px 10px 4px 4px;
-            border-radius:var(--radius);
-            border:1px solid var(--border);
-            background:rgba(0,0,0,.02);
-        }
+/* 🌟 Efek animasi berkedip khusus kalau WA terputus / error */
+.dot-pulse {
+    animation: waPulse 1.5s infinite ease-in-out;
+}
+
+@keyframes waPulse {
+    0% { transform: scale(0.9); opacity: 1; }
+    50% { transform: scale(1.3); opacity: 0.4; }
+    100% { transform: scale(0.9); opacity: 1; }
+}
+
+/* Container pembungkus utama */
+.wa-dropdown-wrapper {
+    position: relative;
+}
+
+/* Base style untuk menu melayang (Float) */
+.wa-float-menu {
+    position: absolute;
+    top: 45px; /* Jarak tepat di bawah tombol header */
+    right: 0;
+    width: 260px;
+    background: #ffffff;
+    border: 1px solid var(--border, #eee);
+    border-radius: 8px;
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.08);
+    z-index: 1000;
+    display: none; /* Sembunyikan default */
+    animation: waFadeIn 0.2s ease-out;
+}
+
+/* Kelas aktif saat diklik via JS */
+.wa-float-menu.show {
+    display: block;
+}
+
+/* Bagian Header Float */
+.wa-float-header {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 12px 15px;
+    border-bottom: 1px solid #f5f5f5;
+    font-size: 13px;
+    color: #111;
+}
+
+.wa-float-indicator {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    display: inline-block;
+}
+
+/* Bagian Isi/Body Float */
+.wa-float-body {
+    padding: 12px 15px;
+}
+
+.wa-float-body p {
+    margin: 0;
+    font-size: 12px;
+    color: #666;
+    line-height: 1.5;
+}
+
+/* Bagian Tombol/Footer Float */
+.wa-float-footer {
+    padding: 10px 15px;
+    background: #fafafa;
+    border-top: 1px solid #f5f5f5;
+    border-bottom-left-radius: 8px;
+    border-bottom-right-radius: 8px;
+    display: flex;
+    justify-content: flex-end;
+}
+
+.wa-float-btn {
+    font-size: 11px;
+    font-weight: 600;
+    color: #111;
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    padding: 4px 8px;
+    border-radius: 4px;
+    transition: background 0.15s;
+}
+
+.wa-float-btn:hover {
+    background: #eee;
+    color: #000;
+}
+
+/* Animasi muncul pop-over */
+@keyframes waFadeIn {
+    from { opacity: 0; transform: translateY(-5px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+/* Pembungkus utama untuk posisi patokan absolute */
+.user-dropdown-wrapper {
+    position: relative;
+    display: inline-block;
+}
+
+/* Tambahan style untuk chevron icon kecil di dalam chip */
+.user-chip {
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    user-select: none;
+    transition: background 0.2s;
+}
+.user-chip:hover {
+    border-radius: 8px;
+}
+.uc-caret {
+    font-size: 12px;
+    margin-left: 5px;
+    transition: transform 0.2s;
+}
+
+/* Styling Menu Melayang (Floating Pop Up) */
+.floating-dropdown {
+    display: none; /* Sembunyikan default-nya */
+    position: absolute;
+    top: 110%; /* Muncul tepat di bawah chip */
+    right: 0;
+    width: 220px;
+   background: #fafafa;
+    border: 1px solid #d1cfcf;
+    border-radius: 8px;
+    z-index: 999;
+    overflow: hidden;
+    animation: fadeIn 0.15s ease-out;
+}
+
+/* Header kecil di dalam popup */
+.dropdown-header {
+    padding: 12px 16px;
+    display: flex;
+    flex-direction: column;
+}
+.dropdown-header strong {
+    font-size: 14px;
+    color: #0c0b0b;
+}
+.dropdown-header span {
+    font-size: 11px;
+    color: #363535;
+}
+
+.dropdown-divider {
+    border: 0;
+    border-top: 1px solid #d8d8d8;
+    margin: 0;
+}
+
+/* Item Menu */
+.dropdown-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    width: 100%;
+    padding: 10px 16px;
+    font-size: 13px;
+    color: #1b1c1d;
+    text-decoration: none;
+    background: none;
+    border: none;
+    text-align: left;
+    cursor: pointer;
+    transition: background 0.2s, color 0.2s;
+}
+.dropdown-item:hover {
+    background: #f1eded; /* Warna merah khas Satrio Gym pas di-hover */
+    color: #0d0d0d;
+}
+.dropdown-item.text-danger {
+    color: #171515;
+}
+.dropdown-item.text-danger:hover {
+    background: #d5d4d4;
+    color: #1b1a1a;
+}
+
+/* Animasi Pop Up Halus */
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(-5px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+/* Class pembantu saat menu aktif */
+.floating-dropdown.show {
+    display: block;
+}
+.user-chip.active .uc-caret {
+    transform: rotate(180deg); /* Chevron otomatis berputar ke atas */
+}
 
         .uc-avatar{
             width:30px; height:30px;
@@ -614,7 +825,7 @@
             </div>
 
             <div class="sb-brand-text">
-                <div class="sb-brand-name">UB GYM</div>
+                <div class="sb-brand-name">{{ $settings['gym_name'] ?? 'Satrio Gym Fitness' }}</div>
                 <div class="sb-brand-sub">Admin Panel</div>
             </div>
 
@@ -632,6 +843,19 @@
             <i class="fa-solid fa-angle-right" style="font-size:10px;"></i>
         </button>
 
+   @php
+    // 1. 🌟 FIX SINKRONISASI: Hitung jumlah Transaksi Online yang butuh Verifikasi
+    $sidebarPendingCount = \App\Models\Transaction::where('source', 'online')
+        ->where('payment_method', 'transfer')
+        ->where('status', 'pending')
+        ->whereIn('category', ['activation', 'monthly', 'pt'])
+        ->count();
+
+    // 2. Hitung produk aktif yang stoknya menipis/habis (stok <= 5)
+    $sidebarLowStockCount = \App\Models\Product::where('is_active', true)
+        ->where('stok', '<=', 5)
+        ->count();
+@endphp
         {{-- NAV --}}
         <nav id="sb-nav">
 
@@ -672,12 +896,22 @@
                 <span class="nav-label">Sesi PT</span>
             </a>
 
-            <a href="{{ route('admin.verifications.index') }}"
-               class="nav-item {{ request()->routeIs('admin.verifications.*') ? 'active' : '' }}"
-               data-tip="Verifikasi">
-                <span class="ni"><i class="fa-solid fa-circle-check"></i></span>
-                <span class="nav-label">Verifikasi Online</span>
-            </a>
+           <a href="{{ route('admin.verifications.index') }}"
+       class="nav-item {{ request()->routeIs('admin.verifications.*') ? 'active' : '' }}"
+       data-tip="Verifikasi"
+       style="position: relative; display: flex; align-items: center; justify-content: space-between;">
+        <div style="display: flex; align-items: center; gap: inherit;">
+            <span class="ni"><i class="fa-solid fa-circle-check"></i></span>
+            <span class="nav-label">Verifikasi Online</span>
+        </div>
+        
+        {{-- Jika ada pendaftaran baru, munculkan pop count merah --}}
+        @if($sidebarPendingCount > 0)
+            <span style="background: #ef4444; color: #fff; font-size: 10px; font-weight: 700; min-width: 18px; height: 18px; padding: 0 5px; border-radius: 10px; display: flex; align-items: center; justify-content: center; line-height: 1; margin-right: 8px;">
+                {{ $sidebarPendingCount }}
+            </span>
+        @endif
+    </a>
 
             <div class="sb-section">Data</div>
 
@@ -688,12 +922,22 @@
                 <span class="nav-label">Data Member</span>
             </a>
 
-            <a href="{{ route('admin.data.products') }}"
-               class="nav-item {{ request()->routeIs('admin.data.products*') ? 'active' : '' }}"
-               data-tip="Data Produk">
-                <span class="ni"><i class="fa-solid fa-box"></i></span>
-                <span class="nav-label">Data Produk</span>
-            </a>
+           <a href="{{ route('admin.data.products') }}"
+       class="nav-item {{ request()->routeIs('admin.data.products*') ? 'active' : '' }}"
+       data-tip="Data Produk"
+       style="position: relative; display: flex; align-items: center; justify-content: space-between;">
+        <div style="display: flex; align-items: center; gap: inherit;">
+            <span class="ni"><i class="fa-solid fa-box"></i></span>
+            <span class="nav-label">Data Produk</span>
+        </div>
+
+        {{-- Jika ada produk yang stoknya kritis, munculkan pop count oranye --}}
+        @if($sidebarLowStockCount > 0)
+            <span style="background: #f97316; color: #fff; font-size: 10px; font-weight: 700; min-width: 18px; height: 18px; padding: 0 5px; border-radius: 10px; display: flex; align-items: center; justify-content: center; line-height: 1; margin-right: 8px;">
+                {{ $sidebarLowStockCount }}
+            </span>
+        @endif
+    </a>
 
             <div class="sb-section">Laporan</div>
 
@@ -709,6 +953,15 @@
                data-tip="Laporan Kehadiran">
                 <span class="ni"><i class="fa-solid fa-clipboard-check"></i></span>
                 <span class="nav-label">History Visit & PT</span>
+            </a>
+
+              <div class="sb-section">Logs API WA</div>
+            {{-- 🌟 MENu BARU: WHATSAPP LOGS --}}
+            <a href="{{ route('admin.whatsapp.logs') }}"
+               class="nav-item {{ request()->routeIs('admin.whatsapp.logs') ? 'active' : '' }}"
+               data-tip="WA Gateway Logs">
+                <span class="ni"><i class="fa-brands fa-whatsapp" style="color: #25D366;"></i></span>
+                <span class="nav-label">WA Gateway Logs</span>
             </a>
 
         </nav>
@@ -740,49 +993,109 @@
 
     </aside>
 
-    {{-- ============ MAIN ============ --}}
-    <main id="main-body">
+ {{-- ============ MAIN ============ --}}
+<main id="main-body">
 
-        <header id="main-header">
+    <header id="main-header">
 
-            <button class="mobile-menu-btn" onclick="openSidebar()">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="18" height="18">
-                    <line x1="3" y1="6"  x2="21" y2="6"/>
-                    <line x1="3" y1="12" x2="21" y2="12"/>
-                    <line x1="3" y1="18" x2="21" y2="18"/>
-                </svg>
+        <button class="mobile-menu-btn" onclick="openSidebar()">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="18" height="18">
+                <line x1="3" y1="6"  x2="21" y2="6"/>
+                <line x1="3" y1="12" x2="21" y2="12"/>
+                <line x1="3" y1="18" x2="21" y2="18"/>
+            </svg>
+        </button>
+
+        <div class="hdr-title">@yield('header-title', 'Dashboard')</div>
+
+        <div class="hdr-right">
+
+         {{-- 🌟 FIX: Tombol WA Status dengan Dropdown Float --}}
+@php
+    $waStatus = $waStatus ?? \App\Services\FonnteService::checkGatewayStatus();
+    
+    // Tentukan badge, teks, dan detail untuk di dalam float
+    $dotColor = '#ef4444'; 
+    $statusText = 'Disconnected';
+    $statusDesc = 'Sistem tidak dapat terhubung ke Fonnte. Silakan periksa token atau perangkat Anda.';
+    
+    if ($waStatus === 'connected') {
+        $dotColor = '#22c55e';
+        $statusText = 'Connected';
+        $statusDesc = 'Sistem terhubung dengan lancar. Notifikasi otomatis berjalan optimal.';
+    } elseif ($waStatus === 'disabled') {
+        $dotColor = '#eab308';
+        $statusText = 'Disabled';
+        $statusDesc = 'Fitur WhatsApp dinonaktifkan sementara melalui menu pengaturan utama.';
+    }
+@endphp
+
+<div class="wa-dropdown-wrapper" style="position: relative; display: inline-block;">
+    <button class="hdr-btn wa-status-btn" onclick="toggleWaDropdown(event)" id="wa-header-btn" title="Memeriksa status...">
+        <i class="fa-brands fa-whatsapp" style="font-size:18px; color: #25D366;"></i>
+        {{-- Default dot warna abu-abu dulu sebelum diisi oleh AJAX --}}
+        <span id="wa-header-dot" class="notif-dot" style="background: #94a3b8;"></span>
+    </button>
+
+    {{-- Menu Float Mini (Dropdown Pop-over) --}}
+    <div id="wa-status-float" class="wa-float-menu">
+        <div class="wa-float-header">
+            <span class="wa-float-indicator" style="background: {{ $dotColor }};"></span>
+            <strong>WhatsApp {{ $statusText }}</strong>
+        </div>
+        <div class="wa-float-body">
+            <p>{{ $statusDesc }}</p>
+        </div>
+        <div class="wa-float-footer">
+            <a href="{{ route('admin.whatsapp.logs') }}" class="wa-float-btn">
+                <i class="fa-solid fa-clock-history" style="font-size: 11px;"></i> Lihat Riwayat Logs
+            </a>
+        </div>
+    </div>
+</div>
+
+<div class="user-dropdown-wrapper">
+    <div class="user-chip" id="userChipTrigger" onclick="toggleDropdown(event)">
+        <div class="uc-avatar">
+            {{ strtoupper(substr(Auth::user()->name, 0, 2)) }}
+        </div>
+        <div>
+            <div class="uc-name">{{ Auth::user()->name }}</div>
+            <div class="uc-role">{{ ucfirst(Auth::user()->role) }}</div>
+        </div>
+        <i class="fas fa-chevron-down uc-caret"></i>
+    </div>
+
+    <div class="floating-dropdown" id="userDropdownMenu">
+        <div class="dropdown-header">
+            <strong>{{ Auth::user()->name }}</strong>
+            <span>{{ Auth::user()->whatsapp }}</span>
+        </div>
+        <hr class="dropdown-divider">
+        <a href="{{ route('profile.edit') }}" class="dropdown-item">
+            <i class="fas fa-user-edit"></i> Edit Profil
+        </a>
+        <hr class="dropdown-divider">
+        <form method="POST" action="{{ route('logout') }}">
+            @csrf
+            <button type="submit" class="dropdown-item text-danger" onclick="return confirm('Yakin ingin keluar?')">
+                <i class="fas fa-sign-out-alt"></i> Keluar
             </button>
+        </form>
+    </div>
+</div>
 
-            <div class="hdr-title">@yield('header-title', 'Dashboard')</div>
+        </div>
 
-            <div class="hdr-right">
+    </header>
 
-                <button class="hdr-btn">
-                    <i class="fa-regular fa-bell" style="font-size:14px;"></i>
-                    <span class="notif-dot"></span>
-                </button>
+    <section id="main-scroll">
+        <div id="main-content">
+            @yield('content')
+        </div>
+    </section>
 
-                <div class="user-chip">
-                    <div class="uc-avatar">
-                        {{ strtoupper(substr(Auth::user()->name, 0, 2)) }}
-                    </div>
-                    <div>
-                        <div class="uc-name">{{ Auth::user()->name }}</div>
-                        <div class="uc-role">Admin</div>
-                    </div>
-                </div>
-
-            </div>
-
-        </header>
-
-        <section id="main-scroll">
-            <div id="main-content">
-                @yield('content')
-            </div>
-        </section>
-
-    </main>
+</main>
 
 </div>
 
@@ -935,6 +1248,75 @@
             }
         });
     });
+
+    function toggleWaDropdown(event) {
+    // Mencegah trigger event bubbling ke window
+    event.stopPropagation();
+    
+    const floatMenu = document.getElementById('wa-status-float');
+    floatMenu.classList.toggle('show');
+}
+
+// Handler otomatis untuk menutup dropdown jika admin mengklik sembarang area luar
+window.addEventListener('click', function(event) {
+    const floatMenu = document.getElementById('wa-status-float');
+    
+    // Jika dropdown sedang terbuka dan yang diklik bukan bagian dari menu dropdown tersebut
+    if (floatMenu && floatMenu.classList.contains('show')) {
+        if (!floatMenu.contains(event.target)) {
+            floatMenu.classList.remove('show');
+        }
+    }
+});
+
+document.addEventListener("DOMContentLoaded", function() {
+    // Jalankan AJAX secara asynchronous di background
+    fetch("{{ route('admin.ajax.wa.status') }}")
+        .then(response => response.json())
+        .then(data => {
+            const dot = document.getElementById('wa-header-dot');
+            const btn = document.getElementById('wa-header-btn');
+            
+            if (data.status === 'connected') {
+                dot.style.background = '#22c55e';
+                dot.classList.remove('dot-pulse');
+                btn.title = 'WhatsApp Connected';
+            } else if (data.status === 'disabled') {
+                dot.style.background = '#eab308';
+                dot.classList.remove('dot-pulse');
+                btn.title = 'WhatsApp Disabled via Settings';
+            } else {
+                dot.style.background = '#ef4444';
+                dot.classList.add('dot-pulse'); // Berkedip kalau putus
+                btn.title = 'WhatsApp Disconnected (Cek Token/Device)';
+            }
+        })
+        .catch(error => console.error('Gagal memuat status WA:', error));
+});
+function toggleDropdown(event) {
+    // Mencegah event bubble agar fungsi klik-luar tidak langsung memicu penutupan
+    event.stopPropagation();
+    
+    const dropdown = document.getElementById('userDropdownMenu');
+    const chip = document.getElementById('userChipTrigger');
+    
+    dropdown.classList.toggle('show');
+    chip.classList.toggle('active');
+}
+
+// Logika Pintar: Tutup dropdown secara otomatis jika user mengklik area luar menu
+window.addEventListener('click', function(event) {
+    const dropdown = document.getElementById('userDropdownMenu');
+    const chip = document.getElementById('userChipTrigger');
+    
+    if (dropdown && dropdown.classList.contains('show')) {
+        // Cek apakah yang diklik bukan bagian dari chip maupun menu itu sendiri
+        if (!chip.contains(event.target) && !dropdown.contains(event.target)) {
+            dropdown.classList.remove('show');
+            chip.classList.remove('active');
+        }
+    }
+});
 
 </script>
 @stack('scripts')

@@ -20,6 +20,28 @@
             <i class="fa-solid fa-plus" style="font-size:11px;"></i> Tambah Produk
         </button>
     </div>
+    {{-- succes alert --}}
+@if(session('success'))
+<div style="display:flex;gap:12px;align-items:flex-start;background:#fff;border:1px solid var(--border);border-left:3px solid rgba(34,197,94,.8);border-radius:var(--radius);padding:14px 16px;margin-bottom:20px;">
+    <div style="width:30px;height:30px;border-radius:var(--radius);background:rgba(34,197,94,.1);display:flex;align-items:center;justify-content:center;flex-shrink:0;">
+        <i class="fa-solid fa-circle-check" style="font-size:13px;color:#22c55e;"></i>
+    </div>
+    <div style="flex:1;">
+        <p style="font-size:13px;font-weight:700;color:#15803d;margin:0 0 2px;">{{ session('success') }}</p>
+    </div>
+</div>
+@endif
+{{-- ═══ ERROR ALERT ═══ --}}
+@if(session('error'))
+<div style="display:flex;gap:12px;align-items:flex-start;background:#fff;border:1px solid var(--border);border-left:3px solid var(--red);border-radius:var(--radius);padding:14px 16px;margin-bottom:20px;">
+    <div style="width:30px;height:30px;border-radius:var(--radius);background:rgba(239,68,68,.08);display:flex;align-items:center;justify-content:center;flex-shrink:0;">
+        <i class="fa-solid fa-circle-exclamation" style="font-size:13px;color:var(--red);"></i>
+    </div>
+    <div style="flex:1;">
+        <p style="font-size:13px;font-weight:700;color:var(--red);margin:0 0 2px;">{{ session('error') }}</p>
+    </div>
+</div>
+@endif
 
     {{-- STATS --}}
     <div class="grid grid-cols-2 md:grid-cols-4 gap-5">

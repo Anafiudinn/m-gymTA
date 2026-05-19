@@ -11,7 +11,14 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\LandingPageController;
 
 Route::get('/', [LandingPageController::class, 'index'])->name('landing');
+Route::get('/test-wa', function () {
 
+    return \App\Services\FonnteService::send(
+        '6289674901212',
+        'Test WhatsApp dari sistem gym 🔥'
+    );
+
+});
 /*
 |--------------------------------------------------------------------------
 | OWNER CONTROLLERS
@@ -60,6 +67,7 @@ use App\Http\Controllers\Member\PackageController as MemberPackageController;
 */
 
 use App\Http\Controllers\ProfileController;
+use App\Http\Controllers\Auth\PasswordResetController;
 
 /*
 |--------------------------------------------------------------------------
@@ -192,6 +200,11 @@ Route::middleware(['auth', 'role:owner'])
             Route::get('/attendance', [OwnerReportController::class, 'attendance'])
                 ->name('attendance');
         });
+
+         Route::get('/ajax/wa-status', function() {
+    // Memanggil fungsi cache yang sudah kamu buat
+    return response()->json(['status' => \App\Services\FonnteService::checkGatewayStatus()]);
+})->name('ajax.wa.status');
     });
 
 /*
@@ -359,7 +372,21 @@ Route::middleware(['auth', 'role:admin'])
 
         Route::get('/report/pt-activity/export', [AdminReportController::class, 'exportPtActivityExcel'])
             ->name('report.pt_activity.export');
+
+      Route::get('/whatsapp-logs', [\App\Http\Controllers\Admin\WhatsappLogController::class, 'index'])
+            ->name('whatsapp.logs');
+
+            Route::get('/ajax/wa-status', function() {
+    // Memanggil fungsi cache yang sudah kamu buat
+    return response()->json(['status' => \App\Services\FonnteService::checkGatewayStatus()]);
+})->name('ajax.wa.status');
     });
+
+    /*
+    |--------------------------------------------------------------------------
+    | WHATSAPP LOGS MANAGEMENT
+    |--------------------------------------------------------------------------
+    */
 
 /*
 |--------------------------------------------------------------------------
@@ -406,6 +433,25 @@ Route::middleware('auth')->group(function () {
 
     Route::delete('/profile', [ProfileController::class, 'destroy'])
         ->name('profile.destroy');
+});
+
+
+Route::middleware('guest')->group(function () {
+    // 1. Halaman Form Minta OTP (Masukkan No WA)
+    Route::get('forgot-password', [PasswordResetController::class, 'create'])
+                ->name('password.request');
+
+    // 2. Proses pembuatan OTP & Kirim via Fonnte
+    Route::post('forgot-password', [PasswordResetController::class, 'store'])
+                ->name('password.whatsapp');
+
+    // 3. Halaman Form Verifikasi OTP & Input Password Baru
+    Route::get('reset-password/{whatsapp}', [PasswordResetController::class, 'edit'])
+                ->name('password.reset');
+
+    // 4. Proses Update Password Baru ke Database
+    Route::post('reset-password', [PasswordResetController::class, 'update'])
+                ->name('password.update');
 });
 
 require __DIR__ . '/auth.php';

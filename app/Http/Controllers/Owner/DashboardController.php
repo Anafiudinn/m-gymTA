@@ -157,8 +157,11 @@ class DashboardController extends Controller
         | RETURN VIEW
         |--------------------------------------------------------------------------
         */
+         $waStatus = \App\Services\FonnteService::checkGatewayStatus();
 
         return view('owner.dashboard', [
+
+          'waStatus',
 
             // KPI
             'incomeToday' => $incomeToday,
@@ -188,6 +191,8 @@ class DashboardController extends Controller
 
             // Recent Transactions
             'recentTransactions' => $recentTransactions,
+
+          
         ]);
     }
 }

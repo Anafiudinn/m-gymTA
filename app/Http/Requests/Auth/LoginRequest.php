@@ -6,9 +6,11 @@ use Illuminate\Auth\Events\Lockout;
 use Illuminate\Contracts\Validation\ValidationRule;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\RateLimiter;
 use Illuminate\Support\Str;
 use Illuminate\Validation\ValidationException;
+use App\Models\User;
 
 class LoginRequest extends FormRequest
 {
@@ -25,29 +27,49 @@ class LoginRequest extends FormRequest
      *
      * @return array<string, ValidationRule|array<mixed>|string>
      */
-  public function rules(): array
-{
-    return [
-        'whatsapp' => ['required', 'string'], // Ganti email jadi whatsapp
-        'password' => ['required', 'string'],
-    ];
-}
-
-public function authenticate(): void
-{
-    $this->ensureIsNotRateLimited();
-
-    // Ubah 'email' menjadi 'whatsapp' di sini
-    if (! Auth::attempt($this->only('whatsapp', 'password'), $this->remember)) {
-        RateLimiter::hit($this->throttleKey());
-
-        throw ValidationException::withMessages([
-            'whatsapp' => __('auth.failed'),
-        ]);
+    public function rules(): array
+    {
+        return [
+            'whatsapp' => ['required', 'string'],
+            'password' => ['required', 'string'],
+        ];
     }
 
-    RateLimiter::clear($this->throttleKey());
-}
+    /**
+     * Attempt to authenticate the request's credentials.
+     *
+     * @throws ValidationException
+     */
+    public function authenticate(): void
+    {
+        $this->ensureIsNotRateLimited();
+
+        // 1. Ambil data user berdasarkan nomor WhatsApp
+        $user = User::where('whatsapp', $this->input('whatsapp'))->first();
+
+        // 🌟 JIKA NOMOR WA TIDAK ADA DI DB
+        if (! $user) {
+            RateLimiter::hit($this->throttleKey());
+
+            throw ValidationException::withMessages([
+                'whatsapp' => 'Nomor WhatsApp tidak terdaftar di sistem UB GYM.',
+            ]);
+        }
+
+        // 🌟 JIKA NOMOR WA ADA, TAPI PASSWORD-NYA SALAH
+        if (! Hash::check($this->input('password'), $user->password)) {
+            RateLimiter::hit($this->throttleKey());
+
+            throw ValidationException::withMessages([
+                'password' => 'Password yang Anda masukkan salah. Silakan coba lagi.',
+            ]);
+        }
+
+        // 2. Jika nomor & password cocok, langsung login akunnya
+        Auth::login($user, $this->boolean('remember'));
+
+        RateLimiter::clear($this->throttleKey());
+    }
 
     /**
      * Ensure the login request is not rate limited.
@@ -64,8 +86,9 @@ public function authenticate(): void
 
         $seconds = RateLimiter::availableIn($this->throttleKey());
 
+        // 🌟 Ubah target error key dari 'email' menjadi 'whatsapp' agar teks pembatasan muncul di UI
         throw ValidationException::withMessages([
-            'email' => trans('auth.throttle', [
+            'whatsapp' => trans('auth.throttle', [
                 'seconds' => $seconds,
                 'minutes' => ceil($seconds / 60),
             ]),
@@ -77,6 +100,7 @@ public function authenticate(): void
      */
     public function throttleKey(): string
     {
-        return Str::transliterate(Str::lower($this->string('email')).'|'.$this->ip());
+        // 🌟 Ubah 'email' menjadi 'whatsapp' agar penguncian spam mendeteksi nomor WA + IP penembak
+        return Str::transliterate(Str::lower($this->string('whatsapp')).'|'.$this->ip());
     }
 }

@@ -197,50 +197,52 @@
             <p style="font-size:13px; color:#999; margin-top:4px;">Tambahkan akun admin operasional gym.</p>
         </div>
 
-        <form action="{{ route('owner.admins.store') }}" method="POST" style="display:flex; flex-direction:column; gap:16px;">
-            @csrf
+      <form action="{{ route('owner.admins.store') }}" method="POST" style="display:flex; flex-direction:column; gap:16px;">
+    @csrf
 
-            <div>
-                <label style="font-size:12px; font-weight:700; color:#555; display:block; margin-bottom:6px; text-transform:uppercase; letter-spacing:.06em;">Nama Admin</label>
-                <input type="text"
-                    name="name"
-                    required
-                    placeholder="Contoh: Budi Santoso"
-                    style="width:100%; border:1px solid var(--border); border-radius:1px; padding:11px 14px; font-size:14px; font-family:'Outfit',sans-serif; outline:none; color:#111; transition:.15s ease; background:#fafafa;"
-                    onfocus="this.style.borderColor='var(--red)'; this.style.background='#fff'"
-                    onblur="this.style.borderColor='var(--border)'; this.style.background='#fafafa'">
-            </div>
+    <div>
+        <label style="font-size:12px; font-weight:700; color:#555; display:block; margin-bottom:6px; text-transform:uppercase; letter-spacing:.06em;">Nama Admin</label>
+        <input type="text"
+            name="name"
+            required
+            placeholder="Contoh: Budi Santoso"
+            style="width:100%; border:1px solid var(--border); border-radius:1px; padding:11px 14px; font-size:14px; font-family:'Outfit',sans-serif; outline:none; color:#111; transition:.15s ease; background:#fafafa;"
+            onfocus="this.style.borderColor='var(--red)'; this.style.background='#fff'"
+            onblur="this.style.borderColor='var(--border)'; this.style.background='#fafafa'">
+    </div>
 
-            <div>
-                <label style="font-size:12px; font-weight:700; color:#555; display:block; margin-bottom:6px; text-transform:uppercase; letter-spacing:.06em;">Nomor WhatsApp</label>
-                <input type="text"
-                    name="whatsapp"
-                    required
-                    placeholder="08xxxxxxxxxx"
-                    style="width:100%; border:1px solid var(--border); border-radius:1px; padding:11px 14px; font-size:14px; font-family:'Outfit',sans-serif; outline:none; color:#111; transition:.15s ease; background:#fafafa;"
-                    onfocus="this.style.borderColor='var(--red)'; this.style.background='#fff'"
-                    onblur="this.style.borderColor='var(--border)'; this.style.background='#fafafa'">
-            </div>
+    <div>
+        <label style="font-size:12px; font-weight:700; color:#555; display:block; margin-bottom:6px; text-transform:uppercase; letter-spacing:.06em;">Nomor WhatsApp</label>
+        <input type="text"
+            name="whatsapp"
+            required
+            inputmode="numeric"
+            placeholder="Contoh: 08123456789 atau 628123456789"
+            oninput="this.value = this.value.replace(/[^0-9]/g, '');"
+            style="width:100%; border:1px solid var(--border); border-radius:1px; padding:11px 14px; font-size:14px; font-family:'Outfit',sans-serif; outline:none; color:#111; transition:.15s ease; background:#fafafa;"
+            onfocus="this.style.borderColor='var(--red)'; this.style.background='#fff'"
+            onblur="this.style.borderColor='var(--border)'; this.style.background='#fafafa'">
+    </div>
 
-            <div>
-                <label style="font-size:12px; font-weight:700; color:#555; display:block; margin-bottom:6px; text-transform:uppercase; letter-spacing:.06em;">Password</label>
-                <input type="password"
-                    name="password"
-                    required
-                    placeholder="Min. 8 karakter"
-                    style="width:100%; border:1px solid var(--border); border-radius:1px; padding:11px 14px; font-size:14px; font-family:'Outfit',sans-serif; outline:none; color:#111; transition:.15s ease; background:#fafafa;"
-                    onfocus="this.style.borderColor='var(--red)'; this.style.background='#fff'"
-                    onblur="this.style.borderColor='var(--border)'; this.style.background='#fafafa'">
-            </div>
+    <div>
+        <label style="font-size:12px; font-weight:700; color:#555; display:block; margin-bottom:6px; text-transform:uppercase; letter-spacing:.06em;">Password</label>
+        <input type="password"
+            name="password"
+            required
+            placeholder="Min. 8 karakter"
+            style="width:100%; border:1px solid var(--border); border-radius:1px; padding:11px 14px; font-size:14px; font-family:'Outfit',sans-serif; outline:none; color:#111; transition:.15s ease; background:#fafafa;"
+            onfocus="this.style.borderColor='var(--red)'; this.style.background='#fff'"
+            onblur="this.style.borderColor='var(--border)'; this.style.background='#fafafa'">
+    </div>
 
-            <button type="submit"
-                style="width:100%; background:var(--red); color:#fff; border:none; padding:13px; border-radius:1px; font-size:14px; font-weight:700; font-family:'Outfit',sans-serif; cursor:pointer; transition:.18s ease; margin-top:4px;"
-                onmouseover="this.style.background='var(--red-dark)'"
-                onmouseout="this.style.background='var(--red)'">
-                Simpan Admin
-            </button>
+    <button type="submit"
+        style="width:100%; background:var(--red); color:#fff; border:none; padding:13px; border-radius:1px; font-size:14px; font-weight:700; font-family:'Outfit',sans-serif; cursor:pointer; transition:.18s ease; margin-top:4px;"
+        onmouseover="this.style.background='var(--red-dark)'"
+        onmouseout="this.style.background='var(--red)'">
+        Simpan Admin
+    </button>
+</form>
 
-        </form>
     </div>
 </div>
 @foreach($admins as $admin)
@@ -262,33 +264,36 @@
             Edit Admin
         </h2>
 
-        <form action="{{ route('owner.admins.update', $admin->id) }}" method="POST">
-            @csrf
-            @method('PUT')
+     <form action="{{ route('owner.admins.update', $admin->id) }}" method="POST">
+    @csrf
+    @method('PUT')
 
-            <div style="margin-bottom:16px;">
-                <label style="font-size:12px; font-weight:700;">Nama</label>
-                <input type="text"
-                    name="name"
-                    value="{{ $admin->name }}"
-                    required
-                    style="width:100%; border:1px solid var(--border); padding:12px; margin-top:6px;">
-            </div>
+    <div style="margin-bottom:16px;">
+        <label style="font-size:12px; font-weight:700;">Nama</label>
+        <input type="text"
+            name="name"
+            value="{{ $admin->name }}"
+            required
+            style="width:100%; border:1px solid var(--border); padding:12px; margin-top:6px;">
+    </div>
 
-            <div style="margin-bottom:20px;">
-                <label style="font-size:12px; font-weight:700;">WhatsApp</label>
-                <input type="text"
-                    name="whatsapp"
-                    value="{{ $admin->whatsapp }}"
-                    required
-                    style="width:100%; border:1px solid var(--border); padding:12px; margin-top:6px;">
-            </div>
+    <div style="margin-bottom:20px;">
+        <label style="font-size:12px; font-weight:700;">WhatsApp</label>
+        <input type="text"
+            name="whatsapp"
+            value="{{ $admin->whatsapp }}"
+            required
+            inputmode="numeric"
+            placeholder="Contoh: 08123456789 atau 628123456789"
+            oninput="this.value = this.value.replace(/[^0-9]/g, '');"
+            style="width:100%; border:1px solid var(--border); padding:12px; margin-top:6px;">
+    </div>
 
-            <button type="submit"
-                style="width:100%; background:var(--red); color:#fff; border:none; padding:13px; font-weight:700; cursor:pointer;">
-                Simpan Perubahan
-            </button>
-        </form>
+    <button type="submit"
+        style="width:100%; background:var(--red); color:#fff; border:none; padding:13px; font-weight:700; cursor:pointer;">
+        Simpan Perubahan
+    </button>
+</form>
 
     </div>
 </div>

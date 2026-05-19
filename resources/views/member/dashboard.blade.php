@@ -182,7 +182,68 @@
         @endif
 
     </a>
+    <a href="{{ route('profile.edit') }}"
+       class="member-tab {{ $activeTab == 'profile' ? 'active' : '' }}">
+        PROFIL
+    </a>
 
+</div>
+{{-- =========================================================
+    INFO MITRA / KOTAK CS (TAMBAHAN BARU)
+========================================================= --}}
+<div class="cs-info-wrap" style="
+    margin: 15px 0 25px 0;
+    padding: 15px;
+    background: #0d0d11;
+    border: 1px solid #222;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 15px;
+    flex-wrap: wrap;
+">
+    <div style="display: flex; align-items: center; gap: 12px;">
+        <div style="
+            width: 40px; 
+            height: 40px; 
+            background: rgba(255, 45, 45, 0.1); 
+            border-radius: 50%; 
+            display: flex; 
+            align-items: center; 
+            justify-content: center;
+            color: #ff2d2d;
+            font-size: 18px;
+        ">
+            <i class="fa-solid fa-headset"></i>
+        </div>
+        <div>
+            <h4 style="margin: 0; font-size: 14px; color: #f3f3f3; font-weight: 700;">Butuh Bantuan & Informasi?</h4>
+            <p style="margin: 3px 0 0 0; font-size: 12px; color: #999;">Hubungi admin kami untuk kendala member / paket.</p>
+        </div>
+    </div>
+    
+    <a href="https://wa.me/{{ $adminWhatsapp }}?text=Halo%20Admin,%20saya%20member%20ingin%20bertanya..." 
+       target="_blank" 
+       style="
+            background: #25d366;
+            color: #fff;
+            padding: 8px 16px;
+            border-radius: 6px;
+            font-size: 12px;
+            font-weight: 700;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            box-shadow: 0 4px 12px rgba(37, 211, 102, 0.2);
+            transition: all 0.2s ease;
+       "
+       onmouseover="this.style.transform='translateY(-2px)'"
+       onmouseout="this.style.transform='translateY(0)'">
+        <i class="fa-brands fa-whatsapp" style="font-size: 15px;"></i>
+        CHAT ADMIN
+    </a>
 </div>
 
 {{-- =========================================================
@@ -206,67 +267,54 @@
 
         @include('member.tabs.history')
 
+    @elseif($activeTab == 'profile')
+
+        @include('member.tabs.profile'
+            )
     @endif
 
 </div>
-
-{{-- =========================================================
-   ALERT
-========================================================= --}}
-
-@if(session('success'))
+@push('scripts')
 <script>
-    Swal.fire({
-        icon: 'success',
-        title: 'BERHASIL!',
-        text: "{{ session('success') }}",
+    document.addEventListener('DOMContentLoaded', function () {
 
-        background: '#0f0f13',
-        color: '#fff',
+        @if(session('success'))
+        Swal.fire({
+            icon: 'success',
+            title: 'BERHASIL!',
+            text: @json(session('success')),
+            background: '#0d0d11',
+            color: '#f3f3f3',
+            confirmButtonColor: '#ff2d2d',
+            customClass: { popup: 'swal2-popup', confirmButton: 'swal2-confirm' }
+        });
+        @endif
 
-        confirmButtonColor: '#ff2d2d',
+        @if(session('error'))
+        Swal.fire({
+            icon: 'error',
+            title: 'WADUH!',
+            text: @json(session('error')),
+            background: '#0d0d11',
+            color: '#f3f3f3',
+            confirmButtonColor: '#ff2d2d',
+            customClass: { popup: 'swal2-popup', confirmButton: 'swal2-confirm' }
+        });
+        @endif
 
-        borderRadius: 0,
+        @if($errors->any())
+        Swal.fire({
+            icon: 'warning',
+            title: 'ADA KESALAHAN',
+            text: @json($errors->first()),
+            background: '#0d0d11',
+            color: '#f3f3f3',
+            confirmButtonColor: '#ff2d2d',
+            customClass: { popup: 'swal2-popup', confirmButton: 'swal2-confirm' }
+        });
+        @endif
 
-        customClass:{
-            popup:'animated fadeInUp'
-        }
     });
 </script>
-@endif
-
-@if(session('error'))
-<script>
-    Swal.fire({
-        icon: 'error',
-        title: 'WADUH!',
-        text: "{{ session('error') }}",
-
-        background: '#0f0f13',
-        color: '#fff',
-
-        confirmButtonColor: '#ff2d2d',
-
-        borderRadius: 0
-    });
-</script>
-@endif
-
-@if($errors->any())
-<script>
-    Swal.fire({
-        icon: 'warning',
-        title: 'ADA KESALAHAN',
-        text: "{{ $errors->first() }}",
-
-        background: '#0f0f13',
-        color: '#fff',
-
-        confirmButtonColor: '#ff2d2d',
-
-        borderRadius: 0
-    });
-</script>
-@endif
-
+@endpush
 @endsection

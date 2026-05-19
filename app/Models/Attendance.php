@@ -18,4 +18,13 @@ public function admin()
 {
     return $this->belongsTo(User::class, 'admin_id');
 }
+
+public function getTypeLabelAttribute()
+{
+    return match ($this->type) {
+        'member_package' => 'Member Paket',
+        'paid_visit' => 'Kunjungan Harian',
+        default => ucfirst($this->type),
+    };
+}
 }

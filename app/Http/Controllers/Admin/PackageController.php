@@ -3,12 +3,15 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
+use App\Helpers\WhatsappMessage;
+use App\Helpers\WhatsappFormat; // Panggil helper barumu di sini
 use App\Models\Membership;
 use App\Models\PtMembership;
 use App\Models\PtPackage;
 use App\Models\Setting;
 use App\Models\Transaction;
 use App\Models\User;
+use App\Services\FonnteService;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -24,11 +27,14 @@ class PackageController extends Controller
         $hasMonthlyPackage = false;
 
         if ($request->filled('search')) {
-            $user = User::where('whatsapp', $request->search)
+            // Bersihkan query pencarian jika kasir mengetik nomor WA dengan format berantakan
+            $searchKey = WhatsappFormat::formatNumber($request->search) ?? $request->search;
+
+            $user = User::where('whatsapp', $searchKey)
                 ->orWhere('member_code', $request->search)
                 ->first();
 
-            if (!$user) {
+            if (! $user) {
                 return redirect()->route('admin.package.index', ['tab' => $tab])
                     ->with('error', 'Data member "'.$request->search.'" tidak ditemukan!');
             }
@@ -52,22 +58,45 @@ class PackageController extends Controller
         $totalToday = $transactions->sum('amount');
 
         return view('admin.package.index', compact(
-            'user', 'tab', 'bulananMember', 'bulananTamu', 
+            'user', 'tab', 'bulananMember', 'bulananTamu',
             'ptPackages', 'transactions', 'totalToday', 'hasMonthlyPackage'
         ));
     }
 
     public function activateMember(Request $request)
     {
-        $request->validate([
+      $request->validate([
             'name' => 'required|string|max:255',
-            'whatsapp' => 'required',
+            'whatsapp' => [
+                'required',
+                'string',
+                'max:30',
+                function ($attribute, $value, $fail) {
+                    // Bersihkan nomor terlebih dahulu untuk tes isi aslinya
+                    $cleaned = preg_replace('/[^0-9]/', '', $value);
+                    
+                    // Cek apakah polanya valid diawali 08, 628, atau 8
+                    if (!preg_match('/^(08|628|8)\d{7,13}$/', $cleaned)) {
+                        $fail('Nomor WhatsApp yang dimasukkan tidak valid untuk operator Indonesia (harus diawali 08, 628, atau 8).');
+                    }
+                },
+            ],
             'payment_method' => 'required|in:cash,transfer',
         ]);
 
         try {
-            DB::transaction(function () use ($request, &$user) {
-                $existingUser = User::where('whatsapp', $request->whatsapp)->first();
+            $isNewUser = false;
+            $user = null;
+
+            // Bersihkan nomor WhatsApp dari spasi, strip, +62 sebelum masuk logika DB
+            $cleanWhatsapp = WhatsappFormat::formatNumber($request->whatsapp);
+
+            if (!$cleanWhatsapp) {
+                throw new \Exception('Format nomor WhatsApp tidak valid atau kosong.');
+            }
+
+            DB::transaction(function () use ($request, $cleanWhatsapp, &$user, &$isNewUser) {
+                $existingUser = User::where('whatsapp', $cleanWhatsapp)->first();
 
                 if ($existingUser) {
                     if ($existingUser->is_active_member) {
@@ -76,13 +105,14 @@ class PackageController extends Controller
                     $existingUser->update(['is_active_member' => true]);
                     $user = $existingUser;
                 } else {
+                    $isNewUser = true;
                     do {
-                        $memberCode = 'GYM-' . strtoupper(Str::random(5));
+                        $memberCode = 'GYM-'.strtoupper(Str::random(5));
                     } while (User::where('member_code', $memberCode)->exists());
 
                     $user = User::create([
                         'name' => $request->name,
-                        'whatsapp' => $request->whatsapp,
+                        'whatsapp' => $cleanWhatsapp, // Simpan dalam kondisi rapi (contoh: 62882...)
                         'password' => bcrypt('12345678'),
                         'role' => 'member',
                         'is_active_member' => true,
@@ -91,7 +121,7 @@ class PackageController extends Controller
                 }
 
                 Transaction::create([
-                    'invoice_code' => 'ACT-' . strtoupper(Str::random(8)),
+                    'invoice_code' => 'ACT-'.strtoupper(Str::random(8)),
                     'user_id' => $user->id,
                     'admin_id' => auth()->id(),
                     'category' => 'activation',
@@ -102,8 +132,18 @@ class PackageController extends Controller
                 ]);
             });
 
+            // Kirim pesan WA sesuai kondisi (User baru vs Aktivasi ulang)
+            if ($isNewUser) {
+                $waMessage = WhatsappMessage::newMemberAccount($user);
+            } else {
+                $waMessage = WhatsappMessage::activation($user);
+            }
+
+            // Pastikan menggunakan nomor terformat untuk pengiriman API Fonnte
+            FonnteService::send($user->whatsapp, $waMessage);
+
             return redirect()->route('admin.package.index', ['tab' => 'aktivasi'])
-                ->with('success', $user->name . ' berhasil diaktivasi menjadi member!');
+                ->with('success', $user->name.' berhasil diaktivasi menjadi member!');
 
         } catch (\Throwable $th) {
             return redirect()->back()->with('error', $th->getMessage());
@@ -113,32 +153,59 @@ class PackageController extends Controller
     public function buyPackage(Request $request)
     {
         try {
-            DB::transaction(function () use ($request, &$user, &$packageName) {
-                // 1. VALIDASI & TENTUKAN USER
+            $isNewUser = false;
+            $user = null;
+            $packageName = '';
+            $latestMembership = null;
+
+            // 1. PROSES VALIDASI INPUT
+            if ($request->filled('user_id')) {
+                $request->validate([
+                    'user_id' => 'required|exists:users,id',
+                    'payment_method' => 'required|in:cash,transfer',
+                ]);
+            } else {
+               $request->validate([
+                'guest_name' => 'required|string|max:255',
+                'guest_whatsapp' => [
+                    'required',
+                    'string',
+                    'max:30',
+                    function ($attribute, $value, $fail) {
+                        $cleaned = preg_replace('/[^0-9]/', '', $value);
+                        if (!preg_match('/^(08|628|8)\d{7,13}$/', $cleaned)) {
+                            $fail('Nomor WhatsApp tamu tidak valid untuk operator Indonesia.');
+                        }
+                    },
+                ],
+                'payment_method' => 'required|in:cash,transfer',
+            ]);
+            }
+
+            DB::transaction(function () use ($request, &$user, &$packageName, &$isNewUser, &$latestMembership) {
                 if ($request->filled('user_id')) {
-                    $request->validate([
-                        'user_id' => 'required|exists:users,id',
-                        'payment_method' => 'required|in:cash,transfer',
-                    ]);
                     $user = User::findOrFail($request->user_id);
                 } else {
-                    $request->validate([
-                        'guest_name' => 'required|string|max:255',
-                        'guest_whatsapp' => 'required',
-                        'payment_method' => 'required|in:cash,transfer',
-                    ]);
+                    // Bersihkan nomor WhatsApp guest inputan kasir
+                    $cleanWhatsapp = WhatsappFormat::formatNumber($request->guest_whatsapp);
 
-                    $existingUser = User::where('whatsapp', $request->guest_whatsapp)->first();
+                    if (!$cleanWhatsapp) {
+                        throw new \Exception('Format nomor WhatsApp tamu tidak valid.');
+                    }
+
+                    $existingUser = User::where('whatsapp', $cleanWhatsapp)->first();
                     if ($existingUser) {
                         $user = $existingUser;
                     } else {
+                        $isNewUser = true;
+                        
                         do {
-                            $memberCode = 'GYM-' . strtoupper(Str::random(5));
+                            $memberCode = 'GYM-'.strtoupper(Str::random(5));
                         } while (User::where('member_code', $memberCode)->exists());
 
                         $user = User::create([
                             'name' => $request->guest_name,
-                            'whatsapp' => $request->guest_whatsapp,
+                            'whatsapp' => $cleanWhatsapp, // Tersimpan rapi
                             'password' => bcrypt('12345678'),
                             'role' => 'member',
                             'is_active_member' => false,
@@ -160,20 +227,19 @@ class PackageController extends Controller
                 // 3. HITUNG TANGGAL (Stacking Paket Beruntun)
                 $lastMembership = Membership::where('user_id', $user->id)
                     ->where('status', 'active')
-                    ->whereDate('end_date', '>=', now())
+                    ->where('end_date', '>=', now())
                     ->latest('end_date')
                     ->first();
 
-                $startDate = $lastMembership 
-                    ? Carbon::parse($lastMembership->end_date)->addDay() 
+                $startDate = $lastMembership
+                    ? Carbon::parse($lastMembership->end_date)->addDay()
                     : now();
                 $endDate = Carbon::parse($startDate)->addDays(30);
 
-                // Menggunakan waktu presisi yang sama untuk mempermudah pencarian saat pembatalan
                 $currentTimestamp = now();
 
                 // 4. SIMPAN DATA MEMBERSHIP BARU
-                Membership::create([
+                $latestMembership = Membership::create([
                     'user_id' => $user->id,
                     'package_name' => $packageName,
                     'start_date' => $startDate,
@@ -184,7 +250,7 @@ class PackageController extends Controller
 
                 // 5. SIMPAN DATA TRANSAKSI
                 Transaction::create([
-                    'invoice_code' => 'PKG-' . strtoupper(Str::random(8)),
+                    'invoice_code' => 'PKG-'.strtoupper(Str::random(8)),
                     'user_id' => $user->id,
                     'admin_id' => Auth::id(),
                     'category' => 'monthly',
@@ -196,10 +262,20 @@ class PackageController extends Controller
                 ]);
             });
 
+            // Kirim pesan WA berdasarkan status user
+            if ($isNewUser) {
+                $waMessage = WhatsappMessage::newMemberWithPackage($user, $latestMembership, $packageName);
+            } else {
+                $waMessage = WhatsappMessage::monthly($user, $latestMembership, $packageName);
+            }
+
+            // Target pengiriman dijamin bersih hasil konversi database atau pembersihan di atas
+            FonnteService::send($user->whatsapp, $waMessage);
+
             return redirect()->route('admin.package.index', [
                 'tab' => 'bulanan',
                 'search' => $user->member_code ?? $user->whatsapp,
-            ])->with('success', $packageName . ' berhasil dibeli!');
+            ])->with('success', $packageName.' berhasil dibeli!');
 
         } catch (\Throwable $th) {
             return redirect()->back()->with('error', $th->getMessage());
@@ -223,7 +299,7 @@ class PackageController extends Controller
                 ->where('end_date', '>=', now())
                 ->exists();
 
-            if (!$user->is_active_member && !$hasMonthlyPackage) {
+            if (! $user->is_active_member && ! $hasMonthlyPackage) {
                 return redirect()->back()
                     ->with('error', 'PT hanya untuk member aktif atau pemilik paket bulanan!');
             }
@@ -232,7 +308,7 @@ class PackageController extends Controller
             $currentTimestamp = now();
 
             Transaction::create([
-                'invoice_code' => 'PT-' . strtoupper(Str::random(8)),
+                'invoice_code' => 'PT-'.strtoupper(Str::random(8)),
                 'user_id' => $user->id,
                 'admin_id' => Auth::id(),
                 'category' => 'pt',
@@ -255,10 +331,13 @@ class PackageController extends Controller
 
             DB::commit();
 
+            $waMessage = WhatsappMessage::pt($user, $package);
+            FonnteService::send($user->whatsapp, $waMessage);
+
             return redirect()->route('admin.package.index', [
                 'tab' => 'pt',
                 'search' => $user->member_code ?? $user->whatsapp,
-            ])->with('success', 'Paket PT ' . $package->nama_paket . ' berhasil ditambahkan!');
+            ])->with('success', 'Paket PT '.$package->nama_paket.' berhasil ditambahkan!');
 
         } catch (\Throwable $th) {
             DB::rollBack();
@@ -268,9 +347,9 @@ class PackageController extends Controller
 
     public function cancelTransaction($id)
     {
-        $transaction = Transaction::findOrFail($id);
+        $transaction = Transaction::with('user')->findOrFail($id);
 
-        if (!$transaction->created_at->isToday()) {
+        if (! $transaction->created_at->isToday()) {
             return redirect()->back()->with('error', 'Transaksi lama tidak bisa dibatalkan!');
         }
 
@@ -278,34 +357,34 @@ class PackageController extends Controller
             return redirect()->back()->with('error', 'Transaksi sudah dibatalkan.');
         }
 
+        $user = $transaction->user;
+
         DB::beginTransaction();
         try {
             $transaction->update(['status' => 'cancelled']);
 
             if ($transaction->category === 'activation') {
-                $transaction->user?->update(['is_active_member' => false]);
-                
+                if ($user) {
+                    $user->update(['is_active_member' => false]);
+                }
+
             } elseif ($transaction->category === 'monthly') {
-                // FIXED LOGIC: Cari paket yang dibuat pada rentang menit/detik yang sama dengan transaksi ini
-                // Cara ini 100% akurat menemukan pasangan paket dari transaksi yang mau dibatalkan
                 $membershipToCancel = Membership::where('user_id', $transaction->user_id)
                     ->whereBetween('created_at', [
-                        $transaction->created_at->copy()->subSeconds(5), 
-                        $transaction->created_at->copy()->addSeconds(5)
+                        $transaction->created_at->copy()->subSeconds(5),
+                        $transaction->created_at->copy()->addSeconds(5),
                     ])
                     ->first();
 
                 if ($membershipToCancel) {
-                    // Direkomendasikan memakai delete() jika transaksinya adalah perpanjangan salah input agar antrean tanggal bersih kembali
-                    $membershipToCancel->delete(); 
+                    $membershipToCancel->delete();
                 }
-                
+
             } elseif ($transaction->category === 'pt') {
-                // FIXED LOGIC untuk paket PT
                 $ptToCancel = PtMembership::where('user_id', $transaction->user_id)
                     ->whereBetween('created_at', [
-                        $transaction->created_at->copy()->subSeconds(5), 
-                        $transaction->created_at->copy()->addSeconds(5)
+                        $transaction->created_at->copy()->subSeconds(5),
+                        $transaction->created_at->copy()->addSeconds(5),
                     ])
                     ->first();
 
@@ -315,11 +394,22 @@ class PackageController extends Controller
             }
 
             DB::commit();
-            return redirect()->back()->with('success', 'Transaksi berhasil dibatalkan!');
+
+            if ($user && $user->whatsapp) {
+                // Amankan nomor WhatsApp yang barangkali di DB lama belum dibersihkan sebelum dikirim
+                $targetWhatsapp = WhatsappFormat::formatNumber($user->whatsapp);
+                
+                if ($targetWhatsapp) {
+                    $waMessage = WhatsappMessage::transactionCancelled($user, $transaction);
+                    FonnteService::send($targetWhatsapp, $waMessage);
+                }
+            }
+
+            return redirect()->back()->with('success', 'Transaksi berhasil dibatalkan dan notifikasi WA telah dikirim!');
 
         } catch (\Throwable $th) {
             DB::rollBack();
-            return redirect()->back()->with('error', 'Gagal membatalkan transaksi: ' . $th->getMessage());
+            return redirect()->back()->with('error', 'Gagal membatalkan transaksi: '.$th->getMessage());
         }
     }
 }

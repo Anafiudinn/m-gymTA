@@ -283,8 +283,8 @@
                         Instagram Gym
                     </label>
                     <input type="text"
-                           name="gym_instagram"
-                           value="{{ $settings['gym_instagram'] ?? '' }}"
+                           name="instagram"
+                           value="{{ $settings['instagram'] ?? '' }}"
                            placeholder="Contoh: @gymku"
                            style="
                             width:100%;padding:10px 14px;
@@ -417,6 +417,169 @@
             </div>
         </div>
 
+     {{-- =============================================
+    WHATSAPP GATEWAY
+============================================= --}}
+<div class="card" style="margin-bottom:28px;">
+
+    <div style="
+        display:flex;
+        align-items:center;
+        gap:12px;
+        padding-bottom:16px;
+        margin-bottom:20px;
+        border-bottom:1px solid var(--border);
+    ">
+        <div style="
+            width:38px;height:38px;
+            border-radius:1px;
+            background:rgba(34,197,94,.10);
+            color:#22c55e;
+            display:flex;align-items:center;justify-content:center;
+            font-size:15px;
+        ">
+            <i class="fa-brands fa-whatsapp"></i>
+        </div>
+
+        <div>
+            <div style="font-size:.9rem;font-weight:800;color:var(--text);">
+                WhatsApp Gateway
+            </div>
+
+            <div style="font-size:.78rem;color:var(--muted);">
+                Pengaturan notifikasi otomatis WhatsApp gym
+            </div>
+        </div>
+    </div>
+
+    <div style="
+        display:grid;
+        grid-template-columns:repeat(auto-fill,minmax(240px,1fr));
+        gap:18px;
+    ">
+
+        {{-- TOKEN FONNTE --}}
+        <div style="grid-column:1/-1;">
+            <label style="
+                display:block;
+                font-size:.8rem;
+                font-weight:700;
+                color:#555;
+                margin-bottom:8px;
+            ">
+                <i class="fa-solid fa-key"
+                   style="color:#22c55e;margin-right:6px;"></i>
+
+                Fonnte Token
+            </label>
+
+            <input type="text"
+                   name="fonnte_token"
+                   value="{{ $settings['fonnte_token'] ?? '' }}"
+                   placeholder="Masukkan token API Fonnte"
+                   style="
+                    width:100%;
+                    padding:10px 14px;
+                    border:1px solid var(--border);
+                    border-radius:1px;
+                    background:var(--surface-2);
+                    font-family:'Outfit',sans-serif;
+                    font-size:.875rem;
+                    font-weight:600;
+                    color:var(--text);
+                    outline:none;
+                    transition:.18s ease;
+                   "
+                   onfocus="this.style.borderColor='#22c55e';this.style.boxShadow='0 0 0 3px rgba(34,197,94,.12)';"
+                   onblur="this.style.borderColor='var(--border)';this.style.boxShadow='none';">
+        </div>
+
+        {{-- NOMOR GATEWAY --}}
+        <div>
+            <label style="
+                display:block;
+                font-size:.8rem;
+                font-weight:700;
+                color:#555;
+                margin-bottom:8px;
+            ">
+                <i class="fa-solid fa-mobile-screen-button"
+                   style="color:#22c55e;margin-right:6px;"></i>
+
+                Nomor Gateway
+            </label>
+
+            <input type="text"
+                   name="wa_gateway_number"
+                   value="{{ $settings['wa_gateway_number'] ?? '' }}"
+                   placeholder="628xxxxxxxxxx"
+                   style="
+                    width:100%;
+                    padding:10px 14px;
+                    border:1px solid var(--border);
+                    border-radius:1px;
+                    background:var(--surface-2);
+                    font-family:'Outfit',sans-serif;
+                    font-size:.875rem;
+                    font-weight:600;
+                    color:var(--text);
+                    outline:none;
+                    transition:.18s ease;
+                   "
+                   onfocus="this.style.borderColor='#22c55e';this.style.boxShadow='0 0 0 3px rgba(34,197,94,.12)';"
+                   onblur="this.style.borderColor='var(--border)';this.style.boxShadow='none';">
+        </div>
+    </div>
+
+    {{-- ENABLE NOTIFICATION --}}
+    <div style="
+        margin-top:22px;
+        padding-top:18px;
+        border-top:1px dashed var(--border);
+    ">
+
+        <label style="
+            display:flex;
+            align-items:center;
+            gap:12px;
+            cursor:pointer;
+            user-select:none;
+        ">
+
+            <input type="checkbox"
+                   name="wa_enabled"
+                   value="1"
+                   {{ ($settings['wa_enabled'] ?? false) ? 'checked' : '' }}
+                   style="
+                    width:18px;
+                    height:18px;
+                    accent-color:#22c55e;
+                    cursor:pointer;
+                   ">
+
+            <div>
+                <div style="
+                    font-size:.85rem;
+                    font-weight:700;
+                    color:var(--text);
+                ">
+                    Aktifkan Notifikasi WhatsApp
+                </div>
+
+                <div style="
+                    font-size:.75rem;
+                    color:var(--muted);
+                    margin-top:2px;
+                ">
+                    Sistem akan otomatis mengirim notifikasi ke member/admin
+                </div>
+            </div>
+
+        </label>
+
+    </div>
+
+</div>
         {{-- BUTTON SIMPAN --}}
         <div style="display:flex;justify-content:flex-end;">
             <button type="submit"

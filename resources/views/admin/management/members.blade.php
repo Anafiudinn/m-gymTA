@@ -452,7 +452,27 @@
         <p class="page-sub">Kelola member, paket, dan aktivitas gym.</p>
     </div>
 </div>
-
+@if(session('success'))
+<div style="display:flex;gap:12px;align-items:flex-start;background:#fff;border:1px solid var(--border);border-left:3px solid rgba(34,197,94,.8);border-radius:var(--radius);padding:14px 16px;margin-bottom:20px;">
+    <div style="width:30px;height:30px;border-radius:var(--radius);background:rgba(34,197,94,.1);display:flex;align-items:center;justify-content:center;flex-shrink:0;">
+        <i class="fa-solid fa-circle-check" style="font-size:13px;color:#22c55e;"></i>
+    </div>
+    <div style="flex:1;">
+        <p style="font-size:13px;font-weight:700;color:#15803d;margin:0 0 2px;">{{ session('success') }}</p>
+    </div>
+</div>
+@endif
+{{-- ═══ ERROR ALERT ═══ --}}
+@if(session('error'))
+<div style="display:flex;gap:12px;align-items:flex-start;background:#fff;border:1px solid var(--border);border-left:3px solid var(--red);border-radius:var(--radius);padding:14px 16px;margin-bottom:20px;">
+    <div style="width:30px;height:30px;border-radius:var(--radius);background:rgba(239,68,68,.08);display:flex;align-items:center;justify-content:center;flex-shrink:0;">
+        <i class="fa-solid fa-circle-exclamation" style="font-size:13px;color:var(--red);"></i>
+    </div>
+    <div style="flex:1;">
+        <p style="font-size:13px;font-weight:700;color:var(--red);margin:0 0 2px;">{{ session('error') }}</p>
+    </div>
+</div>
+@endif
 {{-- Stats --}}
 <div class="stats-grid">
     <div class="stat-card">
@@ -694,7 +714,7 @@
                         <line x1="8" y1="12" x2="16" y2="12"/>
                     </svg>
                 </div>
-                <span class="digi-brand-name">UB GYM</span>
+                <span class="digi-brand-name">{{ $settings['gym_name'] ?? 'Satrio Gym Fitness' }}</span>
             </div>
 
             <div class="digi-member-row">
@@ -756,7 +776,8 @@
         </div>
 
         <form id="editForm" method="POST">
-            @csrf @method('PATCH')
+            @csrf
+            
             <div style="padding:16px 18px;display:flex;flex-direction:column;gap:12px;">
                 <div>
                     <label class="field-label">Nama Member</label>

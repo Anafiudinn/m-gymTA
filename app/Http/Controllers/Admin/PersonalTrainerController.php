@@ -111,25 +111,29 @@ class PersonalTrainerController extends Controller
     /**
      * Cut 1 PT session
      */
+  /**
+     * Cut 1 PT session
+     */
     public function cutSession($id)
     {
         return DB::transaction(function () use ($id) {
+            // Muat relasi user dan package agar efisien saat dipanggil
             $membership = PtMembership::with(['user', 'package'])->findOrFail($id);
 
             if ($membership->remaining_sessions <= 0) {
                 return back()->with('error', 'Sesi PT member sudah habis!');
             }
 
-            // Simpan data lama untuk log
+            // Simpan data lama untuk log & pesan
             $before = $membership->remaining_sessions;
 
-            // Eksekusi potong sesi
+            // Eksekusi potong sesi (metode subtractSession dari Model kamu)
             $membership->subtractSession();
 
             $after = $membership->remaining_sessions;
 
             // CATAT KE LOG PT SESSION
-            \App\Models\PtSessionLog::create([
+            PtSessionLog::create([
                 'user_id'          => $membership->user_id,
                 'admin_id'         => auth()->id(),
                 'pt_membership_id' => $membership->id,
@@ -139,7 +143,14 @@ class PersonalTrainerController extends Controller
                 'current_session'  => $after,
             ]);
 
-            return back()->with('success', "1 sesi digunakan. Sisa: $after");
+            // KIRIM NOTIFIKASI WHATSAPP KE MEMBER
+            $user = $membership->user;
+            if ($user && $user->whatsapp) {
+                $waMessage = \App\Helpers\WhatsappMessage::ptSessionCut($user, $membership, $before, $after);
+                \App\Services\FonnteService::send($user->whatsapp, $waMessage);
+            }
+
+            return back()->with('success', "1 sesi digunakan. Sisa sesi saat ini: {$after}x");
         });
     }
 }

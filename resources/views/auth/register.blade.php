@@ -402,10 +402,13 @@
                         type="text"
                         name="whatsapp"
                         value="{{ old('whatsapp') }}"
-                        placeholder="08xxxxxxxxxx"
                         required
                         autocomplete="whatsapp"
-                    >
+                        inputmode="numeric" 
+       placeholder="Contoh: 08123456789" 
+       oninput="this.value = this.value.replace(/[^0-9]/g, '');">
+
+                    
                 </div>
                 <div class="wa-hint">
                     <i class="fab fa-whatsapp"></i>

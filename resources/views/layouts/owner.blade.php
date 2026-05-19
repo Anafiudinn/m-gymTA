@@ -5,7 +5,7 @@
     <meta name="viewport"
         content="width=device-width, initial-scale=1.0">
 
-    <title>@yield('title', 'Dashboard') — UB GYM</title>
+    <title>@yield('title', 'Dashboard') — {{ $settings['gym_name'] ?? 'Satrio Gym Fitness' }}</title>
 
     {{-- TAILWIND --}}
     <script src="https://cdn.tailwindcss.com"></script>
@@ -426,80 +426,346 @@
             width:18px;
             height:18px;
         }
+        .hdr-title { 
+    font-size: 14px; 
+    font-weight: 700; 
+    color: #111; 
+}
 
-        .hdr-title{
-            font-size:15px;
-            font-weight:700;
-            color:#111;
-        }
+.hdr-right {
+    margin-left: auto;
+    display: flex; 
+    align-items: center; 
+    gap: 10px;
+}
 
-        .hdr-right{
-            margin-left:auto;
+/* 🌟 Modifikasi tombol WA status */
+.hdr-btn {
+    width: 36px; 
+    height: 36px;
+    border-radius: var(--radius);
+    border: 1px solid var(--border);
+    background: rgba(37, 211, 102, 0.03); /* Sentuhan warna hijau WA transparan */
+    display: flex; 
+    align-items: center; 
+    justify-content: center;
+    cursor: pointer;
+    transition: .15s ease; 
+    position: relative;
+}
 
-            display:flex;
-            align-items:center;
-            gap:12px;
-        }
+.hdr-btn:hover { 
+    background: rgba(37, 211, 102, 0.1); /* Agak terang pas di-hover */
+}
 
-        .hdr-btn{
-            width:42px;
-            height:42px;
+.notif-dot {
+    width: 8px; /* Sedikit diperbesar dari 6px agar lebih kelihatan */
+    height: 8px;
+    border-radius: 50%;
+    position: absolute; 
+    top: 6px; 
+    right: 6px;
+    border: 1.5px solid #fff; /* Biar ada garis pembatas putih dengan background */
+}
 
-            border-radius:1px;
+/* 🌟 Efek animasi berkedip khusus kalau WA terputus / error */
+.dot-pulse {
+    animation: waPulse 1.5s infinite ease-in-out;
+}
 
-            border:1px solid var(--border);
+@keyframes waPulse {
+    0% { transform: scale(0.9); opacity: 1; }
+    50% { transform: scale(1.3); opacity: 0.4; }
+    100% { transform: scale(0.9); opacity: 1; }
+}
 
-            background:rgba(0,0,0,.02);
+/* Container pembungkus utama */
+.wa-dropdown-wrapper {
+    position: relative;
+}
 
-            display:flex;
-            align-items:center;
-            justify-content:center;
+/* Base style untuk menu melayang (Float) */
+.wa-float-menu {
+    position: absolute;
+    top: 45px; /* Jarak tepat di bawah tombol header */
+    right: 0;
+    width: 260px;
+    background: #ffffff;
+    border: 1px solid var(--border, #eee);
+    border-radius: 8px;
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.08);
+    z-index: 1000;
+    display: none; /* Sembunyikan default */
+    animation: waFadeIn 0.2s ease-out;
+}
 
-            color:#555;
+/* Kelas aktif saat diklik via JS */
+.wa-float-menu.show {
+    display: block;
+}
 
-            cursor:pointer;
+/* Bagian Header Float */
+.wa-float-header {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 12px 15px;
+    border-bottom: 1px solid #f5f5f5;
+    font-size: 13px;
+    color: #111;
+}
 
-            transition:.18s ease;
+.wa-float-indicator {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    display: inline-block;
+}
 
-            position:relative;
-        }
+/* Bagian Isi/Body Float */
+.wa-float-body {
+    padding: 12px 15px;
+}
 
-        .hdr-btn:hover{
-            background:rgba(0,0,0,.05);
-            color:#111;
-        }
+.wa-float-body p {
+    margin: 0;
+    font-size: 12px;
+    color: #666;
+    line-height: 1.5;
+}
 
-        .hdr-btn svg{
-            width:16px;
-            height:16px;
-        }
+/* Bagian Tombol/Footer Float */
+.wa-float-footer {
+    padding: 10px 15px;
+    background: #fafafa;
+    border-top: 1px solid #f5f5f5;
+    border-bottom-left-radius: 8px;
+    border-bottom-right-radius: 8px;
+    display: flex;
+    justify-content: flex-end;
+}
 
-        .notif-dot{
-            width:7px;
-            height:7px;
+.wa-float-btn {
+    font-size: 11px;
+    font-weight: 600;
+    color: #111;
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    padding: 4px 8px;
+    border-radius: 4px;
+    transition: background 0.15s;
+}
 
-            border-radius:1px;
+.wa-float-btn:hover {
+    background: #eee;
+    color: #000;
+}
 
-            background:var(--red);
+/* Animasi muncul pop-over */
+@keyframes waFadeIn {
+    from { opacity: 0; transform: translateY(-5px); }
+    to { opacity: 1; transform: translateY(0); }
+}
 
-            position:absolute;
-            top:9px;
-            right:9px;
-        }
+/* Container pembungkus utama */
+.wa-dropdown-wrapper {
+    position: relative;
+}
 
-        .user-chip{
-            display:flex;
-            align-items:center;
-            gap:10px;
+      
+/* Container pembungkus utama */
+.wa-dropdown-wrapper {
+    position: relative;
+}
 
-            padding:5px 12px 5px 5px;
+/* Base style untuk menu melayang (Float) */
+.wa-float-menu {
+    position: absolute;
+    top: 45px; /* Jarak tepat di bawah tombol header */
+    right: 0;
+    width: 260px;
+    background: #ffffff;
+    border: 1px solid var(--border, #eee);
+    border-radius: 8px;
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.08);
+    z-index: 1000;
+    display: none; /* Sembunyikan default */
+    animation: waFadeIn 0.2s ease-out;
+}
 
-            border-radius:1px;
+/* Kelas aktif saat diklik via JS */
+.wa-float-menu.show {
+    display: block;
+}
 
-            border:1px solid var(--border);
+/* Bagian Header Float */
+.wa-float-header {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 12px 15px;
+    border-bottom: 1px solid #f5f5f5;
+    font-size: 13px;
+    color: #111;
+}
 
-            background:rgba(0,0,0,.02);
-        }
+.wa-float-indicator {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    display: inline-block;
+}
+
+/* Bagian Isi/Body Float */
+.wa-float-body {
+    padding: 12px 15px;
+}
+
+.wa-float-body p {
+    margin: 0;
+    font-size: 12px;
+    color: #666;
+    line-height: 1.5;
+}
+
+/* Bagian Tombol/Footer Float */
+.wa-float-footer {
+    padding: 10px 15px;
+    background: #fafafa;
+    border-top: 1px solid #f5f5f5;
+    border-bottom-left-radius: 8px;
+    border-bottom-right-radius: 8px;
+    display: flex;
+    justify-content: flex-end;
+}
+
+.wa-float-btn {
+    font-size: 11px;
+    font-weight: 600;
+    color: #111;
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    padding: 4px 8px;
+    border-radius: 4px;
+    transition: background 0.15s;
+}
+
+.wa-float-btn:hover {
+    background: #eee;
+    color: #000;
+}
+
+/* Animasi muncul pop-over */
+@keyframes waFadeIn {
+    from { opacity: 0; transform: translateY(-5px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+      
+/* Pembungkus utama untuk posisi patokan absolute */
+.user-dropdown-wrapper {
+    position: relative;
+    display: inline-block;
+}
+
+/* Tambahan style untuk chevron icon kecil di dalam chip */
+.user-chip {
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    user-select: none;
+    transition: background 0.2s;
+}
+.user-chip:hover {
+    background: rgba(255, 255, 255, 0.75); /* Efek highlight tipis pas di-hover */
+    border-radius: 8px;
+}
+.uc-caret {
+    font-size: 12px;
+    color: #a0aec0;
+    margin-left: 5px;
+    transition: transform 0.2s;
+}
+
+/* Styling Menu Melayang (Floating Pop Up) */
+.floating-dropdown {
+    display: none; /* Sembunyikan default-nya */
+    position: absolute;
+    top: 110%; /* Muncul tepat di bawah chip */
+    right: 0;
+    width: 220px;
+   background: #fafafa;
+    border: 1px solid #d6d2d2;
+    border-radius: 8px;
+    z-index: 999;
+    overflow: hidden;
+    animation: fadeIn 0.15s ease-out;
+}
+
+/* Header kecil di dalam popup */
+.dropdown-header {
+    padding: 12px 16px;
+    display: flex;
+    flex-direction: column;
+}
+.dropdown-header strong {
+    font-size: 14px;
+    color: #0c0b0b;
+}
+.dropdown-header span {
+    font-size: 11px;
+    color: #6a6a6a;
+}
+
+.dropdown-divider {
+    border: 0;
+    border-top: 1px solid #bfbfbf;
+    margin: 0;
+}
+
+/* Item Menu */
+.dropdown-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    width: 100%;
+    padding: 10px 16px;
+    font-size: 13px;
+    color: #1b1c1d;
+    text-decoration: none;
+    background: none;
+    border: none;
+    text-align: left;
+    cursor: pointer;
+    transition: background 0.2s, color 0.2s;
+}
+.dropdown-item:hover {
+    background: #f1eded; /* Warna merah khas Satrio Gym pas di-hover */
+    color: #262424;
+}
+.dropdown-item.text-danger {
+    color: #171515;
+}
+.dropdown-item.text-danger:hover {
+    background: #d5d4d4;
+    color: #1b1a1a;
+}
+
+/* Animasi Pop Up Halus */
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(-5px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+/* Class pembantu saat menu aktif */
+.floating-dropdown.show {
+    display: block;
+}
 
         .uc-avatar{
             width:36px;
@@ -952,7 +1218,7 @@
             <div>
 
                 <div class="sb-brand-name">
-                    UB GYM
+                  {{ $settings['gym_name'] ?? 'Satrio Gym Fitness' }}
                 </div>
 
                 <div class="sb-brand-sub">
@@ -1173,37 +1439,76 @@
 
             <div class="hdr-right">
 
-                {{-- NOTIF --}}
-                <button class="hdr-btn">
+        @php
+    $waStatus = $waStatus ?? \App\Services\FonnteService::checkGatewayStatus();
+    
+    // Tentukan badge, teks, dan detail untuk di dalam float
+    $dotColor = '#ef4444'; 
+    $statusText = 'Disconnected';
+    $statusDesc = 'Sistem tidak dapat terhubung ke Fonnte. Silakan periksa token atau perangkat Anda.';
+    
+    if ($waStatus === 'connected') {
+        $dotColor = '#22c55e';
+        $statusText = 'Connected';
+        $statusDesc = 'Sistem terhubung dengan lancar. Notifikasi otomatis berjalan optimal.';
+    } elseif ($waStatus === 'disabled') {
+        $dotColor = '#eab308';
+        $statusText = 'Disabled';
+        $statusDesc = 'Fitur WhatsApp dinonaktifkan sementara melalui menu pengaturan utama.';
+    }
+@endphp
 
-                    <i class="fa-regular fa-bell"></i>
+<div class="wa-dropdown-wrapper" style="position: relative; display: inline-block;">
+    <button class="hdr-btn wa-status-btn" onclick="toggleWaDropdown(event)" id="wa-header-btn" title="Memeriksa status...">
+        <i class="fa-brands fa-whatsapp" style="font-size:18px; color: #25D366;"></i>
+        {{-- Default dot warna abu-abu dulu sebelum diisi oleh AJAX --}}
+        <span id="wa-header-dot" class="notif-dot" style="background: #94a3b8;"></span>
+    </button>
 
-                    <span class="notif-dot"></span>
+    {{-- Menu Float Mini (Dropdown Pop-over) --}}
+    <div id="wa-status-float" class="wa-float-menu">
+        <div class="wa-float-header">
+            <span class="wa-float-indicator" style="background: {{ $dotColor }};"></span>
+            <strong>WhatsApp {{ $statusText }}</strong>
+        </div>
+        <div class="wa-float-body">
+            <p>{{ $statusDesc }}</p>
+        </div>
 
-                </button>
+    </div>
+</div>
+            
+<div class="user-dropdown-wrapper">
+    <div class="user-chip" id="userChipTrigger" onclick="toggleDropdown(event)">
+        <div class="uc-avatar">
+            {{ strtoupper(substr(Auth::user()->name, 0, 2)) }}
+        </div>
+        <div>
+            <div class="uc-name">{{ Auth::user()->name }}</div>
+            <div class="uc-role">{{ ucfirst(Auth::user()->role) }}</div>
+        </div>
+        <i class="fas fa-chevron-down uc-caret"></i>
+    </div>
 
-                {{-- USER --}}
-                <div class="user-chip">
-
-                    <div class="uc-avatar">
-                        {{ strtoupper(substr(Auth::user()->name,0,2)) }}
-                    </div>
-
-                    <div>
-
-                        <div class="uc-name">
-                            {{ Auth::user()->name }}
-                        </div>
-
-                        <div class="uc-role">
-                            Owner
-                        </div>
-
-                    </div>
-
-                </div>
-
-            </div>
+    <div class="floating-dropdown" id="userDropdownMenu">
+        <div class="dropdown-header">
+            <strong>{{ Auth::user()->name }}</strong>
+            <span>{{ Auth::user()->whatsapp }}</span>
+        </div>
+        <hr class="dropdown-divider">
+        <a href="{{ route('profile.edit') }}" class="dropdown-item">
+            <i class="fas fa-user-edit"></i> Edit Profil
+        </a>
+        <hr class="dropdown-divider">
+        <form method="POST" action="{{ route('logout') }}">
+            @csrf
+            <button type="submit" class="dropdown-item text-danger" onclick="return confirm('Yakin ingin keluar?')">
+                <i class="fas fa-sign-out-alt"></i> Keluar
+            </button>
+        </form>
+    </div>
+</div>
+</div>
 
         </header>
 
@@ -1381,6 +1686,74 @@
         d.textContent = str;
         return d.innerHTML;
     }
+    function toggleDropdown(event) {
+    // Mencegah event bubble agar fungsi klik-luar tidak langsung memicu penutupan
+    event.stopPropagation();
+    
+    const dropdown = document.getElementById('userDropdownMenu');
+    const chip = document.getElementById('userChipTrigger');
+    
+    dropdown.classList.toggle('show');
+    chip.classList.toggle('active');
+}
+
+// Logika Pintar: Tutup dropdown secara otomatis jika user mengklik area luar menu
+window.addEventListener('click', function(event) {
+    const dropdown = document.getElementById('userDropdownMenu');
+    const chip = document.getElementById('userChipTrigger');
+    
+    if (dropdown && dropdown.classList.contains('show')) {
+        // Cek apakah yang diklik bukan bagian dari chip maupun menu itu sendiri
+        if (!chip.contains(event.target) && !dropdown.contains(event.target)) {
+            dropdown.classList.remove('show');
+            chip.classList.remove('active');
+        }
+    }
+});
+   function toggleWaDropdown(event) {
+    // Mencegah trigger event bubbling ke window
+    event.stopPropagation();
+    
+    const floatMenu = document.getElementById('wa-status-float');
+    floatMenu.classList.toggle('show');
+}
+
+// Handler otomatis untuk menutup dropdown jika admin mengklik sembarang area luar
+window.addEventListener('click', function(event) {
+    const floatMenu = document.getElementById('wa-status-float');
+    
+    // Jika dropdown sedang terbuka dan yang diklik bukan bagian dari menu dropdown tersebut
+    if (floatMenu && floatMenu.classList.contains('show')) {
+        if (!floatMenu.contains(event.target)) {
+            floatMenu.classList.remove('show');
+        }
+    }
+});
+
+document.addEventListener("DOMContentLoaded", function() {
+    // Jalankan AJAX secara asynchronous di background
+    fetch("{{ route('owner.ajax.wa.status') }}")
+        .then(response => response.json())
+        .then(data => {
+            const dot = document.getElementById('wa-header-dot');
+            const btn = document.getElementById('wa-header-btn');
+            
+            if (data.status === 'connected') {
+                dot.style.background = '#22c55e';
+                dot.classList.remove('dot-pulse');
+                btn.title = 'WhatsApp Connected';
+            } else if (data.status === 'disabled') {
+                dot.style.background = '#eab308';
+                dot.classList.remove('dot-pulse');
+                btn.title = 'WhatsApp Disabled via Settings';
+            } else {
+                dot.style.background = '#ef4444';
+                dot.classList.add('dot-pulse'); // Berkedip kalau putus
+                btn.title = 'WhatsApp Disconnected (Cek Token/Device)';
+            }
+        })
+        .catch(error => console.error('Gagal memuat status WA:', error));
+});
 
     /* =========================================================
         AUTO-FIRE FROM LARAVEL SESSION FLASH

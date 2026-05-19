@@ -30,5 +30,31 @@ public function transactionItems()
 {
     return $this->hasMany(TransactionItem::class);
 }
+public function getCategoryLabelAttribute()
+{
+    return match ($this->category) {
+
+        'activation' => 'Aktivasi Member',
+        'monthly' => 'Paket Bulanan',
+        'pt' => 'Personal Trainer',
+        'visit' => 'Kunjungan',
+        'retail' => 'Pembelian Produk',
+
+        default => ucfirst($this->category),
+    };
+}
+
+public function getStatusLabelAttribute()
+{
+    return match ($this->status) {
+
+        'success' => 'Berhasil',
+        'pending' => 'Menunggu',
+        'rejected' => 'Ditolak',
+        'cancelled' => 'Dibatalkan',
+
+        default => ucfirst($this->status),
+    };
+}
 
 }

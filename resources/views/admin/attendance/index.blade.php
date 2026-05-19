@@ -16,6 +16,28 @@
     <h1 style="font-size:20px;font-weight:800;color:var(--text);margin:0 0 2px;">Check-in & Kehadiran</h1>
     <p style="font-size:12px;color:var(--muted);margin:0;">Catat check-in member dan kunjungan tamu harian</p>
 </div>
+{{-- notif fikasi sukses dan eror --}}
+@if(session('success'))
+<div style="display:flex;gap:12px;align-items:flex-start;background:#fff;border:1px solid var(--border);border-left:3px solid rgba(34,197,94,.8);border-radius:var(--radius);padding:14px 16px;margin-bottom:20px;">
+    <div style="width:30px;height:30px;border-radius:var(--radius);background:rgba(34,197,94,.1);display:flex;align-items:center;justify-content:center;flex-shrink:0;">
+        <i class="fa-solid fa-circle-check" style="font-size:13px;color:#22c55e;"></i>
+    </div>
+    <div style="flex:1;">
+        <p style="font-size:13px;font-weight:700;color:#15803d;margin:0 0 2px;">{{ session('success') }}</p>
+    </div>
+</div>
+@endif
+{{-- ═══ ERROR ALERT ═══ --}}
+@if(session('error'))
+<div style="display:flex;gap:12px;align-items:flex-start;background:#fff;border:1px solid var(--border);border-left:3px solid var(--red);border-radius:var(--radius);padding:14px 16px;margin-bottom:20px;">
+    <div style="width:30px;height:30px;border-radius:var(--radius);background:rgba(239,68,68,.08);display:flex;align-items:center;justify-content:center;flex-shrink:0;">
+        <i class="fa-solid fa-circle-exclamation" style="font-size:13px;color:var(--red);"></i>
+    </div>
+    <div style="flex:1;">
+        <p style="font-size:13px;font-weight:700;color:var(--red);margin:0 0 2px;">{{ session('error') }}</p>
+    </div>
+</div>
+@endif
 
 @php $activeTab = request('tab', 'member'); @endphp
 
@@ -195,14 +217,14 @@
                 </div>
                 <div>
                     <p style="font-size:13px;font-weight:700;color:var(--text);margin:0;line-height:1.3;">Daftar Tamu Baru</p>
-                    <p style="font-size:11px;color:var(--muted);margin:0;">Day pass Rp 15.000</p>
+                    <p style="font-size:11px;color:var(--muted);margin:0;">Day pass</p>
                 </div>
             </div>
 
             <form action="{{ route('admin.attendance.process') }}" method="POST" style="padding:18px;display:flex;flex-direction:column;gap:14px;">
                 @csrf
                 <input type="hidden" name="type" value="guest">
-                <input type="hidden" name="amount" value="15000">
+             <input type="hidden" name="amount" value="{{ $price }}">
 
                 {{-- Nama Lengkap --}}
                 <div>
@@ -227,13 +249,15 @@
                 </div>
 
                 {{-- Biaya Day Pass --}}
-                <div>
-                    <label style="display:block;font-size:10.5px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.08em;margin-bottom:6px;">Biaya Day Pass</label>
-                    <div style="border:1px solid var(--border);background:#fafafa;border-radius:var(--radius);padding:10px 12px;display:flex;align-items:center;justify-content:space-between;">
-                        <span style="font-size:12.5px;color:var(--muted);">Day Pass</span>
-                        <span style="font-size:14px;font-weight:800;color:var(--text);">Rp 15.000</span>
-                    </div>
-                </div>
+             <div>
+        <label style="display:block;font-size:10.5px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.08em;margin-bottom:6px;">Biaya Day Pass</label>
+        <div style="border:1px solid var(--border);background:#fafafa;border-radius:var(--radius);padding:10px 12px;display:flex;align-items:center;justify-content:space-between;">
+            <span style="font-size:12.5px;color:var(--muted);">Day Pass</span>
+            <span style="font-size:14px;font-weight:800;color:var(--text);">
+                Rp {{ number_format($price, 0, ',', '.') }}
+            </span>
+        </div>
+    </div>
 
                 {{-- Metode Pembayaran --}}
                 <div>
@@ -324,7 +348,7 @@
             </div>
         </div>
 
-        {{-- List --}}
+    {{-- List --}}
         <div style="max-height:580px;overflow-y:auto;">
             @foreach($attendanceHistory as $item)
             @php
@@ -344,16 +368,32 @@
 
                 {{-- Name & Type --}}
                 <div style="flex:1;min-width:0;">
-                    <p style="font-size:13px;font-weight:700;color:var(--text);margin:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">
-                        {{ $item->guest_name ?? optional($item->user)->name ?? '-' }}
-                    </p>
+                    <div style="display:flex;align-items:center;gap:6px;">
+                        <p style="font-size:13px;font-weight:700;color:var(--text);margin:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">
+                            {{ $item->guest_name ?? optional($item->user)->name ?? '-' }}
+                        </p>
+                        
+                        {{-- OPSI 1: Badge Member Code di samping nama (Kelihatan rapi & profesional) --}}
+                        @if(!$isGuest && optional($item->user)->member_code)
+                            <span style="font-size:10px;font-weight:700;background:rgba(239,68,68,.08);color:var(--red);padding:1px 5px;border-radius:4px;font-family:monospace;line-height:1;">
+                                {{ $item->user->member_code }}
+                            </span>
+                        @endif
+                    </div>
+
                     <p style="font-size:11px;color:var(--muted);margin:2px 0 0;">
-                        @if($isGuest) Visit Harian
-                        @elseif($isPackage) Membership Aktif
-                        @else Visit Harian Member
+                        @if($isGuest) 
+                            Visit Harian
+                        @elseif($isPackage) 
+                            Membership Aktif 
+                            {{-- OPSI 2: Kalau mau ditaruh di dalam teks bawah, buka komen ini: --}}
+                           <!-- {{ optional($item->user)->member_code }} -->
+                        @else 
+                            Visit Harian Member
                         @endif
                     </p>
                 </div>
+          
 
                 {{-- Amount / Badge --}}
                 <div style="text-align:right;flex-shrink:0;">

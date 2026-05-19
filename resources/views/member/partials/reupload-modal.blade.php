@@ -1,154 +1,131 @@
-{{-- =========================================================
-    REUPLOAD PAYMENT MODAL (Lengkap dengan Rekening Penerima)
-========================================================= --}}
 <div id="reuploadModal"
-     style="position:fixed; inset:0; background:rgba(0,0,0,.75); backdrop-filter:blur(6px); display:none; align-items:center; justify-content:center; z-index:10000; padding:20px;">
+     style="position:fixed;inset:0;background:rgba(0,0,0,.75);backdrop-filter:blur(6px);display:none;align-items:center;justify-content:center;z-index:10000;padding:12px;">
 
-    <div style="width:100%; max-width:540px; background:#111; border:1px solid #222; border-radius:22px; overflow:hidden;">
+    <div style="width:100%;max-width:420px;background:#111;border:1px solid #222;border-radius:14px;overflow:hidden;max-height:calc(100vh - 24px);display:flex;flex-direction:column;">
 
         {{-- HEADER --}}
-        <div style="padding:24px; border-bottom:1px solid #222; display:flex; justify-content:space-between; align-items:center;">
+        <div style="padding:13px 16px;border-bottom:1px solid #222;display:flex;justify-content:space-between;align-items:center;flex-shrink:0;">
             <div>
-                <p style="margin:0; color:#666; font-size:11px; text-transform:uppercase; letter-spacing:1px;">
-                    Perbaiki Pembayaran
-                </p>
-                <h3 id="reuploadPackageName" style="margin:4px 0 0; color:#fff; font-size:26px; font-weight:900;">
-                    Paket
-                </h3>
+                <p style="margin:0;color:#666;font-size:9px;text-transform:uppercase;letter-spacing:1px;">Perbaiki Pembayaran</p>
+                <h3 id="reuploadPackageName" style="margin:3px 0 0;color:#fff;font-size:17px;font-weight:900;">Paket</h3>
             </div>
-
             <button onclick="closeReuploadModal()" type="button"
-                    style="width:38px; height:38px; border:none; border-radius:10px; background:#1a1a1a; color:#777; cursor:pointer;">
+                    style="width:30px;height:30px;border:none;border-radius:8px;background:#1a1a1a;color:#777;cursor:pointer;font-size:13px;">
                 <i class="fa-solid fa-xmark"></i>
             </button>
         </div>
 
         {{-- BODY --}}
-        <div style="padding:24px; max-height:calc(100vh - 150px); overflow-y:auto;">
+        <div style="padding:14px 16px;overflow-y:auto;flex:1;">
 
             {{-- TOTAL --}}
-            <div style="margin-bottom:25px;">
-                <p style="margin:0 0 6px; color:#666; font-size:12px;">
-                    Total Pembayaran
-                </p>
-                <h2 id="reuploadAmount" style="margin:0; color:#ef4444; font-size:42px; font-weight:900;">
-                    Rp 0
-                </h2>
+            <div style="margin-bottom:12px;">
+                <p style="margin:0 0 3px;color:#666;font-size:10px;">Total Pembayaran</p>
+                <h2 id="reuploadAmount" style="margin:0;color:#ef4444;font-size:28px;font-weight:900;">Rp 0</h2>
             </div>
 
-            {{-- 1. INFO TRANSAKSI & REJECTION REASON --}}
-            <div style="background:#161616; border:1px solid #222; border-radius:14px; padding:18px; margin-bottom:16px;">
-                <div style="display:flex; justify-content:space-between; margin-bottom:12px;">
-                    <span style="color:#666; font-size:13px;">Invoice</span>
-                    <strong id="reuploadInvoice" style="color:#fff;">INV</strong>
+            {{-- INFO TRANSAKSI --}}
+            <div style="background:#161616;border:1px solid #222;border-radius:10px;padding:12px 14px;margin-bottom:10px;">
+                <div style="display:flex;justify-content:space-between;margin-bottom:8px;">
+                    <span style="color:#666;font-size:12px;">Invoice</span>
+                    <strong id="reuploadInvoice" style="color:#fff;font-size:12px;">INV</strong>
                 </div>
-
-                <div style="display:flex; justify-content:space-between; margin-bottom:14px; padding-bottom:14px; border-bottom:1px solid #222;">
-                    <span style="color:#666; font-size:13px;">Status</span>
-                    <strong style="color:#ef4444; font-weight:900;">DITOLAK</strong>
+                <div style="display:flex;justify-content:space-between;margin-bottom:10px;padding-bottom:10px;border-bottom:1px solid #222;">
+                    <span style="color:#666;font-size:12px;">Status</span>
+                    <strong style="color:#ef4444;font-weight:900;font-size:12px;">DITOLAK</strong>
                 </div>
-
                 <div>
-                    <p style="margin:0 0 6px; font-size:11px; font-weight:800; color:#ef4444; text-transform:uppercase; letter-spacing:.05em;">
-                        Alasan Penolakan:
-                    </p>
-                    <p id="reuploadReason" style="margin:0; color:#aaa; font-size:13px; line-height:1.5;">
-                        -
-                    </p>
+                    <p style="margin:0 0 4px;font-size:10px;font-weight:800;color:#ef4444;text-transform:uppercase;letter-spacing:.05em;">Alasan Penolakan:</p>
+                    <p id="reuploadReason" style="margin:0;color:#aaa;font-size:12px;line-height:1.5;">-</p>
                 </div>
             </div>
 
-            {{-- 2. INFO REKENING TUJUAN (DATA PENERIMA/ADMIN) --}}
-            <div style="background:#161616; border:1px solid #222; border-radius:14px; padding:18px; margin-bottom:24px;">
-                <p style="margin:0 0 16px; color:#888; font-size:11px; text-transform:uppercase; letter-spacing:0.5px;">
-                    Transfer Ke Rekening (Penerima)
-                </p>
-
-                <div style="display:flex; justify-content:space-between; margin-bottom:10px;">
-                    <span style="color:#666; font-size:13px;">Bank</span>
-                    <strong style="color:#fff;">{{ $settings['bank_name'] ?? '-' }}</strong>
+            {{-- REKENING TUJUAN --}}
+            <div style="background:#161616;border:1px solid #222;border-radius:10px;padding:12px 14px;margin-bottom:14px;">
+                <p style="margin:0 0 10px;color:#888;font-size:9px;text-transform:uppercase;letter-spacing:0.5px;">Transfer Ke Rekening</p>
+                <div style="display:flex;justify-content:space-between;margin-bottom:7px;">
+                    <span style="color:#666;font-size:12px;">Bank</span>
+                    <strong style="color:#fff;font-size:12px;">{{ $settings['bank_name'] ?? '-' }}</strong>
                 </div>
-
-                <div style="display:flex; justify-content:space-between; margin-bottom:10px;">
-                    <span style="color:#666; font-size:13px;">No. Rekening</span>
-                    <strong style="color:#fff;">{{ $settings['bank_number'] ?? '-' }}</strong>
+                <div style="display:flex;justify-content:space-between;margin-bottom:7px;">
+                    <span style="color:#666;font-size:12px;">No. Rekening</span>
+                    <strong style="color:#fff;font-size:12px;">{{ $settings['bank_number'] ?? '-' }}</strong>
                 </div>
-
-                <div style="display:flex; justify-content:space-between;">
-                    <span style="color:#666; font-size:13px;">Atas Nama</span>
-                    <strong style="color:#fff;">{{ $settings['bank_holder'] ?? '-' }}</strong>
+                <div style="display:flex;justify-content:space-between;">
+                    <span style="color:#666;font-size:12px;">Atas Nama</span>
+                    <strong style="color:#fff;font-size:12px;">{{ $settings['bank_holder'] ?? '-' }}</strong>
                 </div>
             </div>
 
-            {{-- FORM --}}
-            <form id="reuploadForm" method="POST" enctype="multipart/form-data"
-                  onsubmit="return confirm('Apakah Anda yakin ingin mengirim ulang bukti pembayaran ini? Pastikan foto bukti yang baru sudah jelas.');">
-                @csrf
-                @method('PUT')
+            <form id="reuploadForm" method="POST" enctype="multipart/form-data">
+    @csrf
+    @method('PUT')
 
-                {{-- BANK PENGIRIM --}}
-                <div style="margin-bottom:16px;">
-                    <label style="display:block; margin-bottom:8px; color:#fff; font-size:12px; font-weight:700;">
-                        Bank Pengirim Anda
-                    </label>
+    <div style="margin-bottom:10px;">
+        <label style="display:block;margin-bottom:5px;color:#fff;font-size:11px;font-weight:700;">
+            Bank Pengirim
+        </label>
 
-                    <select name="sender_bank" required
-                            style="width:100%; background:#161616; border:1px solid #222; border-radius:12px; padding:14px; color:#fff;">
-                        <option value="">Pilih Bank</option>
-                        <option value="BCA">BCA</option>
-                        <option value="BRI">BRI</option>
-                        <option value="BNI">BNI</option>
-                        <option value="MANDIRI">MANDIRI</option>
-                        <option value="SEABANK">SEABANK</option>
-                        <option value="DANA">DANA</option>
-                        <option value="OVO">OVO</option>
-                        <option value="GOPAY">GOPAY</option>
-                    </select>
-                </div>
+        <select id="reuploadSenderBank"
+                name="sender_bank"
+                required
+                style="width:100%;height:40px;background:#161616;border:1px solid #222;border-radius:9px;padding:0 12px;color:#fff;font-size:13px;">
 
-                {{-- NAMA REKENING PENGIRIM --}}
-                <div style="margin-bottom:16px;">
-                    <label style="display:block; margin-bottom:8px; color:#fff; font-size:12px; font-weight:700;">
-                        Nama Pengirim
-                    </label>
+            <option value="">Pilih Bank</option>
+            <option value="BCA">BCA</option>
+            <option value="BRI">BRI</option>
+            <option value="BNI">BNI</option>
+            <option value="MANDIRI">MANDIRI</option>
+            <option value="SEABANK">SEABANK</option>
+            <option value="DANA">DANA</option>
+            <option value="OVO">OVO</option>
+            <option value="GOPAY">GOPAY</option>
+        </select>
+    </div>
 
-                    <input type="text" name="sender_name" required placeholder="Nama pemilik rekening"
-                           style="width:100%; background:#161616; border:1px solid #222; border-radius:12px; padding:14px; color:#fff;">
-                </div>
+    <div style="margin-bottom:10px;">
+        <label style="display:block;margin-bottom:5px;color:#fff;font-size:11px;font-weight:700;">
+            Nama Pengirim
+        </label>
 
-                {{-- NOMOR REKENING PENGIRIM --}}
-                <div style="margin-bottom:16px;">
-                    <label style="display:block; margin-bottom:8px; color:#fff; font-size:12px; font-weight:700;">
-                        Nomor Rekening / E-Wallet
-                    </label>
+        <input id="reuploadSenderName"
+               type="text"
+               name="sender_name"
+               required
+               placeholder="Nama pemilik rekening"
+               style="width:100%;height:40px;background:#161616;border:1px solid #222;border-radius:9px;padding:0 12px;color:#fff;font-size:13px;">
+    </div>
 
-                    <input type="text" name="sender_account" required placeholder="0812xxxx / 123xxxx"
-                           style="width:100%; background:#161616; border:1px solid #222; border-radius:12px; padding:14px; color:#fff;">
-                </div>
+    <div style="margin-bottom:10px;">
+        <label style="display:block;margin-bottom:5px;color:#fff;font-size:11px;font-weight:700;">
+            Nomor Rekening / E-Wallet
+        </label>
 
-                {{-- UPLOAD BUKTI BARU --}}
-                <div style="margin-bottom:24px;">
-                    <label style="display:block; margin-bottom:8px; color:#fff; font-size:12px; font-weight:700;">
-                        Upload Bukti Baru
-                    </label>
+        <input id="reuploadSenderAccount"
+               type="text"
+               name="sender_account"
+               required
+               placeholder="0812xxxx / 123xxxx"
+               style="width:100%;height:40px;background:#161616;border:1px solid #222;border-radius:9px;padding:0 12px;color:#fff;font-size:13px;">
+    </div>
 
-                    <input type="file" name="proof_attachment" required accept="image/*"
-                           style="width:100%; background:#161616; border:1px solid #222; border-radius:12px; padding:14px; color:#fff;">
-                </div>
+    <div style="margin-bottom:14px;">
+        <label style="display:block;margin-bottom:5px;color:#fff;font-size:11px;font-weight:700;">
+            Upload Bukti Baru
+        </label>
 
-                {{-- BUTTON KIRIM --}}
-                <button type="submit"
-                        style="width:100%; border:none; border-radius:14px; background:#ef4444; color:#fff; padding:16px; font-weight:900; cursor:pointer; font-size:14px; margin-bottom:14px; letter-spacing:0.5px;">
-                    KIRIM ULANG PEMBAYARAN
-                </button>
+        <input type="file"
+               name="proof_attachment"
+               required
+               accept="image/*"
+               style="width:100%;background:#161616;border:1px solid #222;border-radius:9px;padding:9px 12px;color:#fff;font-size:12px;">
+    </div>
 
-                {{-- CHAT ADMIN --}}
-                <a href="https://wa.me/6281234567890" target="_blank"
-                   style="width:100%; display:flex; align-items:center; justify-content:center; gap:10px; padding:14px; border-radius:14px; border:1px solid #222; background:#161616; color:#888; text-decoration:none; font-weight:700; font-size:13px;">
-                    <i class="fa-brands fa-whatsapp"></i>
-                    Chat Admin
-                </a>
-            </form>
+    <button type="submit"
+            style="width:100%;border:none;border-radius:10px;background:#ef4444;color:#fff;padding:13px;font-weight:900;cursor:pointer;font-size:13px;margin-bottom:8px;letter-spacing:0.5px;">
+        KIRIM ULANG PEMBAYARAN
+    </button>
+</form>
 
         </div>
     </div>

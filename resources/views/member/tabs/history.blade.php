@@ -1,12 +1,12 @@
 @push('styles')
 <style>
     /* ============================================================
-        HISTORY SECTION
+        HISTORY SECTION (OPTIMIZED)
     ============================================================ */
     .history-grid {
         display: grid;
         grid-template-columns: repeat(2, 1fr);
-        gap: 22px;
+        gap: 16px; /* Lebih compact dari 22px */
         align-items: flex-start;
     }
 
@@ -15,9 +15,9 @@
                 rgba(255, 255, 255, .02),
                 rgba(255, 255, 255, .01));
         border: 1px solid var(--border);
-        border-radius: 20px;
-       padding:24px;
-min-height:auto;
+        border-radius: 16px;
+        padding: 20px; /* Diperkecil dari 24px agar hemat ruang */
+        min-height: auto;
         backdrop-filter: blur(10px);
         overflow: hidden;
         position: relative;
@@ -27,24 +27,21 @@ min-height:auto;
         content: '';
         position: absolute;
         inset: 0;
-        background:
-            radial-gradient(circle at top right,
-                rgba(239, 68, 68, .08),
-                transparent 35%);
+        background: radial-gradient(circle at top right, rgba(239, 68, 68, .06), transparent 30%);
         pointer-events: none;
     }
 
     .history-title {
         display: flex;
         align-items: center;
-        gap: 12px;
-        font-family: 'Bebas Neue', sans-serif;
-        font-size: 20px;
+        gap: 10px;
+  font-family: 'Bebas Neue', sans-serif;
+        font-size: 18px; /* Lebih proporsional */
         font-weight: 900;
-        letter-spacing: .08em;
+        letter-spacing: .06em;
         text-transform: uppercase;
-        margin-bottom: 26px;
-        padding-bottom: 18px;
+        margin-bottom: 18px;
+        padding-bottom: 12px;
         border-bottom: 1px solid rgba(255, 255, 255, .06);
         position: relative;
         z-index: 2;
@@ -52,53 +49,11 @@ min-height:auto;
 
     .history-title i {
         color: var(--red);
-        font-size: 18px;
+        font-size: 16px;
     }
 
     /* ============================================================
-        EMPTY STATE
-    ============================================================ */
-    .empty-state {
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        justify-content: center;
-        text-align: center;
-        padding: 50px 20px;
-        color: var(--muted);
-    }
-
-    .empty-icon-box {
-        width: 72px;
-        height: 72px;
-        background: rgba(255, 255, 255, .03);
-        border: 1px solid rgba(255, 255, 255, .06);
-        border-radius: 18px;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        margin-bottom: 18px;
-        font-size: 24px;
-        color: var(--red);
-    }
-
-    .empty-state h5 {
-        color: var(--text);
-        font-size: 15px;
-        font-weight: 800;
-        text-transform: uppercase;
-        letter-spacing: .08em;
-        margin-bottom: 8px;
-    }
-
-    .empty-state p {
-        font-size: 13px;
-        line-height: 1.7;
-        max-width: 260px;
-    }
-
-    /* ============================================================
-        TABLE
+        TABLE STYLES (DESKTOP ONLY)
     ============================================================ */
     .history-table {
         width: 100%;
@@ -112,15 +67,15 @@ min-height:auto;
         font-size: 10px;
         color: #7b7b7b;
         text-transform: uppercase;
-        letter-spacing: .15em;
-        padding-bottom: 14px;
+        letter-spacing: .1em;
+        padding-bottom: 10px;
         border-bottom: 1px solid rgba(255, 255, 255, .06);
         font-weight: 800;
     }
 
     .history-table td {
-        padding: 14px 0;
-        font-size: 14px;
+        padding: 12px 0; /* Dipersempit agar compact */
+        font-size: 13px; /* Sedikit dikecilkan agar pas */
         border-bottom: 1px solid rgba(255, 255, 255, .04);
         vertical-align: middle;
     }
@@ -136,151 +91,181 @@ min-height:auto;
     .history-table tr:hover {
         transform: translateX(2px);
     }
-/* ============================================================
-    FOOTER
-============================================================ */
-.history-footer{
-    margin-top:20px;
-    padding-top:18px;
-    border-top:1px solid rgba(255,255,255,.06);
-    display:flex;
-    justify-content:center;
-}
 
-.history-footer a{
-    display:inline-flex;
-    align-items:center;
-    gap:8px;
-    padding:11px 16px;
-    border-radius:12px;
-    background:rgba(255,255,255,.03);
-    border:1px solid rgba(255,255,255,.07);
-    color:#ddd;
-    text-decoration:none;
-    font-size:12px;
-    font-weight:700;
-    transition:.2s ease;
-}
-
-.history-footer a:hover{
-    background:rgba(239,68,68,.08);
-    border-color:rgba(239,68,68,.18);
-    color:#fff;
-    transform:translateY(-2px);
-}
     /* ============================================================
-        STATUS
+        MOBILE CARD LIST (Sembunyi di Desktop)
+    ============================================================ */
+    .mobile-history-list {
+        display: none;
+        flex-direction: column;
+        gap: 12px;
+        position: relative;
+        z-index: 2;
+    }
+
+    .mobile-history-card {
+        background: rgba(255, 255, 255, 0.01);
+        border: 1px solid rgba(255, 255, 255, 0.04);
+        border-radius: 12px;
+        padding: 14px;
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+    }
+
+    .mobile-card-row {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        gap: 10px;
+    }
+
+    /* ============================================================
+        COMPONENTS & BADGES
     ============================================================ */
     .status-pill {
-        padding: 5px 11px;
-        border-radius: 999px;
-        font-size: 10px;
+        padding: 4px 8px;
+        border-radius: 6px; /* Kotak rounded lebih modern & compact dari 999px */
+        font-size: 9px;
         font-weight: 900;
-        letter-spacing: .08em;
+        letter-spacing: .05em;
         text-transform: uppercase;
         white-space: nowrap;
         width: fit-content;
     }
 
-    .status-success {
-        background: rgba(34, 197, 94, .12);
-        color: #22c55e;
-        border: 1px solid rgba(34, 197, 94, .2);
+    .status-success { background: rgba(34, 197, 94, .1); color: #22c55e; border: 1px solid rgba(34, 197, 94, .15); }
+    .status-pending { background: rgba(234, 179, 8, .1); color: #facc15; border: 1px solid rgba(234, 179, 8, .15); }
+    .status-danger  { background: rgba(239, 68, 68, .1); color: #ef4444; border: 1px solid rgba(239, 68, 68, .15); }
+    .status-info    { background: rgba(59, 130, 246, .1); color: #3b82f6; border: 1px solid rgba(59, 130, 246, .15); }
+
+    .invoice-code {
+        font-family: 'Barlow Condensed', sans-serif;
+        color: var(--red);
+        font-size: 14px;
+        font-weight: 800;
+        letter-spacing: .05em;
     }
 
-    .status-pending {
-        background: rgba(234, 179, 8, .12);
-        color: #facc15;
-        border: 1px solid rgba(234, 179, 8, .2);
-    }
-
-    .status-danger {
-        background: rgba(239, 68, 68, .12);
-        color: #ef4444;
-        border: 1px solid rgba(239, 68, 68, .2);
-    }
-
-    .status-info {
-        background: rgba(59, 130, 246, .12);
-        color: #3b82f6;
-        border: 1px solid rgba(59, 130, 246, .2);
-    }
-
-    /* ============================================================
-        SMALL TEXT
-    ============================================================ */
     .muted-text {
         font-size: 11px;
         color: var(--muted);
-        line-height: 1.6;
+        line-height: 1.5;
     }
 
-    .invoice-code {
-        font-family: 'Barlow Condensed', monospace;
-        color: var(--red);
-        font-size: 15px;
+    .detail-btn {
+        padding: 6px 10px;
+        font-size: 10px;
+        background: rgba(255, 255, 255, .04);
+        border: 1px solid rgba(255, 255, 255, .08);
+        border-radius: 8px;
+        color: var(--text);
+        cursor: pointer;
         font-weight: 800;
-        letter-spacing: .08em;
+        display: inline-flex;
+        align-items: center;
+        gap: 4px;
+        transition: .2s ease;
     }
-
-   .detail-btn {
-    padding:8px 12px;
-    font-size:10px;
-    background:rgba(255,255,255,.04);
-    border:1px solid rgba(255,255,255,.08);
-    border-radius:10px;
-    color:var(--text);
-    cursor:pointer;
-    font-weight:800;
-    display:flex;
-    align-items:center;
-    gap:6px;
-    transition:.2s ease;
-    white-space:nowrap;
-}
 
     .detail-btn:hover {
         background: rgba(255, 255, 255, .08);
         border-color: rgba(255, 255, 255, .14);
     }
 
-    .activity-wrap {
+    .history-footer {
+        margin-top: 16px;
+        padding-top: 14px;
+        border-top: 1px solid rgba(255, 255, 255, .06);
+        display: flex;
+        justify-content: center;
+    }
+
+    .history-footer a {
+        display: inline-flex;
+        align-items: center;
+        padding: 8px 14px;
+        border-radius: 10px;
+        background: rgba(255, 255, 255, .02);
+        border: 1px solid rgba(255, 255, 255, .06);
+        color: #bbb;
+        text-decoration: none;
+        font-size: 11px;
+        font-weight: 700;
+        transition: .2s ease;
+    }
+
+    .history-footer a:hover {
+        background: rgba(239, 68, 68, .08);
+        border-color: rgba(239, 68, 68, .18);
+        color: #fff;
+        transform: translateY(-1px);
+    }
+
+    .empty-state {
         display: flex;
         flex-direction: column;
-        gap: 7px;
+        align-items: center;
+        justify-content: center;
+        text-align: center;
+        padding: 40px 16px;
+        color: var(--muted);
+    }
+
+    .empty-icon-box {
+        width: 56px;
+        height: 56px;
+        background: rgba(255, 255, 255, .02);
+        border: 1px solid rgba(255, 255, 255, .05);
+        border-radius: 14px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin-bottom: 14px;
+        font-size: 20px;
+        color: var(--red);
+    }
+
+    .empty-state h5 {
+        color: var(--text);
+        font-size: 13px;
+        font-weight: 800;
+        text-transform: uppercase;
+        letter-spacing: .05em;
+        margin-bottom: 6px;
+    }
+
+    .empty-state p {
+        font-size: 12px;
+        line-height: 1.6;
+        max-width: 240px;
     }
 
     /* ============================================================
-        RESPONSIVE
+        RESPONSIVE BREAKPOINTS
     ============================================================ */
-    @media(max-width:950px) {
+    @media(max-width: 1024px) {
         .history-grid {
             grid-template-columns: 1fr;
+            gap: 16px;
         }
     }
 
-  @media(max-width:768px){
+    @media(max-width: 768px) {
+        .history-column {
+            padding: 16px;
+        }
+        
+        /* SEMBUNYIKAN TABEL DI HP */
+        .history-table {
+            display: none;
+        }
 
-    .history-grid{
-        grid-template-columns:1fr;
-        gap:16px;
+        /* TAMPILKAN MODE CARD DI HP */
+        .mobile-history-list {
+            display: flex;
+        }
     }
-
-    .history-column{
-        padding:18px;
-        border-radius:18px;
-        overflow-x:auto;
-    }
-
-    .history-table{
-        min-width:620px;
-    }
-
-    .history-title{
-        font-size:18px;
-        margin-bottom:20px;
-    }
-}
 </style>
 @endpush
 
@@ -293,122 +278,91 @@ min-height:auto;
         KOLOM KIRI — AKTIVITAS GYM
     ========================================================= --}}
     <div class="history-column">
-
         <div class="history-title">
             <i class="fa-solid fa-dumbbell"></i>
             AKTIVITAS MEMBER
         </div>
 
         @if($activities->isEmpty())
-
         <div class="empty-state">
-
             <div class="empty-icon-box">
                 <i class="fa-solid fa-clock-rotate-left"></i>
             </div>
-
             <h5>BELUM ADA AKTIVITAS</h5>
-
-            <p>
-                Aktivitas check-in gym dan penggunaan sesi PT akan tampil di sini.
-            </p>
-
+            <p>Aktivitas check-in gym dan penggunaan sesi PT akan tampil di sini.</p>
         </div>
-
         @else
 
+        {{-- Desktop Table View --}}
         <table class="history-table">
-
             <thead>
                 <tr>
-                    <th>TANGGAL</th>
-                    <th>AKTIVITAS</th>
-                    <th>JAM</th>
+                    <th style="width: 25%;">TANGGAL</th>
+                    <th style="width: 55%;">AKTIVITAS</th>
+                    <th style="width: 20%; text-align: right;">JAM</th>
                 </tr>
             </thead>
-
             <tbody>
-
                 @foreach($activities as $row)
-
                 <tr>
-
-                    {{-- DATE --}}
-                    <td style="font-weight:700;">
-                        {{ $row->date->format('d M Y') }}
-                    </td>
-
-                    {{-- ACTIVITY --}}
+                    <td style="font-weight:700;">{{ $row->date->format('d M Y') }}</td>
                     <td>
-
-                        <div class="activity-wrap">
-
-                            <span class="status-pill {{ $row->badge_class }}">
-                                {{ $row->badge }}
-                            </span>
-
-                            <div class="muted-text">
-                                {{ $row->description }}
-                            </div>
-
+                        <div style="display: flex; flex-direction: column; gap: 4px;">
+                            <span class="status-pill {{ $row->badge_class }}">{{ $row->badge }}</span>
+                            <div class="muted-text">{{ $row->description }}</div>
                         </div>
-
                     </td>
-
-                    {{-- TIME --}}
-                    <td style="color:var(--muted); font-size:13px;">
+                    <td style="color:var(--muted); font-size:12px; text-align: right;">
                         {{ $row->date->format('H:i') }} WIB
                     </td>
-
                 </tr>
-
-
                 @endforeach
-
             </tbody>
-
-
         </table>
-        <div class="history-footer">
-            <a href="{{ route('member.activities') }}">
-                Lihat Semua Aktivitas
-            </a>
+
+        {{-- Mobile Card View --}}
+        <div class="mobile-history-list">
+            @foreach($activities as $row)
+            <div class="mobile-history-card">
+                <div class="mobile-card-row">
+                    <span style="font-weight: 700; font-size: 13px;">{{ $row->date->format('d M Y') }}</span>
+                    <span class="muted-text" style="font-size: 12px;">{{ $row->date->format('H:i') }} WIB</span>
+                </div>
+                <div style="display: flex; flex-direction: column; gap: 4px;">
+                    <span class="status-pill {{ $row->badge_class }}">{{ $row->badge }}</span>
+                    <div class="muted-text">{{ $row->description }}</div>
+                </div>
+            </div>
+            @endforeach
         </div>
 
+        <div class="history-footer">
+            <a href="{{ route('member.activities') }}">Lihat Semua Aktivitas</a>
+        </div>
         @endif
-
     </div>
 
     {{-- =========================================================
-        KOLOM KANAN — RIWAYAT PAKET
+        KOLOM KAIAN — RIWAYAT PAKET
     ========================================================= --}}
     <div class="history-column">
-
         <div class="history-title">
             <i class="fa-solid fa-wallet"></i>
             RIWAYAT PAKET
         </div>
 
         @if($transactions->isEmpty())
-
         <div class="empty-state">
-
             <div class="empty-icon-box">
                 <i class="fa-solid fa-receipt"></i>
             </div>
-
             <h5>BELUM ADA TRANSAKSI</h5>
-
-            <p>
-                Riwayat pembelian membership dan paket PT akan muncul di sini.
-            </p>
-
+            <p>Riwayat pembelian membership dan paket PT akan muncul di sini.</p>
         </div>
-
         @else
 
+        {{-- Desktop Table View --}}
         <table class="history-table">
-
             <thead>
                 <tr>
                     <th>INVOICE</th>
@@ -417,125 +371,107 @@ min-height:auto;
                     <th style="text-align:right;">STATUS</th>
                 </tr>
             </thead>
-
             <tbody>
-
                 @foreach($transactions as $trx)
-
                 @php
+                    $packageLabel = match($trx->category) {
+                        'activation' => 'Aktivasi Member',
+                        'monthly' => match((int) $trx->amount) {
+                            (int) ($settings['bulanan_member'] ?? 0) => 'Membership Member',
+                            (int) ($settings['bulanan_tamu'] ?? 0) => 'Membership Tamu',
+                            default => 'Membership Bulanan',
+                        },
+                        'pt' => $trx->ptPackage->nama_paket ?? 'Paket PT',
+                        default => ucfirst($trx->category),
+                    };
 
-                $packageLabel = match($trx->category) {
-
-                'activation' => 'Aktivasi Member',
-
-                'monthly' => match((int) $trx->amount) {
-
-                (int) ($settings['bulanan_member'] ?? 0)
-                => 'Membership Member',
-
-                (int) ($settings['bulanan_tamu'] ?? 0)
-                => 'Membership Tamu',
-
-                default
-                => 'Membership Bulanan',
-                },
-
-                'pt'
-                => $trx->ptPackage->nama_paket ?? 'Paket PT',
-
-                default
-                => ucfirst($trx->category),
-                };
-
-                $statusClass = match($trx->status) {
-
-                'success'
-                => 'status-success',
-
-                'rejected'
-                => 'status-danger',
-
-                default
-                => 'status-pending',
-                };
-
+                    $statusClass = match($trx->status) {
+                        'success' => 'status-success',
+                        'rejected' => 'status-danger',
+                        default => 'status-pending',
+                    };
                 @endphp
-
                 <tr>
-
-                    {{-- INVOICE --}}
                     <td>
-
-                        <div class="invoice-code">
-                            #{{ $trx->invoice_code }}
-                        </div>
-
-                        <div class="muted-text" style="margin-top:5px;">
+                        <div class="invoice-code">#{{ $trx->invoice_code }}</div>
+                        <div class="muted-text" style="margin-top:2px;">
                             {{ $trx->created_at->format('d M Y • H:i') }}
                         </div>
-
                     </td>
-
-                    {{-- PACKAGE --}}
                     <td>
-
-                        <div style="font-weight:700; color:var(--text);">
-                            {{ $packageLabel }}
-                        </div>
-
-                        <div class="muted-text" style="margin-top:5px;">
+                        <div style="font-weight:700; color:var(--text);">{{ $packageLabel }}</div>
+                        <div class="muted-text" style="margin-top:2px;">
                             {{ strtoupper($trx->payment_method) }}
                         </div>
-
                     </td>
-
-                    {{-- TOTAL --}}
                     <td style="font-weight:800; white-space:nowrap;">
                         Rp {{ number_format($trx->amount, 0, ',', '.') }}
                     </td>
-
-                    {{-- STATUS --}}
                     <td>
-
-                        <div style="
-                                display:flex;
-                                justify-content:flex-end;
-                                align-items:center;
-                                gap:8px;
-                            ">
-
-                            <span class="status-pill {{ $statusClass }}">
-                                {{ strtoupper($trx->status) }}
-                            </span>
-
-                            <button
-                                onclick="openTrackingModal('{{ $trx->id }}')"
-                                class="detail-btn">
-
-                                <i class="fa-solid fa-circle-info"></i>
-                                DETAIL
-
+                        <div style="display:flex; justify-content:flex-end; align-items:center; gap:6px;">
+                            <span class="status-pill {{ $statusClass }}">{{ strtoupper($trx->status) }}</span>
+                            <button onclick="openTrackingModal('{{ $trx->id }}')" class="detail-btn">
+                                <i class="fa-solid fa-circle-info"></i> DETAIL
                             </button>
-
                         </div>
-
                     </td>
-
                 </tr>
-
                 @endforeach
-
             </tbody>
-
         </table>
-        <div class="history-footer">
-            <a href="{{ route('member.transactions') }}">
-                Lihat Semua Riwayat
-            </a>
+
+        {{-- Mobile Card View --}}
+        <div class="mobile-history-list">
+            @foreach($transactions as $trx)
+            @php
+                $packageLabel = match($trx->category) {
+                    'activation' => 'Aktivasi Member',
+                    'monthly' => match((int) $trx->amount) {
+                        (int) ($settings['bulanan_member'] ?? 0) => 'Membership Member',
+                        (int) ($settings['bulanan_tamu'] ?? 0) => 'Membership Tamu',
+                        default => 'Membership Bulanan',
+                    },
+                    'pt' => $trx->ptPackage->nama_paket ?? 'Paket PT',
+                    default => ucfirst($trx->category),
+                };
+
+                $statusClass = match($trx->status) {
+                    'success' => 'status-success',
+                    'rejected' => 'status-danger',
+                    default => 'status-pending',
+                };
+            @endphp
+            <div class="mobile-history-card">
+                <div class="mobile-card-row">
+                    <div class="invoice-code">#{{ $trx->invoice_code }}</div>
+                    <span class="status-pill {{ $statusClass }}">{{ strtoupper($trx->status) }}</span>
+                </div>
+                
+                <div class="mobile-card-row" style="align-items: flex-start;">
+                    <div>
+                        <div style="font-weight:700; color:var(--text); font-size: 13px;">{{ $packageLabel }}</div>
+                        <div class="muted-text">{{ strtoupper($trx->payment_method) }} • {{ $trx->created_at->format('d M Y H:i') }}</div>
+                    </div>
+                    <div style="text-align: right;">
+                        <div style="font-weight:800; color: var(--text); font-size: 13px;">
+                            Rp {{ number_format($trx->amount, 0, ',', '.') }}
+                        </div>
+                    </div>
+                </div>
+
+                <div style="display: flex; justify-content: flex-end; margin-top: 2px;">
+                    <button onclick="openTrackingModal('{{ $trx->id }}')" class="detail-btn" style="width: 100%; justify-content: center;">
+                        <i class="fa-solid fa-circle-info"></i> LIHAT DETAIL TRACKING
+                    </button>
+                </div>
+            </div>
+            @endforeach
         </div>
 
+        <div class="history-footer">
+            <a href="{{ route('member.transactions') }}">Lihat Semua Riwayat</a>
+        </div>
         @endif
-
     </div>
 
 </div>

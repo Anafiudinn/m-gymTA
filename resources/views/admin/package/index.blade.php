@@ -18,7 +18,17 @@
     <h1 style="font-size:20px;font-weight:800;color:var(--text);margin:0 0 2px;">Paket & Aktivasi</h1>
     <p style="font-size:12px;color:var(--muted);margin:0;">Kelola pendaftaran member dan pembelian paket latihan</p>
 </div>
-
+{{-- succes alert --}}
+@if(session('success'))
+<div style="display:flex;gap:12px;align-items:flex-start;background:#fff;border:1px solid var(--border);border-left:3px solid rgba(34,197,94,.8);border-radius:var(--radius);padding:14px 16px;margin-bottom:20px;">
+    <div style="width:30px;height:30px;border-radius:var(--radius);background:rgba(34,197,94,.1);display:flex;align-items:center;justify-content:center;flex-shrink:0;">
+        <i class="fa-solid fa-circle-check" style="font-size:13px;color:#22c55e;"></i>
+    </div>
+    <div style="flex:1;">
+        <p style="font-size:13px;font-weight:700;color:#15803d;margin:0 0 2px;">{{ session('success') }}</p>
+    </div>
+</div>
+@endif
 {{-- ═══ ERROR ALERT ═══ --}}
 @if(session('error'))
 <div style="display:flex;gap:12px;align-items:flex-start;background:#fff;border:1px solid var(--border);border-left:3px solid var(--red);border-radius:var(--radius);padding:14px 16px;margin-bottom:20px;">
@@ -157,7 +167,7 @@
                         <div style="border:1px solid var(--border);border-radius:var(--radius);padding:9px 12px;font-size:13px;color:var(--muted);background:#fafafa;">{{ $user->name }}</div>
                     </div>
                     <div>
-                        <label style="display:block;font-size:10.5px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.07em;margin-bottom:5px;">Kode Member <span style="color:var(--border);font-weight:400;">(opsional)</span></label>
+                        <label style="display:block;font-size:10.5px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.07em;margin-bottom:5px;">Kode Member <span style="color:var(--text);font-weight:400;">(opsional)</span></label>
                         <input type="text" name="member_code" value="{{ request('search') }}" placeholder="MBR001"
                                style="width:100%;border:1px solid var(--border);border-radius:var(--radius);padding:9px 12px;font-size:13px;color:var(--text);outline:none;font-family:'Outfit',sans-serif;box-sizing:border-box;background:#fff;transition:border-color .15s,box-shadow .15s;"
                                onfocus="this.style.borderColor='var(--red)';this.style.boxShadow='0 0 0 3px rgba(239,68,68,.08)';"
@@ -209,7 +219,7 @@
                                onblur="this.style.borderColor='var(--border)';this.style.boxShadow='none';">
                     </div>
                     <div>
-                        <label style="display:block;font-size:10.5px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.07em;margin-bottom:5px;">Kode Member <span style="color:var(--border);font-weight:400;">(opsional)</span></label>
+                        <label style="display:block;font-size:10.5px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.07em;margin-bottom:5px;">Kode Member <span style="color:var(--text);font-weight:400;">(opsional)</span></label>
                         <input type="text" name="member_code" value="{{ request('search') }}" placeholder="MBR001"
                                style="width:100%;border:1px solid var(--border);border-radius:var(--radius);padding:9px 12px;font-size:13px;color:var(--text);outline:none;font-family:'Outfit',sans-serif;box-sizing:border-box;background:#fff;transition:border-color .15s,box-shadow .15s;"
                                onfocus="this.style.borderColor='var(--red)';this.style.boxShadow='0 0 0 3px rgba(239,68,68,.08)';"

@@ -102,6 +102,8 @@ class DashboardController extends Controller
                 ->where('status', 'success')
                 ->sum('amount');
         }
+        $waStatus = \App\Services\FonnteService::checkGatewayStatus();
+
 
         return view('admin.dashboard', compact(
             'todayAttendance',
@@ -115,7 +117,9 @@ class DashboardController extends Controller
             'recentTransactions',
             'recentAttendances',
             'chartLabels',
-            'chartData'
+            'chartData',
+            'waStatus'
         ));
     }
+    
 }
