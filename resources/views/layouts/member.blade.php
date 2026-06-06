@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>@yield('title', 'Member Area') —  {{ $settings['gym_name'] ?? 'Satrio Gym Fitness' }}</title>
+    <title>@yield('title', 'Member Area') —  {{ $settings['gym_name'] ?? 'UB GYM' }}</title>
 
     {{-- Fonts --}}
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -717,7 +717,7 @@
                     <i class="fa-solid fa-dumbbell"></i>
                 </div>
                 <div class="brand-text">
-                     {{ $settings['gym_name'] ?? 'Satrio Gym Fitness' }} </span>
+                     {{ $settings['gym_name'] ?? 'UB GYM' }} </span>
                 </div>
             </div>
 
@@ -768,8 +768,6 @@
     <div class="member-content">
         @yield('content')
     </div>
-
-    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
   <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 

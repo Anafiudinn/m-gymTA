@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>{{ $settings['gym_name'] ?? 'Satrio Gym Fitness' }} – Semarang</title>
+    <title>{{ $settings['gym_name'] ?? 'UB GYM' }} – Semarang</title>
 
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
@@ -35,18 +35,23 @@
 
         .clip-logo { clip-path: polygon(0 0, 100% 0, 88% 100%, 0 100%); }
 
+        /* ── HERO BG: cover penuh, posisi center, tidak burik ── */
         .hero-bg {
-            background-image: url('https://images.unsplash.com/photo-1534438327276-14e5300c3a48?w=1600&q=80');
+            background-image: url('{{ asset("storage/foto_gym/hero.jpg") }}');
             background-size: cover;
-            background-position: center;
-            opacity: .18;
+            background-position: center center;
+            background-repeat: no-repeat;
+            opacity: .50;
             filter: grayscale(60%);
+            will-change: transform;
         }
 
+        /* ── ABOUT IMG: cover penuh, posisi center ── */
         .about-img {
-            background-image: url('https://images.unsplash.com/photo-1571019613454-1cb2f99b2d8b?w=800&q=80');
+            background-image: url('{{ asset("storage/foto_gym/about.jpg") }}');
             background-size: cover;
-            background-position: center;
+            background-position: center center;
+            background-repeat: no-repeat;
             opacity: .6;
             filter: grayscale(40%);
         }
@@ -108,69 +113,90 @@
             line-height: .95;
         }
 
-      /* ── Netflix-style Price Carousel ── */
-.price-track {
-    display: flex;
-    gap: 18px; /* sebelumnya 2px */
-    overflow-x: auto;
-    scroll-snap-type: x mandatory;
-    -webkit-overflow-scrolling: touch;
-    scrollbar-width: none;
-    padding-bottom: 6px;
-}
+        /* ═══════════════════════════════════════════════════════
+           PRICE CAROUSEL — fleksibel: center jika sedikit kartu,
+           scroll jika banyak kartu
+        ═══════════════════════════════════════════════════════ */
 
-.price-track::-webkit-scrollbar {
-    display: none;
-}
+        /* Wrapper carousel dengan overflow hidden */
+        .price-wrapper {
+            overflow: hidden;
+        }
 
-.price-card {
-    flex: 0 0 360px; /* desktop lebih lebar */
-    min-height: 100%;
-    scroll-snap-align: start;
-    display: flex;
-    flex-direction: column;
-    background: #161616;
-    position: relative;
-    border: 1px solid #252525;
-    transition:
-        transform .25s,
-        box-shadow .25s,
-        border-color .25s;
-}
+        /* Track: flex, wrap tidak, scroll horizontal */
+        .price-track {
+            display: flex;
+            gap: 18px;
+            overflow-x: auto;
+            scroll-snap-type: x mandatory;
+            -webkit-overflow-scrolling: touch;
+            scrollbar-width: none;
+            padding-bottom: 6px;
+        }
+        .price-track::-webkit-scrollbar { display: none; }
 
-.price-card:hover {
-    transform: translateY(-8px);
-    box-shadow: 0 20px 40px rgba(0,0,0,.6);
-    border-color: #3a3a3a;
-    z-index: 2;
-}
+        /* Jika sedikit kartu (via JS class), track jadi centered */
+        .price-track.is-centered {
+            justify-content: center;
+            overflow-x: visible;
+            scroll-snap-type: none;
+            flex-wrap: wrap;
+        }
 
-.price-card.featured {
-    background: #1a0808;
-    border-top: 3px solid var(--red);
-}
+        /* Kartu harga */
+        .price-card {
+            flex: 0 0 340px;
+            min-height: 100%;
+            scroll-snap-align: start;
+            display: flex;
+            flex-direction: column;
+            background: #161616;
+            position: relative;
+            border: 1px solid #252525;
+            transition: transform .25s, box-shadow .25s, border-color .25s;
+        }
 
-/* Tablet */
-@media (max-width: 1024px) {
-    .price-card {
-        flex: 0 0 320px;
-    }
+        /* Saat centered, kartu boleh grow tapi ada max-width */
+        .price-track.is-centered .price-card {
+            flex: 0 1 340px;
+            scroll-snap-align: unset;
+        }
 
-    .price-track {
-        gap: 14px;
-    }
-}
+        .price-card:hover {
+            transform: translateY(-8px);
+            box-shadow: 0 20px 40px rgba(0,0,0,.6);
+            border-color: #3a3a3a;
+            z-index: 2;
+        }
 
-/* Mobile */
-@media (max-width: 640px) {
-    .price-card {
-        flex: 0 0 85%;
-    }
+        .price-card.featured {
+            background: #1a0808;
+            border-top: 3px solid var(--red);
+        }
 
-    .price-track {
-        gap: 10px;
-    }
-}
+        /* Tablet */
+        @media (max-width: 1024px) {
+            .price-card { flex: 0 0 300px; }
+            .price-track { gap: 14px; }
+            .price-track.is-centered .price-card { flex: 0 1 300px; }
+        }
+
+        /* Mobile */
+        @media (max-width: 640px) {
+            .price-card { flex: 0 0 85%; }
+            .price-track { gap: 10px; }
+            /* Di mobile tetap scroll, override centered */
+            .price-track.is-centered {
+                justify-content: flex-start;
+                overflow-x: auto;
+                scroll-snap-type: x mandatory;
+                flex-wrap: nowrap;
+            }
+            .price-track.is-centered .price-card {
+                flex: 0 0 85%;
+                scroll-snap-align: start;
+            }
+        }
 
         .carousel-btn {
             width: 44px;
@@ -189,6 +215,9 @@
         .carousel-btn:disabled { opacity: .3; cursor: not-allowed; }
         .carousel-btn:disabled:hover { background: #222; border-color: #333; }
 
+        /* Sembunyikan nav arrow jika centered (cukup sedikit kartu) */
+        .price-nav-hidden { visibility: hidden; pointer-events: none; }
+
         /* Progress dots */
         .price-dot {
             width: 20px;
@@ -200,24 +229,24 @@
         .price-dot.active { background: var(--red); width: 32px; }
 
         .waQuickBtn{
-    width:100%;
-    border:none;
-    outline:none;
-    cursor:pointer;
-    text-align:left;
-    padding:14px 16px;
-    border-radius:12px;
-    background:linear-gradient(to right,#1f2937,#23272f);
-    color:#fff;
-    font-weight:600;
-    font-size:14px;
-    transition:all .2s;
-}
-
-.waQuickBtn:hover{
-    background:linear-gradient(to right,#25D36622,#23272f);
-    transform:translateX(4px);
-}
+            width:100%;
+            border:none;
+            outline:none;
+            cursor:pointer;
+            text-align:left;
+            padding:14px 16px;
+            border-radius:12px;
+            background:linear-gradient(to right,#1f2937,#23272f);
+            color:#fff;
+            font-weight:600;
+            font-size:14px;
+            transition:all .2s;
+        }
+        .waQuickBtn:hover{
+            background:linear-gradient(to right,#25D36622,#23272f);
+            transform:translateX(4px);
+        }
+        
     </style>
 </head>
 <body class="bg-bg font-barlow text-white overflow-x-hidden">
@@ -226,9 +255,9 @@
 <nav class="fixed top-0 left-0 right-0 z-50 bg-[rgba(10,10,10,0.97)] backdrop-blur-md border-b border-border flex items-center justify-between px-8 h-[60px]">
 
     <a href="#hero" class="flex items-center gap-0 no-underline flex-shrink-0">
-        <span class="clip-logo bg-red text-white font-bebas text-[22px] tracking-wider leading-none py-1 pl-2.5 pr-[18px]">SGF</span>
-        <span class="font-condensed font-extrabold text-[19px] tracking-[2px] uppercase text-white pl-2.5 leading-none">
-            {{ \Illuminate\Support\Str::upper($settings['gym_name'] ?? 'SATRIO GYM') }}
+        <span class="clip-logo bg-red text-white font-bebas text-[22px] tracking-wider leading-none py-1 pl-2.5 pr-[18px]">UBG</span>
+        <span class="font-bebas text-[19px] tracking-[2px] uppercase text-white pl-2.5 leading-none">
+            {{ \Illuminate\Support\Str::upper($settings['gym_name'] ?? 'UB GYM') }}
         </span>
     </a>
 
@@ -265,6 +294,7 @@
 
 {{-- ═══════════════════════ HERO ═══════════════════════ --}}
 <section id="hero" class="min-h-screen flex items-center px-8 pt-20 pb-12 relative overflow-hidden flex-wrap gap-10 max-sm:px-4">
+    {{-- Hero BG: absolute inset, cover, tidak terpotong --}}
     <div class="hero-bg absolute inset-0 pointer-events-none"></div>
     <div class="absolute inset-0 bg-gradient-to-r from-[rgba(10,10,10,0.85)] via-[rgba(10,10,10,0.7)] to-[rgba(10,10,10,0.5)] pointer-events-none"></div>
 
@@ -281,7 +311,7 @@
         </h1>
 
         <p class="text-[15px] text-[#aaa] leading-7 max-w-[460px] mb-9">
-            {{ $settings['gym_name'] ?? 'Satrio Gym Fitness' }} — pusat angkat beban di jantung kota Semarang.
+            {{ $settings['gym_name'] ?? 'UB GYM' }} — pusat angkat beban di jantung kota Semarang.
             Alat lengkap, suasana serius, harga jujur. Untuk kamu yang benar-benar mau berubah.
         </p>
 
@@ -312,7 +342,8 @@
 {{-- ═══════════════════════ TENTANG ═══════════════════════ --}}
 <section id="tentang" class="px-8 py-24 grid grid-cols-2 gap-16 items-center max-lg:grid-cols-1 max-lg:px-6 max-sm:px-4 max-sm:py-16">
     <div class="relative">
-        <div class="relative w-full h-[480px] bg-gradient-to-br from-[#1a0a0a] via-[#2a0f0f] to-[#1a0a0a] overflow-hidden max-lg:h-[340px]">
+        {{-- About image: tinggi fixed, tapi bg-cover agar tidak burik di semua ukuran --}}
+        <div class="relative w-full overflow-hidden max-lg:h-[340px]" style="height: 480px;">
             <div class="about-img absolute inset-0"></div>
         </div>
         <div class="absolute -bottom-4 -right-4 bg-red px-5 py-4 text-center z-10 max-lg:right-3 max-lg:-bottom-3">
@@ -322,7 +353,7 @@
     </div>
 
     <div>
-        <div class="section-tag">Tentang {{ $settings['gym_name'] ?? 'Satrio Gym' }}</div>
+        <div class="section-tag">Tentang {{ $settings['gym_name'] ?? 'UB GYM' }}</div>
         <h2 class="section-title">
             TEMPAT DI MANA <span class="text-red">KERINGAT</span><br>BERBICARA.
         </h2>
@@ -361,7 +392,7 @@
             </h2>
         </div>
         <p class="text-[15px] text-[#aaa] leading-[1.8] mb-0">
-            Tidak perlu fasilitas mewah yang bikin terdistraksi. {{ $settings['gym_name'] ?? 'Satrio Gym' }} menyediakan yang paling penting:
+            Tidak perlu fasilitas mewah yang bikin terdistraksi. {{ $settings['gym_name'] ?? 'UB GYM' }} menyediakan yang paling penting:
             alat berat berkualitas dan dukungan untuk progres maksimal.
         </p>
     </div>
@@ -388,18 +419,17 @@
     </div>
 </section>
 
-{{-- ═══════════════════════ HARGA (Netflix-style Carousel) ═══════════════════════ --}}
+{{-- ═══════════════════════ HARGA ═══════════════════════ --}}
 <section id="harga" class="px-8 py-24 max-lg:px-6 max-sm:px-4 max-sm:py-16">
 
-    {{-- Header --}}
+    {{-- Header + Nav Arrows --}}
     <div class="flex items-end justify-between mb-12 flex-wrap gap-6">
         <div>
             <div class="section-tag">Daftar Harga</div>
             <h2 class="section-title mb-3">PILIH JALAN <span class="text-red">KERASMU.</span></h2>
             <p class="text-[15px] text-[#aaa] max-w-[480px]">Harga jujur, tanpa biaya tersembunyi. Bayar sesuai cara latihanmu.</p>
         </div>
-        {{-- Nav arrows --}}
-        <div class="flex items-center gap-2">
+        <div id="priceNavWrap" class="flex items-center gap-2">
             <button id="priceLeft" class="carousel-btn" aria-label="Scroll kiri">
                 <i class="fas fa-chevron-left text-sm"></i>
             </button>
@@ -409,195 +439,169 @@
         </div>
     </div>
 
-    {{-- Track --}}
-    <div id="priceTrack" class="price-track">
+    {{-- Track wrapper --}}
+    <div class="price-wrapper">
+        <div id="priceTrack" class="price-track">
 
-        {{-- ── CARD 1: Tamu Harian ── --}}
-        <div class="price-card px-7 py-9 max-sm:px-5">
-            <div class="text-[10px] font-bold tracking-[2px] uppercase text-red mb-4 flex items-center gap-2">
-                <i class="fas fa-bolt"></i> Tamu Harian
+            {{-- ── CARD 1: Tamu Harian ── --}}
+            <div class="price-card px-7 py-9 max-sm:px-5">
+                <div class="text-[10px] font-bold tracking-[2px] uppercase text-red mb-4 flex items-center gap-2">
+                    <i class="fas fa-bolt"></i> Tamu Harian
+                </div>
+                <div class="font-condensed text-[17px] font-extrabold tracking-[2px] uppercase mb-4">Visit Harian</div>
+
+                <div class="mb-2 flex items-end gap-1">
+                    @if(!empty($settings['visit_tamu']))
+                        <span class="font-bebas text-[52px] leading-none text-red">
+                            {{ number_format($settings['visit_tamu'], 0, ',', '.') }}
+                        </span>
+                        <span class="text-[13px] text-muted mb-2">/ kunjungan</span>
+                    @else
+                        <span class="font-bebas text-[32px] leading-none text-muted italic">Hubungi Kami</span>
+                    @endif
+                </div>
+
+                <p class="text-[13px] text-muted mb-7 leading-relaxed">Mau coba dulu? Datang, bayar, langsung latihan. Tanpa ribet.</p>
+
+                <ul class="list-none flex-1 mb-8 space-y-0">
+                    <li class="text-[13px] text-[#ccc] py-2.5 border-b border-border flex items-center gap-2.5"><i class="fas fa-check text-red text-[11px]"></i> Akses semua alat</li>
+                    <li class="text-[13px] text-[#ccc] py-2.5 border-b border-border flex items-center gap-2.5"><i class="fas fa-check text-red text-[11px]"></i> Tanpa komitmen</li>
+                    <li class="text-[13px] text-[#ccc] py-2.5 flex items-center gap-2.5"><i class="fas fa-check text-red text-[11px]"></i> Cocok untuk pemula</li>
+                </ul>
+
+                <a href="https://wa.me/{{ preg_replace('/\D/', '', $settings['gym_phone'] ?? '6289674901212') }}"
+                   target="_blank"
+                   class="btn-price block w-full py-3.5 font-extrabold text-[12px] tracking-[2px] uppercase text-center no-underline text-white border-2 border-[#444] bg-transparent">
+                    Datang Langsung
+                </a>
             </div>
-            <div class="font-condensed text-[17px] font-extrabold tracking-[2px] uppercase mb-4">Visit Harian</div>
 
-            <div class="mb-2 flex items-end gap-1">
-                @if(!empty($settings['visit_tamu']))
+            {{-- ── CARD 2: Aktivasi Member (Featured) ── --}}
+            <div class="price-card featured px-7 py-9 max-sm:px-5">
+                <div class="absolute -top-px left-0 right-0 bg-red py-1 text-center text-[10px] font-extrabold tracking-[2px] uppercase">
+                    ⚡ BEST VALUE
+                </div>
+                <div class="mt-6"></div>
+
+                <div class="text-[10px] font-bold tracking-[2px] uppercase text-red mb-4 flex items-center gap-2">
+                    <i class="fas fa-id-card"></i> Keanggotaan
+                </div>
+                <div class="font-condensed text-[17px] font-extrabold tracking-[2px] uppercase mb-4">Aktivasi Member</div>
+
+                <div class="mb-2 flex items-end gap-1">
+                    @if(!empty($settings['biaya_aktivasi']))
+                        <span class="font-bebas text-[52px] leading-none text-red">
+                            {{ number_format($settings['biaya_aktivasi'], 0, ',', '.') }}
+                        </span>
+                        <span class="text-[13px] text-muted mb-2">selamanya</span>
+                    @else
+                        <span class="font-bebas text-[32px] leading-none text-muted italic">Hubungi Kami</span>
+                    @endif
+                </div>
+
+                <p class="text-[13px] text-muted mb-7 leading-relaxed">Bayar sekali, jadi member seumur hidup. Akses semua harga member.</p>
+
+                <ul class="list-none flex-1 mb-8 space-y-0">
+                    @if(!empty($settings['visit_member']))
+                        <li class="text-[13px] text-[#ccc] py-2.5 border-b border-border flex items-center gap-2.5">
+                            <i class="fas fa-check text-red text-[11px]"></i>
+                            Per kunjungan cuma {{ number_format($settings['visit_member'], 0, ',', '.') }}
+                        </li>
+                    @endif
+                    <li class="text-[13px] text-[#ccc] py-2.5 border-b border-border flex items-center gap-2.5"><i class="fas fa-check text-red text-[11px]"></i> Berlaku selamanya</li>
+                    <li class="text-[13px] text-[#ccc] py-2.5 flex items-center gap-2.5"><i class="fas fa-check text-red text-[11px]"></i> Hemat jangka panjang</li>
+                </ul>
+
+                <a href="{{ route('register') }}"
+                   class="btn-price red-btn block w-full py-3.5 font-extrabold text-[12px] tracking-[2px] uppercase text-center no-underline text-white bg-red border-2 border-red">
+                    Aktivasi Sekarang
+                </a>
+            </div>
+
+            {{-- ── CARD 3: Member Bulanan ── --}}
+            <div class="price-card px-7 py-9 max-sm:px-5">
+                <div class="text-[10px] font-bold tracking-[2px] uppercase text-red mb-4 flex items-center gap-2">
+                    <i class="fas fa-calendar-alt"></i> Berlangganan
+                </div>
+                <div class="font-condensed text-[17px] font-extrabold tracking-[2px] uppercase mb-4">Member Bulanan</div>
+
+                <div class="mb-2 flex items-end gap-1">
+                    @if(!empty($settings['bulanan_member']))
+                        <span class="font-bebas text-[52px] leading-none text-red">
+                            {{ number_format($settings['bulanan_member'], 0, ',', '.') }}
+                        </span>
+                        <span class="text-[13px] text-muted mb-2">/ bulan</span>
+                    @else
+                        <span class="font-bebas text-[32px] leading-none text-muted italic">Hubungi Kami</span>
+                    @endif
+                </div>
+
+                <p class="text-[13px] text-muted mb-7 leading-relaxed">Khusus yang sudah aktivasi member. Akses unlimited satu bulan penuh.</p>
+
+                <ul class="list-none flex-1 mb-8 space-y-0">
+                    <li class="text-[13px] text-[#ccc] py-2.5 border-b border-border flex items-center gap-2.5"><i class="fas fa-check text-red text-[11px]"></i> Akses unlimited 1 bulan</li>
+                    <li class="text-[13px] text-[#ccc] py-2.5 border-b border-border flex items-center gap-2.5"><i class="fas fa-check text-red text-[11px]"></i> Tanpa biaya per kunjungan</li>
+                    @if(!empty($settings['bulanan_tamu']))
+                        <li class="text-[13px] text-[#ccc] py-2.5 flex items-center gap-2.5">
+                            <i class="fas fa-check text-red text-[11px]"></i>
+                            Non-member: {{ number_format($settings['bulanan_tamu'], 0, ',', '.') }}/bulan
+                        </li>
+                    @endif
+                </ul>
+
+                <a href="{{ route('register') }}"
+                   class="btn-price block w-full py-3.5 font-extrabold text-[12px] tracking-[2px] uppercase text-center no-underline text-white border-2 border-[#444] bg-transparent">
+                    Pilih Paket
+                </a>
+            </div>
+
+            {{-- ── CARDS: Paket Personal Trainer dari DB ── --}}
+            @forelse($paket_pt as $index => $paket)
+            <div class="price-card px-7 py-9 max-sm:px-5">
+                <div class="text-[10px] font-bold tracking-[2px] uppercase text-red mb-4 flex items-center gap-2">
+                    <i class="fas fa-user-friends"></i> Personal Trainer
+                </div>
+                <div class="font-condensed text-[17px] font-extrabold tracking-[2px] uppercase mb-4">
+                    {{ $paket->nama_paket }}
+                </div>
+
+                <div class="mb-2 flex items-end gap-1">
                     <span class="font-bebas text-[52px] leading-none text-red">
-                        {{ number_format($settings['visit_tamu'], 0, ',', '.') }}
+                        {{ number_format($paket->harga, 0, ',', '.') }}
                     </span>
-                    <span class="text-[13px] text-muted mb-2">/ kunjungan</span>
-                @else
-                    <span class="font-bebas text-[32px] leading-none text-muted italic">Hubungi Kami</span>
-                @endif
-            </div>
+                    <span class="text-[13px] text-muted mb-2">/ {{ $paket->jumlah_sesi }} sesi</span>
+                </div>
 
-            <p class="text-[13px] text-muted mb-7 leading-relaxed">Mau coba dulu? Datang, bayar, langsung latihan. Tanpa ribet.</p>
+                <p class="text-[13px] text-muted mb-7 leading-relaxed">
+                    Program 1-on-1 intensif bersama
+                    <strong class="text-white">{{ $paket->coach_name }}</strong>.
+                    {{ $paket->jumlah_sesi }}x pertemuan terstruktur.
+                </p>
 
-            <ul class="list-none flex-1 mb-8 space-y-0">
-                <li class="text-[13px] text-[#ccc] py-2.5 border-b border-border flex items-center gap-2.5"><i class="fas fa-check text-red text-[11px]"></i> Akses semua alat</li>
-                <li class="text-[13px] text-[#ccc] py-2.5 border-b border-border flex items-center gap-2.5"><i class="fas fa-check text-red text-[11px]"></i> Tanpa komitmen</li>
-                <li class="text-[13px] text-[#ccc] py-2.5 flex items-center gap-2.5"><i class="fas fa-check text-red text-[11px]"></i> Cocok untuk pemula</li>
-            </ul>
-
-            <a href="https://wa.me/{{ preg_replace('/\D/', '', $settings['gym_phone'] ?? '6289674901212') }}"
-               target="_blank"
-               class="btn-price block w-full py-3.5 font-extrabold text-[12px] tracking-[2px] uppercase text-center no-underline text-white border-2 border-[#444] bg-transparent">
-                Datang Langsung
-            </a>
-        </div>
-
-        {{-- ── CARD 2: Aktivasi Member (Featured) ── --}}
-        <div class="price-card featured px-7 py-9 max-sm:px-5">
-            <div class="absolute -top-px left-0 right-0 bg-red py-1 text-center text-[10px] font-extrabold tracking-[2px] uppercase">
-                ⚡ BEST VALUE
-            </div>
-            <div class="mt-6"></div>
-
-            <div class="text-[10px] font-bold tracking-[2px] uppercase text-red mb-4 flex items-center gap-2">
-                <i class="fas fa-id-card"></i> Keanggotaan
-            </div>
-            <div class="font-condensed text-[17px] font-extrabold tracking-[2px] uppercase mb-4">Aktivasi Member</div>
-
-            <div class="mb-2 flex items-end gap-1">
-                @if(!empty($settings['biaya_aktivasi']))
-                    <span class="font-bebas text-[52px] leading-none text-red">
-                        {{ number_format($settings['biaya_aktivasi'], 0, ',', '.') }}
-                    </span>
-                    <span class="text-[13px] text-muted mb-2">selamanya</span>
-                @else
-                    <span class="font-bebas text-[32px] leading-none text-muted italic">Hubungi Kami</span>
-                @endif
-            </div>
-
-            <p class="text-[13px] text-muted mb-7 leading-relaxed">Bayar sekali, jadi member seumur hidup. Akses semua harga member.</p>
-
-            <ul class="list-none flex-1 mb-8 space-y-0">
-                @if(!empty($settings['visit_member']))
+                <ul class="list-none flex-1 mb-8 space-y-0">
                     <li class="text-[13px] text-[#ccc] py-2.5 border-b border-border flex items-center gap-2.5">
                         <i class="fas fa-check text-red text-[11px]"></i>
-                        Per kunjungan cuma {{ number_format($settings['visit_member'], 0, ',', '.') }}
+                        {{ $paket->jumlah_sesi }}x pertemuan intensif
                     </li>
-                @endif
-                <li class="text-[13px] text-[#ccc] py-2.5 border-b border-border flex items-center gap-2.5"><i class="fas fa-check text-red text-[11px]"></i> Berlaku selamanya</li>
-                <li class="text-[13px] text-[#ccc] py-2.5 flex items-center gap-2.5"><i class="fas fa-check text-red text-[11px]"></i> Hemat jangka panjang</li>
-            </ul>
-
-            <a href="{{ route('register') }}"
-               class="btn-price red-btn block w-full py-3.5 font-extrabold text-[12px] tracking-[2px] uppercase text-center no-underline text-white bg-red border-2 border-red">
-                Aktivasi Sekarang
-            </a>
-        </div>
-
-        {{-- ── CARD 3: Member Bulanan ── --}}
-        <div class="price-card px-7 py-9 max-sm:px-5">
-            <div class="text-[10px] font-bold tracking-[2px] uppercase text-red mb-4 flex items-center gap-2">
-                <i class="fas fa-calendar-alt"></i> Berlangganan
-            </div>
-            <div class="font-condensed text-[17px] font-extrabold tracking-[2px] uppercase mb-4">Member Bulanan</div>
-
-            <div class="mb-2 flex items-end gap-1">
-                @if(!empty($settings['bulanan_member']))
-                    <span class="font-bebas text-[52px] leading-none text-red">
-                        {{ number_format($settings['bulanan_member'], 0, ',', '.') }}
-                    </span>
-                    <span class="text-[13px] text-muted mb-2">/ bulan</span>
-                @else
-                    <span class="font-bebas text-[32px] leading-none text-muted italic">Hubungi Kami</span>
-                @endif
-            </div>
-
-            <p class="text-[13px] text-muted mb-7 leading-relaxed">Khusus yang sudah aktivasi member. Akses unlimited satu bulan penuh.</p>
-
-            <ul class="list-none flex-1 mb-8 space-y-0">
-                <li class="text-[13px] text-[#ccc] py-2.5 border-b border-border flex items-center gap-2.5"><i class="fas fa-check text-red text-[11px]"></i> Akses unlimited 1 bulan</li>
-                <li class="text-[13px] text-[#ccc] py-2.5 border-b border-border flex items-center gap-2.5"><i class="fas fa-check text-red text-[11px]"></i> Tanpa biaya per kunjungan</li>
-                @if(!empty($settings['bulanan_tamu']))
+                    <li class="text-[13px] text-[#ccc] py-2.5 border-b border-border flex items-center gap-2.5">
+                        <i class="fas fa-check text-red text-[11px]"></i> Program disesuaikan
+                    </li>
                     <li class="text-[13px] text-[#ccc] py-2.5 flex items-center gap-2.5">
-                        <i class="fas fa-check text-red text-[11px]"></i>
-                        Non-member: {{ number_format($settings['bulanan_tamu'], 0, ',', '.') }}/bulan
+                        <i class="fas fa-check text-red text-[11px]"></i> Pendampingan penuh
                     </li>
-                @endif
-            </ul>
+                </ul>
 
-            <a href="{{ route('register') }}"
-               class="btn-price block w-full py-3.5 font-extrabold text-[12px] tracking-[2px] uppercase text-center no-underline text-white border-2 border-[#444] bg-transparent">
-                Pilih Paket
-            </a>
-        </div>
-
-        {{-- ── CARDS: Paket Personal Trainer dari DB ── --}}
-        @forelse($paket_pt as $index => $paket)
-        <div class="price-card px-7 py-9 max-sm:px-5">
-            <div class="text-[10px] font-bold tracking-[2px] uppercase text-red mb-4 flex items-center gap-2">
-                <i class="fas fa-user-friends"></i> Personal Trainer
-            </div>
-            <div class="font-condensed text-[17px] font-extrabold tracking-[2px] uppercase mb-4">
-                {{ $paket->nama_paket }}
-            </div>
-
-            <div class="mb-2 flex items-end gap-1">
-                <span class="font-bebas text-[52px] leading-none text-red">
-                    {{ number_format($paket->harga, 0, ',', '.') }}
-                </span>
-                <span class="text-[13px] text-muted mb-2">/ {{ $paket->jumlah_sesi }} sesi</span>
-            </div>
-
-            <p class="text-[13px] text-muted mb-7 leading-relaxed">
-                Program 1-on-1 intensif bersama
-                <strong class="text-white">{{ $paket->coach_name }}</strong>.
-                {{ $paket->jumlah_sesi }}x pertemuan terstruktur.
-            </p>
-
-            <ul class="list-none flex-1 mb-8 space-y-0">
-                <li class="text-[13px] text-[#ccc] py-2.5 border-b border-border flex items-center gap-2.5">
-                    <i class="fas fa-check text-red text-[11px]"></i>
-                    {{ $paket->jumlah_sesi }}x pertemuan intensif
-                </li>
-                <li class="text-[13px] text-[#ccc] py-2.5 border-b border-border flex items-center gap-2.5">
-                    <i class="fas fa-check text-red text-[11px]"></i> Program disesuaikan
-                </li>
-                <li class="text-[13px] text-[#ccc] py-2.5 flex items-center gap-2.5">
-                    <i class="fas fa-check text-red text-[11px]"></i> Pendampingan penuh
-                </li>
-            </ul>
-
-            @if(!empty($paket->coach_whatsapp))
-                <a href="https://wa.me/{{ preg_replace('/\D/', '', $paket->coach_whatsapp) }}?text=Halo%2C%20saya%20mau%20booking%20PT%20paket%20{{ urlencode($paket->nama_paket) }}"
+                <a href="{{ route('login') }}"
                    target="_blank"
                    class="btn-price block w-full py-3.5 font-extrabold text-[12px] tracking-[2px] uppercase text-center no-underline text-white border-2 border-[#444] bg-transparent">
-                    Booking PT
+                    PILIH PAKET
                 </a>
-            @else
-                <a href="https://wa.me/{{ preg_replace('/\D/', '', $settings['gym_phone'] ?? '6289674901212') }}?text=Halo%2C%20saya%20mau%20booking%20PT%20paket%20{{ urlencode($paket->nama_paket) }}"
-                   target="_blank"
-                   class="btn-price block w-full py-3.5 font-extrabold text-[12px] tracking-[2px] uppercase text-center no-underline text-white border-2 border-[#444] bg-transparent">
-                    Booking PT
-                </a>
-            @endif
-        </div>
-        @empty
-        {{-- Fallback jika tidak ada paket PT di DB --}}
-        <div class="price-card px-7 py-9 max-sm:px-5">
-            <div class="text-[10px] font-bold tracking-[2px] uppercase text-red mb-4 flex items-center gap-2">
-                <i class="fas fa-user-friends"></i> Personal Trainer
             </div>
-            <div class="font-condensed text-[17px] font-extrabold tracking-[2px] uppercase mb-4">Program PT</div>
-            <div class="mb-2">
-                <span class="font-bebas text-[32px] leading-none text-muted italic">Hubungi Kami</span>
-            </div>
-            <p class="text-[13px] text-muted mb-7 leading-relaxed">Paket PT tersedia. Hubungi kami untuk info lebih lanjut.</p>
-            <ul class="list-none flex-1 mb-8 space-y-0">
-                <li class="text-[13px] text-[#ccc] py-2.5 border-b border-border flex items-center gap-2.5"><i class="fas fa-check text-red text-[11px]"></i> Program disesuaikan</li>
-                <li class="text-[13px] text-[#ccc] py-2.5 flex items-center gap-2.5"><i class="fas fa-check text-red text-[11px]"></i> Pendampingan penuh</li>
-            </ul>
-            <a href="https://wa.me/{{ preg_replace('/\D/', '', $settings['gym_phone'] ?? '6289674901212') }}"
-               target="_blank"
-               class="btn-price block w-full py-3.5 font-extrabold text-[12px] tracking-[2px] uppercase text-center no-underline text-white border-2 border-[#444] bg-transparent">
-                Tanya PT
-            </a>
-        </div>
-        @endforelse
+            @empty
+            @endforelse
 
-    </div>{{-- end #priceTrack --}}
+        </div>{{-- end #priceTrack --}}
+    </div>{{-- end .price-wrapper --}}
 
     {{-- Progress dots --}}
     <div id="priceDots" class="flex items-center gap-1.5 mt-6 justify-center"></div>
@@ -609,21 +613,21 @@
     <div class="text-center mb-14">
         <div class="section-tag">Galeri</div>
         <h2 class="section-title">LIHAT <span class="text-red">TEMPATNYA.</span></h2>
-        <p class="text-[15px] text-[#888] mt-3">Suasana asli {{ $settings['gym_name'] ?? 'Satrio Gym' }} — apa adanya, fokus pada yang penting.</p>
+        <p class="text-[15px] text-[#888] mt-3">Suasana asli {{ $settings['gym_name'] ?? 'UB GYM' }} — apa adanya, fokus pada yang penting.</p>
     </div>
 
     <div class="grid grid-cols-4 gap-1.5 max-lg:grid-cols-2 max-sm:grid-cols-2 max-sm:gap-1">
         <div class="gallery-item aspect-[3/4] overflow-hidden relative cursor-pointer">
-            <img src="https://images.unsplash.com/photo-1534438327276-14e5300c3a48?w=600&q=80" alt="{{ $settings['gym_name'] ?? 'Satrio Gym' }}" class="gallery-img w-full h-full object-cover block">
+            <img src="{{ asset('storage/foto_gym/galery1.jpg') }}" alt="{{ $settings['gym_name'] ?? 'UB GYM' }}" class="gallery-img w-full h-full object-cover block">
         </div>
         <div class="gallery-item aspect-[3/4] overflow-hidden relative cursor-pointer">
-            <img src="https://images.unsplash.com/photo-1571019614242-c5c5dee9f50b?w=600&q=80" alt="{{ $settings['gym_name'] ?? 'Satrio Gym' }}" class="gallery-img w-full h-full object-cover block">
+            <img src="{{ asset('storage/foto_gym/galery2.jpg') }}" alt="{{ $settings['gym_name'] ?? 'UB GYM' }}" class="gallery-img w-full h-full object-cover block">
         </div>
         <div class="gallery-item aspect-[3/4] overflow-hidden relative cursor-pointer">
-            <img src="https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=600&q=80" alt="{{ $settings['gym_name'] ?? 'Satrio Gym' }}" class="gallery-img w-full h-full object-cover block">
+            <img src="{{ asset('storage/foto_gym/galery3.jpg') }}" alt="{{ $settings['gym_name'] ?? 'UB GYM' }}" class="gallery-img w-full h-full object-cover block">
         </div>
         <div class="gallery-item aspect-[3/4] overflow-hidden relative cursor-pointer">
-            <img src="https://images.unsplash.com/photo-1517836357463-d25dfeac3438?w=600&q=80" alt="{{ $settings['gym_name'] ?? 'Satrio Gym' }}" class="gallery-img w-full h-full object-cover block">
+            <img src="{{ asset('storage/foto_gym/galery4.jpeg') }}" alt="{{ $settings['gym_name'] ?? 'UB GYM' }}" class="gallery-img w-full h-full object-cover block">
         </div>
     </div>
 </section>
@@ -634,7 +638,7 @@
         <div class="section-tag">Lokasi Kami</div>
         <h2 class="section-title">DATANG DAN <span class="text-red">RASAKAN</span> SENDIRI.</h2>
         <p class="text-[15px] text-[#aaa] leading-[1.8] mb-7">
-            {{ $settings['gym_name'] ?? 'Satrio Gym Fitness' }} berlokasi strategis di Semarang Kota. Mudah dijangkau dari berbagai arah.
+            {{ $settings['gym_name'] ?? 'UB GYM' }} berlokasi strategis di Semarang Kota. Mudah dijangkau dari berbagai arah.
         </p>
 
         <div class="flex flex-col gap-[1px] bg-border">
@@ -644,7 +648,7 @@
                 <div class="text-red text-lg w-[22px] text-center flex-shrink-0"><i class="fas fa-map-marker-alt"></i></div>
                 <div>
                     <div class="text-[10px] font-bold tracking-[2px] uppercase text-muted mb-0.5">Alamat</div>
-                    <div class="font-condensed text-[17px] font-extrabold tracking-wider uppercase">{{ $settings['gym_address'] }}</div>
+                    <div class="font-condensed text-[17px] tracking-wider uppercase">{{ $settings['gym_address'] }}</div>
                 </div>
             </div>
             @endif
@@ -653,7 +657,7 @@
                 <div class="text-red text-lg w-[22px] text-center flex-shrink-0"><i class="fas fa-clock"></i></div>
                 <div>
                     <div class="text-[10px] font-bold tracking-[2px] uppercase text-muted mb-0.5">Jam Buka</div>
-                    <div class="font-condensed text-[17px] font-extrabold tracking-wider uppercase">Setiap Hari · 07:00 – 22:00</div>
+                    <div class="font-condensed text-[17px] tracking-wider uppercase">Setiap Hari · 07:00 – 22:00</div>
                 </div>
             </div>
 
@@ -662,7 +666,7 @@
                 <div class="text-red text-lg w-[22px] text-center flex-shrink-0"><i class="fab fa-whatsapp"></i></div>
                 <div>
                     <div class="text-[10px] font-bold tracking-[2px] uppercase text-muted mb-0.5">WhatsApp</div>
-                    <div class="font-condensed text-[17px] font-extrabold tracking-wider uppercase">
+                    <div class="font-condensed text-[17px] tracking-wider uppercase">
                         {{ $settings['gym_phone'] }}
                     </div>
                 </div>
@@ -674,7 +678,7 @@
                 <div class="text-red text-lg w-[22px] text-center flex-shrink-0"><i class="fab fa-instagram"></i></div>
                 <div>
                     <div class="text-[10px] font-bold tracking-[2px] uppercase text-muted mb-0.5">Instagram</div>
-                    <div class="font-condensed text-[17px] font-extrabold tracking-wider uppercase">
+                    <div class="font-condensed text-[17px] tracking-wider uppercase">
                         {{ ltrim($settings['instagram'], '@') }}
                     </div>
                 </div>
@@ -684,7 +688,7 @@
         </div>
     </div>
 
-    <div class="h-[420px] border border-border overflow-hidden relative max-lg:h-[320px] max-sm:h-[260px]">
+    <div class="h-[460px] border border-border overflow-hidden relative max-lg:h-[320px] max-sm:h-[260px]">
         <iframe
             src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d15799.623113351641!2d110.43915708696574!3d-6.983480299999999!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x2e708ccf72359b7b%3A0x6599f51a22f8c56!2sSatrio%20Fitness%20Club!5e1!3m2!1sid!2sid!4v1778149032478!5m2!1sid!2sid"
             class="map-frame w-full h-full border-none"
@@ -695,7 +699,7 @@
 
 {{-- ═══════════════════════ CTA ═══════════════════════ --}}
 <div class="px-8 pb-18 max-lg:px-6 max-sm:px-4 max-sm:pb-12">
-    <div id="cta" class="px-10 py-18 bg-bg-2 border border-border max-sm:px-5 max-sm:py-10">
+    <div id="cta" class="px-10 py-20 bg-bg-2 border border-border max-sm:px-5 max-sm:py-10">
         <div class="text-center max-w-[680px] mx-auto">
             <h2 class="cta-title mb-4">SIAP MULAI? <span class="text-red">DAFTAR HARI INI.</span></h2>
             <p class="text-[15px] text-[#888] mb-9">Bikin akun, pilih paket, dan langsung mulai latihan. Tidak ada alasan lagi.</p>
@@ -709,23 +713,23 @@
                 </a>
             </div>
 
-            <div class="grid grid-cols-3 gap-[1px] bg-border mt-12 pt-9 border-t border-border max-sm:grid-cols-1">
+            <div class="grid grid-cols-3 gap-[1px] bg-border mt-12 pt-6 border-t border-border max-sm:grid-cols-1">
                 @if(!empty($settings['gym_phone']))
                 <div class="text-center px-3 py-3">
                     <div class="text-[10px] font-bold tracking-[2px] uppercase text-muted mb-1.5">WhatsApp</div>
-                    <div class="font-condensed text-[18px] font-extrabold tracking-wider">{{ $settings['gym_phone'] }}</div>
+                    <div class="font-bebas text-[18px] tracking-wider">{{ $settings['gym_phone'] }}</div>
                 </div>
                 @endif
                 @if(!empty($settings['instagram']))
                 <div class="text-center px-3 py-3">
                     <div class="text-[10px] font-bold tracking-[2px] uppercase text-muted mb-1.5">Instagram</div>
-                    <div class="font-condensed text-[18px] font-extrabold tracking-wider">{{ ltrim($settings['instagram'], '@') }}</div>
+                    <div class="font-bebas text-[18px] tracking-wider">{{ ltrim($settings['instagram'], '@') }}</div>
                 </div>
                 @endif
                 @if(!empty($settings['gym_address']))
                 <div class="text-center px-3 py-3">
                     <div class="text-[10px] font-bold tracking-[2px] uppercase text-muted mb-1.5">Lokasi</div>
-                    <div class="font-condensed text-[18px] font-extrabold tracking-wider">{{ Str::upper($settings['gym_address']) }}</div>
+                    <div class="font-bebas text-[18px] tracking-wider">{{ Str::upper($settings['gym_address']) }}</div>
                 </div>
                 @endif
             </div>
@@ -736,161 +740,86 @@
 {{-- ═══════════════════════ FOOTER ═══════════════════════ --}}
 <footer class="bg-[#080808] border-t border-border px-8 py-7 flex items-center justify-between flex-wrap gap-3 max-sm:px-4 max-sm:flex-col max-sm:items-start">
     <a href="#hero" class="flex items-center gap-0 no-underline">
-        <span class="clip-logo bg-red text-white font-bebas text-base leading-none py-0.5 pl-2 pr-3.5">SGF</span>
+        <span class="clip-logo bg-red text-white font-bebas text-base leading-none py-0.5 pl-2 pr-3.5">UBG</span>
         <span class="font-condensed font-extrabold text-[15px] tracking-[2px] uppercase text-white pl-2 leading-none">
-            {{ \Illuminate\Support\Str::upper($settings['gym_name'] ?? 'SATRIO GYM') }}
+            {{ \Illuminate\Support\Str::upper($settings['gym_name'] ?? 'UB GYM') }}
         </span>
     </a>
-    <p class="text-[12px] text-muted">© {{ date('Y') }} {{ $settings['gym_name'] ?? 'Satrio Gym Fitness' }} Semarang. Dibangun untuk yang serius.</p>
+    <p class="text-[12px] text-muted">© {{ date('Y') }} {{ $settings['gym_name'] ?? 'UB GYM' }} Semarang. Dibangun untuk yang serius.</p>
 </footer>
-
 
 {{-- ═══════════════════════ FLOAT WA CHAT ═══════════════════════ --}}
 <div class="fixed bottom-6 right-6 z-50 flex flex-col items-end gap-3 max-sm:bottom-4 max-sm:right-4">
 
-    {{-- Popup --}}
     <div id="waPanel"
          class="w-[320px] bg-[#0f1115] border border-[#1f2937] rounded-[24px] overflow-hidden shadow-[0_20px_60px_rgba(0,0,0,.55)] opacity-0 pointer-events-none translate-y-4 scale-95 transition-all duration-300">
 
-        {{-- Header --}}
         <div class="bg-[#25D366] px-5 py-4 flex items-start justify-between">
             <div class="flex gap-3">
                 <div class="w-10 h-10 rounded-full bg-white/20 flex items-center justify-center text-white text-lg">
                     <i class="fab fa-whatsapp"></i>
                 </div>
-
                 <div>
                     <div class="font-bold text-white text-[15px] leading-none">
-                        Admin {{ $settings['gym_name'] ?? 'Satrio Gym' }}
+                        Admin {{ $settings['gym_name'] ?? 'UB GYM' }}
                     </div>
-
                     <div class="text-white/80 text-[13px] mt-1">
                         Biasanya balas dalam 5 menit
                     </div>
                 </div>
             </div>
-
-            <button id="closeWaPanel"
-                    class="text-white/90 hover:text-white text-lg">
+            <button id="closeWaPanel" class="text-white/90 hover:text-white text-lg">
                 <i class="fas fa-times"></i>
             </button>
         </div>
 
-        {{-- Content --}}
         <div class="p-5">
-
-            <div class="text-[#9ca3af] text-[14px] mb-4">
-                Pilih topik chat cepat:
-            </div>
-
+            <div class="text-[#9ca3af] text-[14px] mb-4">Pilih topik chat cepat:</div>
             <div class="space-y-3">
-
-                <button class="waQuickBtn"
-                        data-message="Halo, saya mau tanya jadwal dan lokasi gym">
-                    Tanya jadwal & lokasi
-                </button>
-
-                <button class="waQuickBtn"
-                        data-message="Halo, saya mau tanya daftar member gym">
-                    Daftar member (80k)
-                </button>
-
-                <button class="waQuickBtn"
-                        data-message="Halo, saya mau tanya info kelas atau paket gym">
-                    Info kelas
-                </button>
-
-                <button class="waQuickBtn"
-                        data-message="Halo, saya mau tanya personal trainer">
-                    Tanya personal trainer
-                </button>
-
+                <button class="waQuickBtn" data-message="Halo, saya mau tanya jadwal dan lokasi gym">Tanya jadwal & lokasi</button>
+                <button class="waQuickBtn" data-message="Halo, saya mau tanya daftar member gym">Daftar member (80k)</button>
+                <button class="waQuickBtn" data-message="Halo, saya mau tanya info kelas atau paket gym">Info kelas</button>
+                <button class="waQuickBtn" data-message="Halo, saya mau tanya personal trainer">Tanya personal trainer</button>
             </div>
-
         </div>
     </div>
 
-    {{-- Float Button --}}
     <button id="waFloatBtn"
             class="w-[58px] h-[58px] rounded-full bg-[#25D366] text-white text-[28px] flex items-center justify-center shadow-[0_10px_30px_rgba(37,211,102,.45)] hover:scale-110 transition-all">
         <i class="fab fa-whatsapp"></i>
     </button>
-
 </div>
 
 <script>
-
-      const waFloatBtn  = document.getElementById('waFloatBtn');
+    // ── WhatsApp Float ──
+    const waFloatBtn  = document.getElementById('waFloatBtn');
     const waPanel     = document.getElementById('waPanel');
     const closeWaBtn  = document.getElementById('closeWaPanel');
-
-    const WA_NUMBER = "{{ preg_replace('/\D/', '', $settings['gym_phone'] ?? '6289674901212') }}";
-
+    const WA_NUMBER   = "{{ preg_replace('/\D/', '', $settings['gym_phone'] ?? '6289674901212') }}";
     let waOpen = false;
 
     function openWaPanel() {
-        waPanel.classList.remove(
-            'opacity-0',
-            'pointer-events-none',
-            'translate-y-4',
-            'scale-95'
-        );
-
-        waPanel.classList.add(
-            'opacity-100',
-            'translate-y-0',
-            'scale-100'
-        );
-
+        waPanel.classList.remove('opacity-0','pointer-events-none','translate-y-4','scale-95');
+        waPanel.classList.add('opacity-100','translate-y-0','scale-100');
         waOpen = true;
     }
-
     function closeWaPanelFunc() {
-        waPanel.classList.add(
-            'opacity-0',
-            'pointer-events-none',
-            'translate-y-4',
-            'scale-95'
-        );
-
-        waPanel.classList.remove(
-            'opacity-100',
-            'translate-y-0',
-            'scale-100'
-        );
-
+        waPanel.classList.add('opacity-0','pointer-events-none','translate-y-4','scale-95');
+        waPanel.classList.remove('opacity-100','translate-y-0','scale-100');
         waOpen = false;
     }
 
-    waFloatBtn.addEventListener('click', () => {
-        waOpen ? closeWaPanelFunc() : openWaPanel();
-    });
-
+    waFloatBtn.addEventListener('click', () => waOpen ? closeWaPanelFunc() : openWaPanel());
     closeWaBtn.addEventListener('click', closeWaPanelFunc);
 
-    // Quick buttons
     document.querySelectorAll('.waQuickBtn').forEach(btn => {
         btn.addEventListener('click', function() {
-
-            const msg = this.dataset.message;
-
-            window.open(
-                `https://wa.me/${WA_NUMBER}?text=${encodeURIComponent(msg)}`,
-                '_blank'
-            );
+            window.open(`https://wa.me/${WA_NUMBER}?text=${encodeURIComponent(this.dataset.message)}`, '_blank');
         });
     });
 
-    // Klik luar nutup
     document.addEventListener('click', function(e){
-
-        if(
-            waOpen &&
-            !waPanel.contains(e.target) &&
-            !waFloatBtn.contains(e.target)
-        ){
-            closeWaPanelFunc();
-        }
+        if (waOpen && !waPanel.contains(e.target) && !waFloatBtn.contains(e.target)) closeWaPanelFunc();
     });
 
     // ── Mobile nav ──
@@ -899,28 +828,50 @@
     navToggle.addEventListener('click', () => mobileNav.classList.toggle('open'));
     function closeMobileNav() { mobileNav.classList.remove('open'); }
     document.addEventListener('click', (e) => {
-        if (!navToggle.contains(e.target) && !mobileNav.contains(e.target)) {
-            mobileNav.classList.remove('open');
-        }
+        if (!navToggle.contains(e.target) && !mobileNav.contains(e.target)) mobileNav.classList.remove('open');
     });
 
     // ── Price Carousel ──
     (function () {
-        const track  = document.getElementById('priceTrack');
-        const btnL   = document.getElementById('priceLeft');
-        const btnR   = document.getElementById('priceRight');
-        const dotsEl = document.getElementById('priceDots');
+        const track      = document.getElementById('priceTrack');
+        const btnL       = document.getElementById('priceLeft');
+        const btnR       = document.getElementById('priceRight');
+        const dotsEl     = document.getElementById('priceDots');
+        const navWrap    = document.getElementById('priceNavWrap');
+        const cards      = track.querySelectorAll('.price-card');
+        const total      = cards.length;
+        let   activeDot  = 0;
 
-   function getCardWidth() {
-    const card = cards[0];
-    const style = window.getComputedStyle(track);
-    const gap = parseInt(style.columnGap || style.gap || 0);
+        // ── Threshold: jika total kartu cukup muat di layar, aktifkan mode centered ──
+        function checkIfShouldCenter() {
+            // Di mobile (<640px) selalu scroll
+            if (window.innerWidth < 640) {
+                track.classList.remove('is-centered');
+                navWrap.style.visibility = '';
+                dotsEl.style.display = '';
+                return;
+            }
 
-    return card.offsetWidth + gap;
-}
-        const cards     = track.querySelectorAll('.price-card');
-        const total     = cards.length;
-        let   activeDot = 0;
+            // Hitung total lebar kartu + gap
+            const cardW     = cards[0] ? cards[0].offsetWidth : 340;
+            const gap       = 18;
+            const totalW    = total * cardW + (total - 1) * gap;
+            const available = track.parentElement.offsetWidth;
+
+            if (totalW <= available) {
+                // Semua kartu muat → centered, sembunyikan arrow & dots
+                track.classList.add('is-centered');
+                navWrap.style.visibility = 'hidden';
+                navWrap.style.pointerEvents = 'none';
+                dotsEl.style.display = 'none';
+            } else {
+                // Perlu scroll
+                track.classList.remove('is-centered');
+                navWrap.style.visibility = '';
+                navWrap.style.pointerEvents = '';
+                dotsEl.style.display = '';
+            }
+        }
 
         // Build dots
         const dots = [];
@@ -938,32 +889,38 @@
             dots[activeDot]?.classList.add('active');
         }
 
+        function getCardWidth() {
+            if (!cards[0]) return 340;
+            const style = window.getComputedStyle(track);
+            const gap   = parseInt(style.columnGap || style.gap || 18);
+            return cards[0].offsetWidth + gap;
+        }
+
         function scrollTo(idx) {
-           track.scrollTo({
-    left: idx * getCardWidth(),
-    behavior: 'smooth'
-});
+            track.scrollTo({ left: idx * getCardWidth(), behavior: 'smooth' });
             updateDot(idx);
         }
 
         btnL.addEventListener('click', () => scrollTo(Math.max(0, activeDot - 1)));
         btnR.addEventListener('click', () => scrollTo(Math.min(total - 1, activeDot + 1)));
 
-        // Sync dots on manual scroll
         let scrollTimer;
         track.addEventListener('scroll', () => {
             clearTimeout(scrollTimer);
             scrollTimer = setTimeout(() => {
-              const idx = Math.round(track.scrollLeft / getCardWidth());
+                const idx = Math.round(track.scrollLeft / getCardWidth());
                 updateDot(idx);
                 btnL.disabled = idx === 0;
                 btnR.disabled = idx >= total - 1;
             }, 80);
         }, { passive: true });
 
-        // Init button states
         btnL.disabled = true;
         btnR.disabled = total <= 1;
+
+        // Jalankan check saat load dan resize
+        checkIfShouldCenter();
+        window.addEventListener('resize', checkIfShouldCenter);
     })();
 </script>
 

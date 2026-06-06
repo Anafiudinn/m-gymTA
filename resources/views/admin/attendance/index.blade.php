@@ -1,6 +1,5 @@
 @extends('layouts.admin')
 
-@section('title', 'Check-in & Kehadiran')
 @section('header-title', 'Check-in & Kehadiran')
 
 @section('content')

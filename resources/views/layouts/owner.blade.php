@@ -5,7 +5,7 @@
     <meta name="viewport"
         content="width=device-width, initial-scale=1.0">
 
-    <title>@yield('title', 'Dashboard') — {{ $settings['gym_name'] ?? 'Satrio Gym Fitness' }}</title>
+    <title>@yield('title', 'Dashboard') — {{ $settings['gym_name'] ?? 'UB GYM' }}</title>
 
     {{-- TAILWIND --}}
     <script src="https://cdn.tailwindcss.com"></script>
@@ -1218,7 +1218,7 @@
             <div>
 
                 <div class="sb-brand-name">
-                  {{ $settings['gym_name'] ?? 'Satrio Gym Fitness' }}
+                  {{ $settings['gym_name'] ?? 'UB GYM' }}
                 </div>
 
                 <div class="sb-brand-sub">

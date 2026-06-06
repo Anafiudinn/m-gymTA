@@ -315,6 +315,7 @@
         @endif
 
     });
+    
 </script>
 @endpush
 @endsection

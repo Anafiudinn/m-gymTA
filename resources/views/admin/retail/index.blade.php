@@ -653,7 +653,6 @@
                     <select name="payment_method" class="retail-field" required>
                         <option value="cash">Cash</option>
                         <option value="transfer">Transfer</option>
-                        <option value="qris">QRIS</option>
                     </select>
                 </div>
             </div>

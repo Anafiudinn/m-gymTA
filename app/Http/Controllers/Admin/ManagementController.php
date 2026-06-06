@@ -9,6 +9,7 @@ use App\Models\Membership;
 use App\Models\Product;
 use App\Models\PtMembership;
 use App\Models\PtPackage;
+use App\Models\Setting;
 use App\Models\User;
 use App\Services\FonnteService;
 use Illuminate\Http\Request;
@@ -80,6 +81,7 @@ class ManagementController extends Controller
         }
 
         $members = $query->latest()->paginate(10);
+        $settings = Setting::pluck('value', 'key')->toArray();
 
         /* --- Hitungan Statistik --- */
         $totalMembers = User::where('role', 'member')->whereNotNull('member_code')->count();
@@ -93,7 +95,7 @@ class ManagementController extends Controller
 
         return view('admin.management.members', compact(
             'members', 'search', 'status', 'package_filter',
-            'totalMembers', 'activeMembers', 'expiredPackages', 'ptActive'
+            'totalMembers', 'activeMembers', 'expiredPackages', 'ptActive', 'settings'
         ));
     }
 

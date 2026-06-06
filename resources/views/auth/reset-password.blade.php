@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Reset Password – Satrio Gym Fitness</title>
+    <title>Reset Password – {{ $settings['gym_name'] ?? 'UB GYM' }}</title>
     <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Barlow:wght@400;500;600;700;800;900&family=Barlow+Condensed:wght@400;600;700;800;900&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
     <style>
@@ -45,8 +45,8 @@
         .auth-left-bg {
             position: absolute;
             inset: 0;
-            background-image: url('https://images.unsplash.com/photo-1526506118085-60ce8714f8c5?w=900&q=80');
-            background-size: cover;
+            background-image: url('{{ asset("storage/foto_gym/register.jpg") }}');
+            background-size: justify;
             background-position: center;
             filter: grayscale(50%);
         }
@@ -445,8 +445,8 @@
     <div class="auth-right-inner">
 
         <a href="{{ url('/') }}" class="auth-logo">
-            <span class="logo-mark">SGF</span>
-            <span class="logo-name">SATRIO <span>GYM</span></span>
+            <span class="logo-mark">UBG</span>
+            <span class="logo-name">UB <span>GYM</span></span>
         </a>
 
         {{-- Session Status --}}

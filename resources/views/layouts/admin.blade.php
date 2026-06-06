@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>@yield('title', 'Dashboard') — {{ $settings['gym_name'] ?? 'Satrio Gym Fitness' }} Admin</title>
+    <title>@yield('title', 'Dashboard') — {{ $settings['gym_name'] ?? 'UB GYM' }} Admin</title>
 
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
@@ -825,7 +825,7 @@
             </div>
 
             <div class="sb-brand-text">
-                <div class="sb-brand-name">{{ $settings['gym_name'] ?? 'Satrio Gym Fitness' }}</div>
+                <div class="sb-brand-name">{{ $settings['gym_name'] ?? 'UB GYM' }}</div>
                 <div class="sb-brand-sub">Admin Panel</div>
             </div>
 
@@ -978,17 +978,6 @@
                     <div class="sb-urole">Admin</div>
                 </div>
             </div>
-
-            <form method="POST" action="{{ route('logout') }}">
-                @csrf
-                <button type="submit" class="logout-btn">
-                    <span class="ni" style="width:24px;height:24px;">
-                        <i class="fa-solid fa-right-from-bracket" style="font-size:12px;"></i>
-                    </span>
-                    <span class="logout-text">Keluar</span>
-                </button>
-            </form>
-
         </div>
 
     </aside>

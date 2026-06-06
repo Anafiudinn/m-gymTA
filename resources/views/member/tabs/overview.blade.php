@@ -23,215 +23,172 @@
         gap: 20px;
     }
 
-    /* ============================================================
-   DIGITAL MEMBER CARD
-============================================================ */
-    .member-card-digital {
-        position: relative;
-        background: var(--bg2);
-        border: 1px solid var(--border);
-        border-radius: 16px;
-        padding: 28px;
-        overflow: hidden;
-        min-height: 220px;
-        display: flex;
-        flex-direction: column;
-        justify-content: space-between;
-        transition: transform .3s ease, box-shadow .3s ease;
-    }
 
-    .member-card-digital:hover {
-        transform: translateY(-4px);
-        box-shadow: 0 20px 60px rgba(0, 0, 0, .5);
-    }
+.member-card-digital {
+    position: relative;
+    border-radius: 12px;
+    padding: 20px;
+    color: #fff;
+    overflow: hidden;
+    min-height: 164px;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    background: linear-gradient(135deg, #1a0a0a 0%, #111111 60%);
+    border-left: 3px solid #ef4444;
+    border-radius: 0;  /* override radius dulu lalu */
+    border-radius: 12px;
+    transition: box-shadow .25s ease;
+}
+.member-card-digital:hover {
+    box-shadow: 0 16px 48px rgba(0,0,0,.35);
+}
 
-    /* Active: green accent, Inactive: red accent */
-    .member-card-digital.card-active {
-        border-left: 3px solid var(--green);
-        background: linear-gradient(135deg, #0e1a14 0%, #0e0e12 60%);
-    }
+/* Satu warna merah untuk semua state — hanya badge yang beda */
 
-    .member-card-digital.card-inactive {
-        border-left: 3px solid var(--red);
-        background: linear-gradient(135deg, #1a0e0e 0%, #0e0e12 60%);
-    }
+.card-shimmer {
+    position: absolute; inset: 0; border-radius: 12px;
+    background: linear-gradient(125deg,
+        transparent 20%, rgba(255,255,255,.03) 40%,
+        rgba(255,255,255,.07) 50%, rgba(255,255,255,.03) 60%, transparent 80%);
+    pointer-events: none;
+    animation: cardShimmer 4s ease-in-out infinite;
+}
 
-    /* Holographic shimmer overlay */
-    .card-shimmer {
-        position: absolute;
-        inset: 0;
-        background: linear-gradient(125deg,
-                transparent 20%,
-                rgba(255, 255, 255, .03) 40%,
-                rgba(255, 255, 255, .07) 50%,
-                rgba(255, 255, 255, .03) 60%,
-                transparent 80%);
-        pointer-events: none;
-        animation: shimmer 4s ease-in-out infinite;
-    }
+@keyframes cardShimmer {
+    0%,100% { opacity:0; transform:translateX(-100%); }
+    50%      { opacity:1; transform:translateX(100%); }
+}
 
-    @keyframes shimmer {
+.card-deco-circle { position:absolute; border-radius:50%; pointer-events:none; }
+.card-deco-circle.c1 {
+    width:160px; height:160px; top:-60px; right:-50px;
+    background: radial-gradient(circle, rgba(239,68,68,.15) 0%, transparent 70%);
+}
+.card-deco-circle.c2 {
+    width:100px; height:100px; bottom:-35px; left:-20px;
+    background: radial-gradient(circle, rgba(255,255,255,.04) 0%, transparent 70%);
+}
 
-        0%,
-        100% {
-            opacity: 0;
-            transform: translateX(-100%);
-        }
+.card-top {
+    display:flex; align-items:center; justify-content:space-between;
+    margin-bottom:14px; position:relative;
+}
 
-        50% {
-            opacity: 1;
-            transform: translateX(100%);
-        }
-    }
+.card-gym-name {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 14px; letter-spacing:.18em; color:rgba(255,255,255,.45);
+}
+.card-gym-name span { color:#ef4444; }
 
-    /* Decorative circles on card */
-    .card-deco-circle {
-        position: absolute;
-        border-radius: 50%;
-        pointer-events: none;
-    }
+.card-status-badge {
+    padding: 3px 10px; border-radius: 20px;
+    font-size: 9px; font-weight: 800;
+    letter-spacing:.08em; text-transform: uppercase;
+}
 
-    .card-deco-circle.c1 {
-        width: 200px;
-        height: 200px;
-        top: -80px;
-        right: -60px;
-        background: radial-gradient(circle, rgba(255, 45, 45, .12) 0%, transparent 70%);
-    }
+/* Hanya badge yang beda antara aktif & non-aktif */
+.card-status-badge.active {
+    background: rgba(239,68,68,.15);
+    color: #ef4444;
+    border: 1px solid rgba(239,68,68,.3);
+}
+.card-status-badge.inactive {
+    background: rgba(255,255,255,.07);
+    color: rgba(255,255,255,.4);
+    border: 1px solid rgba(255,255,255,.12);
+}
 
-    .card-deco-circle.c2 {
-        width: 120px;
-        height: 120px;
-        bottom: -40px;
-        right: 20px;
-        background: radial-gradient(circle, rgba(255, 45, 45, .08) 0%, transparent 70%);
-    }
+.card-chip {
+    width:30px; height:22px;
+    background: linear-gradient(135deg, #c0a060, #e8d080, #c0a060);
+    border-radius:3px; opacity:.5; margin-bottom:10px; position:relative;
+}
+.card-chip::before {
+    content:''; position:absolute; top:50%; left:0; right:0;
+    height:1px; background:rgba(0,0,0,.3); transform:translateY(-50%);
+}
 
-    .card-active .card-deco-circle {
-        background: radial-gradient(circle, rgba(16, 185, 129, .12) 0%, transparent 70%) !important;
-    }
+.card-member-name {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 26px; letter-spacing:.06em; line-height:1;
+    margin-bottom:4px; text-shadow:0 2px 10px rgba(0,0,0,.5); position:relative;
+}
 
-    /* Card top row */
-    .card-top {
-        display: flex;
-        align-items: center;
-        justify-content: space-between;
-        margin-bottom: 20px;
-    }
+.card-member-id {
+    font-size:10px; color:rgba(255,255,255,.4);
+    font-family:monospace; letter-spacing:.1em; position:relative;
+}
 
-    .card-gym-name {
-        font-family: 'Bebas Neue', sans-serif;
-        font-size: 16px;
-        letter-spacing: .15em;
-        color: var(--muted);
-    }
+.card-bottom {
+    display:flex; align-items:flex-end; justify-content:space-between;
+    border-top: 1px solid rgba(255,255,255,.08);
+    padding-top:10px; margin-top:12px; position:relative;
+}
 
-    .card-gym-name span {
-        color: var(--red);
-    }
+.card-bottom-label {
+    font-size:9px; text-transform:uppercase;
+    color:rgba(255,255,255,.4); font-weight:700;
+    letter-spacing:.1em; margin-bottom:3px;
+}
 
-    .card-status-badge {
-        padding: 4px 10px;
-        border-radius: 20px;
-        font-size: 10px;
-        font-weight: 800;
-        letter-spacing: .08em;
-        text-transform: uppercase;
-    }
+.card-bottom-code {
+    font-size:12px; font-weight:800;
+    font-family:monospace; color:#fb923c;
+}
 
-    .card-status-badge.active {
-        background: var(--green-dim);
-        color: var(--green);
-        border: 1px solid rgba(16, 185, 129, .3);
-    }
+.card-bottom-date {
+    font-size:12px; font-weight:700;
+    color:#fff; text-align:right;
+}
+.member-card-wrapper{
+    display:flex;
+    flex-direction:column;
+    gap:12px;
+}
 
-    .card-status-badge.inactive {
-        background: var(--red-dim);
-        color: var(--red);
-        border: 1px solid rgba(255, 45, 45, .3);
-    }
+/* button luar */
+.btn-dl-card{
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    gap:8px;
 
-    /* Card member name */
-    .card-member-name {
-        font-family: 'Bebas Neue', sans-serif;
-        font-size: 32px;
-        letter-spacing: .06em;
-        line-height: 1;
-        margin-bottom: 6px;
-        text-shadow: 0 2px 10px rgba(0, 0, 0, .5);
-    }
+    width:100%;
+    padding:11px 14px;
 
-    .card-member-id {
-        font-size: 12px;
-        color: var(--muted);
-        font-family: 'Barlow Condensed', sans-serif;
-        letter-spacing: .1em;
-    }
+    background:#111111;
+    color:#ef4444;
 
-    /* Card bottom: QR area */
-    .card-bottom {
-        display: flex;
-        align-items: center;
-        justify-content: space-between;
-        padding-top: 18px;
-        border-top: 1px solid rgba(255, 255, 255, .07);
-        margin-top: 18px;
-    }
+    border:1px solid rgba(239,68,68,.2);
+    border-radius:10px;
 
-    .card-qr-area {
-        display: flex;
-        align-items: center;
-        gap: 12px;
-    }
+    font-size:12px;
+    font-weight:700;
+    letter-spacing:.05em;
 
-    .card-qr-icon {
-        font-size: 38px;
-        line-height: 1;
-    }
+    transition:.2s;
+}
 
-    .card-qr-icon.active {
-        color: var(--green);
-    }
+.btn-dl-card:hover{
+    background:#ef4444;
+    color:#fff;
+    transform:translateY(-2px);
+}
 
-    .card-qr-icon.inactive {
-        color: var(--muted);
-        opacity: .5;
-    }
+/* mode download */
+.download-mode{
+    box-shadow:none !important;
+    transform:none !important;
+}
 
-    .card-qr-text {
-        font-size: 12px;
-        color: var(--muted);
-        line-height: 1.5;
-    }
+.download-mode .card-shimmer{
+    display:none !important;
+}
 
-    .card-qr-text strong {
-        display: block;
-        color: var(--text);
-        font-size: 13px;
-        margin-bottom: 2px;
-    }
-
-    /* Chip-like decoration */
-    .card-chip {
-        width: 36px;
-        height: 28px;
-        background: linear-gradient(135deg, #c0a060, #e8d080, #c0a060);
-        border-radius: 4px;
-        opacity: .5;
-        position: relative;
-        overflow: hidden;
-    }
-
-    .card-chip::before {
-        content: '';
-        position: absolute;
-        top: 50%;
-        left: 0;
-        right: 0;
-        height: 1px;
-        background: rgba(0, 0, 0, .3);
-        transform: translateY(-50%);
-    }
+.download-mode .download-hide{
+    display:none !important;
+}
 
     /* ============================================================
    INFO CARDS (small)
@@ -596,44 +553,73 @@ $firstPending = $pendingTrxs->first();
 {{-- ===== OVERVIEW LAYOUT ===== --}}
 <div class="overview-top">
 
-    {{-- ===== DIGITAL MEMBER CARD ===== --}}
-    <div class="member-card-digital {{ $isActivated ? 'card-active' : 'card-inactive' }}">
+ {{-- Load html2canvas --}}
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+
+<div class="member-card-wrapper">
+
+    <div class="member-card-digital clean-download" id="memberCardEl">
         <div class="card-shimmer"></div>
         <div class="card-deco-circle c1"></div>
         <div class="card-deco-circle c2"></div>
 
-        {{-- Top Row --}}
         <div class="card-top">
-            <div class="card-gym-name">SATRIO <span>GYM</span></div>
-            <span class="card-status-badge {{ $isActivated ? 'active' : 'inactive' }}">
-                {{ $isActivated ? '● AKTIF' : '○ NON-AKTIF' }}
+            @php
+                $gymParts = explode(' ', $settings['gym_name'] ?? 'Nama gym belum diatur');
+                $word1 = strtoupper($gymParts[0]);
+                $rest  = strtoupper(implode(' ', array_slice($gymParts, 1)));
+            @endphp
+
+            <div class="card-gym-name">
+                {{ $word1 }} <span>{{ $rest }}</span>
+            </div>
+
+            {{-- BADGE --}}
+            <span class="card-status-badge download-hide {{ $isActivated ? 'active' : 'inactive' }}">
+                {{ $isActivated ? '● AKTIVASI' : '○ NON-AKTIVASI' }}
             </span>
         </div>
 
-        {{-- Chip + Name --}}
-        <div>
-            <div class="card-chip" style="margin-bottom: 14px;"></div>
-            <div class="card-member-name">{{ auth()->user()->name }}</div>
-            <div class="card-member-id">ID: {{ auth()->user()->member_code }}</div>
+        <div style="position:relative;">
+            <div class="card-chip" style="{{ !$isActivated ? 'opacity:.2;' : '' }}"></div>
+
+            <div class="card-member-name"
+                style="{{ !$isActivated ? 'color:rgba(255,255,255,.55);' : '' }}">
+                {{ strtoupper(auth()->user()->name) }}
+            </div>
         </div>
 
-        {{-- Bottom: QR --}}
         <div class="card-bottom">
-            <div class="card-qr-area">
-                @if($isActivated)
-                <i class="fa-solid fa-qrcode card-qr-icon active"></i>
-                <div class="card-qr-text">
-                    <strong>Scan untuk Check-In</strong>
-                    Tunjukkan ke staff gym
+            <div>
+                <div class="card-bottom-label">Kode Member</div>
+
+                <div class="card-bottom-code"
+                    style="{{ !$isActivated ? 'color:rgba(255,255,255,.25);' : '' }}">
+                    {{ auth()->user()->member_code ?? 'NON MEMBER' }}
                 </div>
-                @else
-                <i class="fa-solid fa-qrcode card-qr-icon inactive"></i>
-                <div class="card-qr-text">QR aktif setelah aktivasi member</div>
-                @endif
             </div>
-            <i class="fa-solid fa-dumbbell" style="color: var(--muted); opacity: .3; font-size: 24px;"></i>
+
+            <div>
+                <div class="card-bottom-label" style="text-align:right;">
+                    Berlaku S/D
+                </div>
+
+                <div class="card-bottom-date"
+                    style="{{ !$isActivated ? 'color:rgba(255,255,255,.3);' : '' }}">
+                    {{ $activePackage ? \Carbon\Carbon::parse($activePackage->end_date)->format('d M Y') : '—' }}
+                </div>
+            </div>
         </div>
     </div>
+
+    {{-- BUTTON DI LUAR CARD --}}
+     <button class="btn-dl-card" onclick="downloadMemberCard()">
+        <i class="fa-solid fa-download"></i>
+        Unduh Kartu Member
+    </button>
+</div>
+
+
 
     {{-- ===== RIGHT SIDE ===== --}}
     <div class="overview-right">
@@ -717,6 +703,48 @@ $firstPending = $pendingTrxs->first();
 
     </div>
 </div>
+<script>
+async function downloadMemberCard() {
+
+    const card = document.getElementById('memberCardEl');
+
+    if (!card) {
+        console.error('Card element tidak ditemukan');
+        return;
+    }
+
+    // aktifkan mode download
+    card.classList.add('download-mode');
+
+    try {
+
+        const canvas = await html2canvas(card, {
+            backgroundColor: null,
+            scale: 4,
+            useCORS: true
+        });
+
+        const image = canvas.toDataURL('image/png');
+
+        const link = document.createElement('a');
+        link.href = image;
+        link.download = 'member-card.png';
+
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+
+    } catch (err) {
+
+        console.error('Gagal download kartu:', err);
+
+    } finally {
+
+        // balikin normal
+        card.classList.remove('download-mode');
+    }
+}
+</script>
 
 {{-- ===== CHECKOUT MODAL (di luar grid juga) ===== --}}
 @include('member.partials.checkout-modal')
